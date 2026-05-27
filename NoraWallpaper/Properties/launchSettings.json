@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "NoraWallpaper (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "NoraWallpaper (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
