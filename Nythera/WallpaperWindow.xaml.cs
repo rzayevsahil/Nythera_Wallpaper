@@ -49,6 +49,10 @@ public sealed partial class WallpaperWindow : Window
     public void PlayVideo(Windows.Storage.StorageFile file)
     {
         _mediaPlayer.Source = MediaSource.CreateFromStorageFile(file);
+        if (_mediaPlayer.PlaybackSession != null)
+        {
+            _mediaPlayer.PlaybackSession.PlaybackRate = Nythera.Services.SettingsService.GetPlaybackSpeed();
+        }
         _mediaPlayer.Play();
     }
 
@@ -70,6 +74,18 @@ public sealed partial class WallpaperWindow : Window
         {
             _mediaPlayer.Volume = volume;
         }
+    }
+    
+    public void SetPlaybackSpeed(double speed)
+    {
+        try
+        {
+            if (_mediaPlayer != null && _mediaPlayer.PlaybackSession != null)
+            {
+                _mediaPlayer.PlaybackSession.PlaybackRate = speed;
+            }
+        }
+        catch { }
     }
     
     public void Cleanup()

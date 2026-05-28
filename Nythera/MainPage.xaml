@@ -297,15 +297,27 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <!-- Volume -->
                                     <TextBlock x:Name="VolumeText" Text="Volume:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
                                     <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" ValueChanged="VolumeSlider_ValueChanged" />
 
+                                    <!-- Speed -->
+                                    <TextBlock x:Name="SpeedText" Text="Oynatma Hızı:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                                    <ComboBox x:Name="SpeedComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="SpeedComboBox_SelectionChanged">
+                                        <ComboBoxItem x:Name="Speed05" Content="0.5x" Tag="0.5" />
+                                        <ComboBoxItem x:Name="Speed075" Content="0.75x" Tag="0.75" />
+                                        <ComboBoxItem x:Name="Speed10" Content="1.0x (Normal)" Tag="1.0" />
+                                        <ComboBoxItem x:Name="Speed125" Content="1.25x" Tag="1.25" />
+                                        <ComboBoxItem x:Name="Speed15" Content="1.5x" Tag="1.5" />
+                                        <ComboBoxItem x:Name="Speed20" Content="2.0x" Tag="2.0" />
+                                    </ComboBox>
+
                                     <!-- Stretch Mode -->
-                                    <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
-                                    <ComboBox x:Name="StretchModeComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
+                                    <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                                    <ComboBox x:Name="StretchModeComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
                                         <ComboBoxItem Content="Fill (Doldur)" Tag="UniformToFill" />
                                         <ComboBoxItem Content="Fit (Sığdır)" Tag="Uniform" />
                                         <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
@@ -313,8 +325,8 @@
                                     </ComboBox>
                                     
                                     <!-- Target Monitor -->
-                                    <TextBlock x:Name="TargetMonitorText" Text="Monitor:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                                    <ComboBox x:Name="TargetMonitorComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="TargetMonitorComboBox_SelectionChanged">
+                                    <TextBlock x:Name="TargetMonitorText" Text="Monitor:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                                    <ComboBox x:Name="TargetMonitorComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="TargetMonitorComboBox_SelectionChanged">
                                         <ComboBoxItem Content="All Monitors (Tüm Ekranlar)" Tag="All" />
                                     </ComboBox>
                                 </Grid>

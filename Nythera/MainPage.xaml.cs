@@ -106,6 +106,19 @@ public sealed partial class MainPage : Page
         }
         if (StretchModeComboBox.SelectedItem == null && StretchModeComboBox.Items.Count > 0)
             StretchModeComboBox.SelectedIndex = 0;
+            
+        // Initialize Speed combo box
+        double savedSpeed = SettingsService.GetPlaybackSpeed();
+        foreach (ComboBoxItem item in SpeedComboBox.Items)
+        {
+            if (item.Tag != null && double.TryParse(item.Tag.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double val) && Math.Abs(val - savedSpeed) < 0.01)
+            {
+                SpeedComboBox.SelectedItem = item;
+                break;
+            }
+        }
+        if (SpeedComboBox.SelectedItem == null && SpeedComboBox.Items.Count > 0)
+            SpeedComboBox.SelectedIndex = 2; // Default to 1.0x
 
         // Initialize Theme
         string savedTheme = SettingsService.GetTheme();
@@ -250,6 +263,14 @@ public sealed partial class MainPage : Page
             PlaylistOrderTitle.Text = LocalizationService.GetString("PlaylistOrder");
         if (ApplyPlaylistButton != null)
             ApplyPlaylistButton.Content = LocalizationService.GetString("ApplyPlaylist");
+            
+        if (SpeedText != null) SpeedText.Text = LocalizationService.GetString("PlaybackSpeed");
+        if (Speed05 != null) Speed05.Content = LocalizationService.GetString("Speed05");
+        if (Speed075 != null) Speed075.Content = LocalizationService.GetString("Speed075");
+        if (Speed10 != null) Speed10.Content = LocalizationService.GetString("Speed10");
+        if (Speed125 != null) Speed125.Content = LocalizationService.GetString("Speed125");
+        if (Speed15 != null) Speed15.Content = LocalizationService.GetString("Speed15");
+        if (Speed20 != null) Speed20.Content = LocalizationService.GetString("Speed20");
             
         if (Interval1m != null) Interval1m.Content = LocalizationService.GetString("Min1");
         if (Interval5m != null) Interval5m.Content = LocalizationService.GetString("Min5");
@@ -1082,6 +1103,34 @@ public sealed partial class MainPage : Page
             // Slider is 0-100, MediaPlayer volume is 0.0-1.0
             win.SetVolume(e.NewValue / 100.0);
         }
+    }
+    
+    private void SpeedComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        try
+        {
+            if (SpeedComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+            {
+                if (double.TryParse(item.Tag.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double speed))
+                {
+                    SettingsService.SavePlaybackSpeed(speed);
+                    
+                    if (PreviewPlayer != null && PreviewPlayer.MediaPlayer != null && PreviewPlayer.MediaPlayer.PlaybackSession != null)
+                    {
+                        PreviewPlayer.MediaPlayer.PlaybackSession.PlaybackRate = speed;
+                    }
+                    
+                    if (_wallpaperWindows != null)
+                    {
+                        foreach (var win in _wallpaperWindows.Values)
+                        {
+                            win.SetPlaybackSpeed(speed);
+                        }
+                    }
+                }
+            }
+        }
+        catch { }
     }
 
     private void StartupToggle_Toggled(object sender, RoutedEventArgs e)

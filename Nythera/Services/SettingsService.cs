@@ -142,6 +142,38 @@ public class SettingsService
             return File.ReadAllText(ThemePath).Trim();
         return "Dark"; // Default
     }
+    
+    private static readonly string PlaybackSpeedPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "speed.txt"
+    );
+
+    public static void SavePlaybackSpeed(double speed)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(PlaybackSpeedPath));
+            File.WriteAllText(PlaybackSpeedPath, speed.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+        catch { }
+    }
+
+    public static double GetPlaybackSpeed()
+    {
+        try
+        {
+            if (File.Exists(PlaybackSpeedPath))
+            {
+                if (double.TryParse(File.ReadAllText(PlaybackSpeedPath).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double speed))
+                {
+                    return speed;
+                }
+            }
+        }
+        catch { }
+        return 1.0; // Default
+    }
 
     private static readonly string LanguagePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

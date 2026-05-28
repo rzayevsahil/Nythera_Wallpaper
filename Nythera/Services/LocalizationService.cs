@@ -66,7 +66,14 @@ public static class LocalizationService
         { "Hour12", "12 Saat" },
         { "Hour24", "24 Saat" },
         { "OrderSeq", "Sırasıyla" },
-        { "OrderRnd", "Rastgele" }
+        { "OrderRnd", "Rastgele" },
+        { "PlaybackSpeed", "Oynatma Hızı:" },
+        { "Speed05", "0.5x" },
+        { "Speed075", "0.75x" },
+        { "Speed10", "1.0x (Normal)" },
+        { "Speed125", "1.25x" },
+        { "Speed15", "1.5x" },
+        { "Speed20", "2.0x" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -131,7 +138,14 @@ public static class LocalizationService
         { "Hour12", "12 Hours" },
         { "Hour24", "24 Hours" },
         { "OrderSeq", "Sequential" },
-        { "OrderRnd", "Random" }
+        { "OrderRnd", "Random" },
+        { "PlaybackSpeed", "Playback Speed:" },
+        { "Speed05", "0.5x" },
+        { "Speed075", "0.75x" },
+        { "Speed10", "1.0x (Normal)" },
+        { "Speed125", "1.25x" },
+        { "Speed15", "1.5x" },
+        { "Speed20", "2.0x" }
     };
 
     public static string GetString(string key)
