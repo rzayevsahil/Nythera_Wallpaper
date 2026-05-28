@@ -16,8 +16,8 @@
           PointerCaptureLost="RootGrid_PointerCanceled">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             
-            <!-- PAGE 2: About (Starts in background) -->
-            <Grid x:Name="Page2" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <!-- PAGE 3: About (Starts in background) -->
+            <Grid x:Name="Page3" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Opacity="0.0" Canvas.ZIndex="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
                     <CompositeTransform TranslateX="0" ScaleX="0.5" ScaleY="0.5" Rotation="180" />
@@ -140,24 +140,13 @@
                                     <Button x:Name="ApplyButton" Content="Apply Wallpaper" Click="ApplyWallpaper_Click" Style="{ThemeResource AccentButtonStyle}" Width="160" IsEnabled="False" />
                                 </StackPanel>
                                 <TextBlock x:Name="StatusText" Text="No video selected." Foreground="Gray" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Settings Card -->
-                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                BorderThickness="1" CornerRadius="8" Padding="20">
-                            <StackPanel Spacing="16">
-                                <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
                                 
-                                <Grid RowSpacing="12" ColumnSpacing="20">
+                                <Grid RowSpacing="12" ColumnSpacing="20" Margin="0,8,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
@@ -174,24 +163,7 @@
                                         <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
                                         <ComboBoxItem Content="Center (Ortala)" Tag="None" />
                                     </ComboBox>
-
-                                    <!-- Theme -->
-                                    <TextBlock x:Name="ThemeText" Text="Theme:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                                    <ComboBox x:Name="ThemeComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="Dark" Tag="Dark" />
-                                        <ComboBoxItem Content="Light" Tag="Light" />
-                                        <ComboBoxItem Content="System" Tag="Default" />
-                                    </ComboBox>
-
-                                    <!-- Language -->
-                                    <TextBlock x:Name="LanguageText" Text="Language:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                                    <ComboBox x:Name="LanguageComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="English" Tag="en" />
-                                        <ComboBoxItem Content="Türkçe" Tag="tr" />
-                                    </ComboBox>
                                 </Grid>
-                                
-                                <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
                             </StackPanel>
                         </Border>
 
@@ -210,10 +182,60 @@
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
+
+            <!-- PAGE 2: Settings (Starts in background) -->
+            <Grid x:Name="Page2" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                  Opacity="0.0" Canvas.ZIndex="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                <Grid.RenderTransform>
+                    <CompositeTransform TranslateX="0" ScaleX="0.5" ScaleY="0.5" Rotation="180" />
+                </Grid.RenderTransform>
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                    <StackPanel Spacing="24" Padding="0,32,0,48">
+                        
+                        <!-- Settings Card -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="20">
+                            <StackPanel Spacing="16">
+                                <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+                                
+                                <Grid RowSpacing="12" ColumnSpacing="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Theme -->
+                                    <TextBlock x:Name="ThemeText" Text="Theme:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+                                    <ComboBox x:Name="ThemeComboBox" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Dark" Tag="Dark" />
+                                        <ComboBoxItem Content="Light" Tag="Light" />
+                                        <ComboBoxItem Content="System" Tag="Default" />
+                                    </ComboBox>
+
+                                    <!-- Language -->
+                                    <TextBlock x:Name="LanguageText" Text="Language:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                                    <ComboBox x:Name="LanguageComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="English" Tag="en" />
+                                        <ComboBoxItem Content="Türkçe" Tag="tr" />
+                                    </ComboBox>
+                                </Grid>
+                                
+                                <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
             
         </Grid>
         
-        <PipsPager x:Name="CarouselPager" NumberOfPages="2" SelectedPageIndex="0" 
+        <PipsPager x:Name="CarouselPager" NumberOfPages="3" SelectedPageIndex="0" 
                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,24"
                    SelectedIndexChanged="CarouselPager_SelectedIndexChanged" />
     </Grid>

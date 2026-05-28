@@ -162,29 +162,46 @@ public sealed partial class MainPage : Page
         NavigateToPage(sender.SelectedPageIndex);
     }
 
-    private void NavigateToPage(int pageIndex)
-    {
-        bool slideRight = pageIndex == 1; // If moving to Page2, we slide right
+    private int _currentPageIndex = 0;
 
-        if (pageIndex == 0)
+    private void NavigateToPage(int newIndex)
+    {
+        if (newIndex == _currentPageIndex) return;
+
+        bool slideRight = newIndex > _currentPageIndex;
+        int oldIndex = _currentPageIndex;
+        _currentPageIndex = newIndex;
+
+        UIElement[] pages = { Page1, Page2, Page3 };
+
+        for (int i = 0; i < pages.Length; i++)
         {
-            // Animate Page1 to Active (Moving from Back to Front)
-            AnimateOrbit(Page1, isEntering: true, slideRight: slideRight);
-            Page1.IsHitTestVisible = true;
-            
-            // Animate Page2 to Background (Moving from Front to Back)
-            AnimateOrbit(Page2, isEntering: false, slideRight: slideRight);
-            Page2.IsHitTestVisible = false;
-        }
-        else
-        {
-            // Animate Page2 to Active (Moving from Back to Front)
-            AnimateOrbit(Page2, isEntering: true, slideRight: slideRight);
-            Page2.IsHitTestVisible = true;
-            
-            // Animate Page1 to Background (Moving from Front to Back)
-            AnimateOrbit(Page1, isEntering: false, slideRight: slideRight);
-            Page1.IsHitTestVisible = false;
+            if (i == newIndex)
+            {
+                // Active page entering
+                AnimateOrbit(pages[i], isEntering: true, slideRight: slideRight);
+                pages[i].IsHitTestVisible = true;
+            }
+            else if (i == oldIndex)
+            {
+                // Old active page exiting
+                AnimateOrbit(pages[i], isEntering: false, slideRight: slideRight);
+                pages[i].IsHitTestVisible = false;
+            }
+            else
+            {
+                // Keep other pages in background
+                var transform = pages[i].RenderTransform as CompositeTransform;
+                if (transform != null)
+                {
+                    transform.TranslateX = 0;
+                    transform.ScaleX = 0.5;
+                    transform.ScaleY = 0.5;
+                    transform.Rotation = 180;
+                }
+                pages[i].Opacity = 0.0;
+                pages[i].IsHitTestVisible = false;
+            }
         }
     }
 
