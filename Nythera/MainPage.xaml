@@ -161,7 +161,7 @@
                                         HorizontalContentAlignment="Stretch"
                                         Padding="0"
                                         Style="{ThemeResource AccentButtonStyle}"
-                                        Width="130">
+                                        MinWidth="130">
                                     <Grid Height="32" HorizontalAlignment="Stretch">
                                         <!-- Progress Bar -->
                                         <Rectangle x:Name="DownloadProgressFill"
@@ -188,11 +188,15 @@
                             <StackPanel Spacing="16">
                                 <StackPanel Spacing="8">
                                     <Grid>
-                                        <TextBlock x:Name="DefaultVideosTitle" Text="Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-                                        <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" x:Name="DefaultVideosTitle" Text="Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0" TextTrimming="CharacterEllipsis" />
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Right">
                                             <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                                 <TextBlock x:Name="PlaylistModeTitle" Text="Slayt Modu:" FontSize="12" VerticalAlignment="Center" Foreground="Gray" />
-                                                <ToggleSwitch x:Name="PlaylistModeToggle" OffContent="Kapalı" OnContent="Açık" Toggled="PlaylistModeToggle_Toggled" VerticalAlignment="Center" Margin="0" />
+                                                <ToggleSwitch x:Name="PlaylistModeToggle" OffContent="Kapalı" OnContent="Açık" Toggled="PlaylistModeToggle_Toggled" VerticalAlignment="Center" Margin="0" MinWidth="0" />
                                             </StackPanel>
                                             <ComboBox x:Name="VideoFilterComboBox" SelectedIndex="0" SelectionChanged="VideoFilterComboBox_SelectionChanged" Width="120" VerticalAlignment="Center">
                                                 <ComboBoxItem Content="Tümü" Tag="All" />
