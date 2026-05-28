@@ -149,6 +149,33 @@ public sealed partial class MainPage : Page
         
         if (_updateInfo != null && _updateInfo.IsUpdateAvailable)
             UpdateStatusText.Text = LocalizationService.GetString("UpdateAvailable");
+            
+        TargetMonitorText.Text = LocalizationService.GetString("MonitorText");
+        
+        foreach (var item in TargetMonitorComboBox.Items)
+        {
+            if (item is ComboBoxItem cbItem && cbItem.Tag != null)
+            {
+                if (cbItem.Tag.ToString() == "All")
+                {
+                    cbItem.Content = LocalizationService.GetString("AllMonitors");
+                }
+                else if (int.TryParse(cbItem.Tag.ToString(), out int monitorCount))
+                {
+                    var mon = _monitors.Find(m => m.Id == cbItem.Tag.ToString());
+                    if (mon != null)
+                    {
+                        mon.Name = string.Format(LocalizationService.GetString("MonitorName"), monitorCount);
+                        cbItem.Content = $"{mon.Name} ({mon.Width}x{mon.Height})";
+                    }
+                }
+            }
+        }
+        
+        if (TargetMonitorComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null)
+        {
+            UpdatePreviewBounds(selectedItem.Tag.ToString());
+        }
     }
 
     private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -318,9 +345,10 @@ public sealed partial class MainPage : Page
             int w = lprcMonitor.Right - lprcMonitor.Left;
             int h = lprcMonitor.Bottom - lprcMonitor.Top;
             
-            _monitors.Add(new MonitorInfo { Id = monitorCount.ToString(), Name = $"Monitor {monitorCount}", Width = w, Height = h });
+            string monitorName = string.Format(LocalizationService.GetString("MonitorName"), monitorCount);
+            _monitors.Add(new MonitorInfo { Id = monitorCount.ToString(), Name = monitorName, Width = w, Height = h });
             
-            var item = new ComboBoxItem { Content = $"Monitor {monitorCount} ({w}x{h})", Tag = monitorCount.ToString() };
+            var item = new ComboBoxItem { Content = $"{monitorName} ({w}x{h})", Tag = monitorCount.ToString() };
             TargetMonitorComboBox.Items.Add(item);
             return true;
         }, IntPtr.Zero);
@@ -361,7 +389,7 @@ public sealed partial class MainPage : Page
                 }
             }
             catch { }
-            previewText = $"Önizleme: Tüm Ekranlar (Ana Ekran baz alındı: {targetWidth}x{targetHeight})";
+            previewText = string.Format(LocalizationService.GetString("PreviewAllMonitors"), targetWidth, targetHeight);
         }
         else
         {
@@ -370,7 +398,7 @@ public sealed partial class MainPage : Page
             {
                 targetWidth = mon.Width;
                 targetHeight = mon.Height;
-                previewText = $"Önizleme: {mon.Name} ({targetWidth}x{targetHeight})";
+                previewText = string.Format(LocalizationService.GetString("PreviewMonitor"), mon.Name, targetWidth, targetHeight);
             }
         }
         

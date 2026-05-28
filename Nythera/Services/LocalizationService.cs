@@ -40,7 +40,12 @@ public static class LocalizationService
         { "DeveloperDesc", "Modern masaüstü ve web uygulamaları tasarlayan tutkulu bir yazılım geliştirici." },
         { "GithubButton", "GitHub Profilim" },
         { "LinkedInButton", "LinkedIn" },
-        { "EmailButton", "E-Posta" }
+        { "EmailButton", "E-Posta" },
+        { "MonitorName", "Monitör {0}" },
+        { "PreviewAllMonitors", "Önizleme: Tüm Ekranlar (Ana Ekran baz alındı: {0}x{1})" },
+        { "PreviewMonitor", "Önizleme: {0} ({1}x{2})" },
+        { "MonitorText", "Monitör:" },
+        { "AllMonitors", "Tüm Ekranlar" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -79,7 +84,12 @@ public static class LocalizationService
         { "DeveloperDesc", "A passionate software developer designing modern desktop and web applications." },
         { "GithubButton", "My GitHub Profile" },
         { "LinkedInButton", "LinkedIn" },
-        { "EmailButton", "Email" }
+        { "EmailButton", "Email" },
+        { "MonitorName", "Monitor {0}" },
+        { "PreviewAllMonitors", "Preview: All Monitors (Based on Primary: {0}x{1})" },
+        { "PreviewMonitor", "Preview: {0} ({1}x{2})" },
+        { "MonitorText", "Monitor:" },
+        { "AllMonitors", "All Monitors" }
     };
 
     public static string GetString(string key)
