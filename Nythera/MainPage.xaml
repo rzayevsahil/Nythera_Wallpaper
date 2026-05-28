@@ -37,15 +37,8 @@
                 </Grid.RenderTransform>
                 <Border CornerRadius="8" Padding="24">
                     <ScrollViewer VerticalScrollBarVisibility="Hidden">
-                        <StackPanel Spacing="24">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <FontIcon Glyph="&#xE946;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                <TextBlock x:Name="AboutTitleText" Text="Hakkında" Grid.Column="1" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="18" />
-                            </Grid>
+                        <StackPanel Spacing="16">
+                                <TextBlock x:Name="AboutTitleText" Text="Hakkında" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="18" />
                             
                             <!-- App Info Section -->
                             <StackPanel Spacing="8">
@@ -56,9 +49,9 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <FontIcon Glyph="&#xE7F4;" FontSize="32" Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Top" Margin="0,4,16,0" />
+                                    <Image Source="ms-appx:///Assets/logo1.png" Width="40" Height="40" Stretch="Uniform" VerticalAlignment="Top" Margin="0,4,16,0" />
                                     <StackPanel Grid.Column="1" Spacing="4">
-                                        <TextBlock Text="Nythera Wallpaper Engine" FontWeight="Bold" FontSize="16" />
+                                        <TextBlock Text="Nythera" FontWeight="Bold" FontSize="16" />
                                         <TextBlock x:Name="AppVersionText" Text="v1.1.0" Foreground="Gray" FontSize="12" />
                                         <TextBlock x:Name="AboutAppDescText" Text="Sisteminizi yormadan masaüstünüzü yüksek kaliteli ve hareketli videolarla canlandıran, performans odaklı yeni nesil duvar kağıdı motoru." TextWrapping="Wrap" Margin="0,4,0,0" />
                                         
@@ -84,7 +77,16 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     
-                                    <PersonPicture DisplayName="Sahil Rzayev" Height="48" Margin="0,0,16,0" VerticalAlignment="Top" />
+                                    <Border Width="96" Height="96" CornerRadius="48" Margin="0,0,16,0" VerticalAlignment="Top">
+                                        <Border.Clip>
+                                            <RectangleGeometry Rect="0,0,96,96">
+                                                <RectangleGeometry.Transform>
+                                                    <TranslateTransform />
+                                                </RectangleGeometry.Transform>
+                                            </RectangleGeometry>
+                                        </Border.Clip>
+                                        <Image Source="ms-appx:///Assets/developer_image.png" Stretch="UniformToFill" />
+                                    </Border>
                                     
                                     <StackPanel Grid.Column="1" Spacing="4">
                                         <TextBlock Text="Sahil Rzayev" FontWeight="Bold" FontSize="16" />
