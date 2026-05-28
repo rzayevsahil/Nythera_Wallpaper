@@ -9,6 +9,9 @@
     mc:Ignorable="d">
 
     <Grid Padding="32">
+        <Grid.Background>
+            <ImageBrush ImageSource="ms-appx:///Assets/Background.png" Stretch="UniformToFill" Opacity="0.4" />
+        </Grid.Background>
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24" Width="450">
             <!-- Header -->
             <StackPanel Spacing="8" HorizontalAlignment="Center">
