@@ -1,10 +1,15 @@
 ; Nythera Inno Setup Script
 ; This script creates a professional Windows Installer (Setup.exe) for Nythera
 
+#define AppExe ".\Nythera\bin\Release\net10.0-windows10.0.26100.0\win-x64\publish\Nythera.exe"
+#dim Version[4]
+#expr GetVersionNumbers(AppExe, Version[0], Version[1], Version[2], Version[3])
+#define AppVer Str(Version[0]) + "." + Str(Version[1]) + "." + Str(Version[2])
+
 [Setup]
 ; App Information
 AppName=Nythera
-AppVersion=1.0.0
+AppVersion={#AppVer}
 AppPublisher=Nythera Studios
 AppPublisherURL=https://github.com/rzayevsahil/Nythera_Wallpaper
 AppSupportURL=https://github.com/rzayevsahil/Nythera_Wallpaper
@@ -18,7 +23,7 @@ DefaultGroupName=Nythera
 
 ; Output Settings
 OutputDir=.\Installer
-OutputBaseFilename=Nythera_Setup_v1.0.0
+OutputBaseFilename=Nythera_Setup_v{#AppVer}
 SetupIconFile=.\Nythera\Assets\AppIcon.ico
 UninstallDisplayIcon={app}\Nythera.exe
 

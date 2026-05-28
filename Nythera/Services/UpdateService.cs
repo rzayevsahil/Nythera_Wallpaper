@@ -10,7 +10,12 @@ namespace Nythera.Services;
 
 public class UpdateService
 {
-    private const string CurrentVersion = "v1.0.0";
+    private static string GetAppVersion()
+    {
+        var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version;
+        return version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v1.0.0";
+    }
+    private static readonly string CurrentVersion = GetAppVersion();
     private const string GithubRepoOwner = "rzayevsahil";
     private const string GithubRepoName = "Nythera_Wallpaper";
     

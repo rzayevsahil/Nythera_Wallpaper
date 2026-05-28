@@ -4,21 +4,15 @@ Bu belge, Nythera uygulaması için yeni bir sürüm yayınlamak ve otomatik gü
 
 ---
 
-## 1. Versiyon Numaralarını Değiştirme
-Yeni bir güncelleme yapmadan önce, kodun ve kurulum dosyasının yeni versiyondan haberdar olması gerekir. Aşağıdaki dosyalarda versiyon numaralarını güncelleyin (Örnek olarak `v1.0.0`'dan `v1.0.1`'e geçiş baz alınmıştır):
+## 1. Versiyon Numarasını Değiştirme (Tek Nokta)
+Nythera'nın yeni mimarisinde sürüm yönetimi **tamamen otomatik** hale getirilmiştir! Artık 2-3 farklı dosyaya girip kod değiştirmenize gerek yoktur. Sürüm bilgisini yalnızca projenin ana tanım dosyasından değiştirmeniz yeterlidir:
 
-**1. `Nythera/Services/UpdateService.cs` Dosyası:**
-```csharp
-// Uygulamanın otomatik güncelleme kontrolü yaparken kullandığı versiyondur.
-private const string CurrentVersion = "v1.0.1"; 
+`Nythera/Nythera.csproj` dosyasını açın ve şu satırı bulun:
+```xml
+<Version>1.0.0</Version> <!-- Bu satırı örneğin 1.0.1 yapın -->
 ```
 
-**2. `Setup.iss` Dosyası:**
-```ini
-// Kurulum dosyasının (Inno Setup) içine yazılacak versiyon bilgileridir.
-AppVersion=1.0.1
-OutputBaseFilename=Nythera_Setup_v1.0.1
-```
+*(Not: Siz bu dosyayı güncelleyip kodu derlediğinizde (`dotnet publish`); otomatik güncelleme sistemi (`UpdateService.cs`) ve kurulum sihirbazı (`Setup.iss`) bu yeni versiyonu compiled edilmiş `.exe` dosyasından otomatik olarak okuyacaktır!)*
 
 ---
 
