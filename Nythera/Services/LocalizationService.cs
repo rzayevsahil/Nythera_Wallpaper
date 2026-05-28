@@ -27,7 +27,20 @@ public static class LocalizationService
         { "On", "Açık" },
         { "Off", "Kapalı" },
         { "OperationCancelled", "İşlem iptal edildi." },
-        { "ErrorApplying", "Hata:" }
+        { "ErrorApplying", "Hata:" },
+        { "AboutTitle", "Hakkında" },
+        { "AppInfoTitle", "Uygulama Bilgileri" },
+        { "AboutAppDesc", "Sisteminizi yormadan masaüstünüzü yüksek kaliteli ve hareketli videolarla canlandıran, performans odaklı yeni nesil duvar kağıdı motoru." },
+        { "Feature1", "• Düşük RAM ve CPU kullanımı" },
+        { "Feature2", "• Akıllı karanlık/aydınlık tema desteği" },
+        { "Feature3", "• Otomatik arka plan güncelleme sistemi" },
+        { "Feature4", "• Tam ekran oyun/uygulama algılama ile otomatik duraklatma" },
+        { "DeveloperTitle", "Geliştirici" },
+        { "DeveloperRole", "Software Developer" },
+        { "DeveloperDesc", "Modern masaüstü ve web uygulamaları tasarlayan tutkulu bir yazılım geliştirici." },
+        { "GithubButton", "GitHub Profilim" },
+        { "LinkedInButton", "LinkedIn" },
+        { "EmailButton", "E-Posta" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -53,7 +66,20 @@ public static class LocalizationService
         { "On", "On" },
         { "Off", "Off" },
         { "OperationCancelled", "Operation cancelled." },
-        { "ErrorApplying", "Error applying:" }
+        { "ErrorApplying", "Error applying:" },
+        { "AboutTitle", "About" },
+        { "AppInfoTitle", "Application Info" },
+        { "AboutAppDesc", "A performance-focused next-generation wallpaper engine that brings your desktop to life with high-quality animated videos without straining your system." },
+        { "Feature1", "• Low RAM and CPU usage" },
+        { "Feature2", "• Smart dark/light theme support" },
+        { "Feature3", "• Automatic background update system" },
+        { "Feature4", "• Auto-pause with full-screen game/app detection" },
+        { "DeveloperTitle", "Developer" },
+        { "DeveloperRole", "Software Developer" },
+        { "DeveloperDesc", "A passionate software developer designing modern desktop and web applications." },
+        { "GithubButton", "My GitHub Profile" },
+        { "LinkedInButton", "LinkedIn" },
+        { "EmailButton", "Email" }
     };
 
     public static string GetString(string key)

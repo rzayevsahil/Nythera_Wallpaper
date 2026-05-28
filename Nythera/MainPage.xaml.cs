@@ -119,6 +119,17 @@ public sealed partial class MainPage : Page
         LanguageText.Text = LocalizationService.GetString("Language");
         DownloadUpdateButton.Content = LocalizationService.GetString("DownloadUpdate");
         
+        AboutTitleText.Text = LocalizationService.GetString("AboutTitle");
+        AppInfoTitle.Text = LocalizationService.GetString("AppInfoTitle");
+        AboutAppDescText.Text = LocalizationService.GetString("AboutAppDesc");
+        Feature1Text.Text = LocalizationService.GetString("Feature1");
+        Feature2Text.Text = LocalizationService.GetString("Feature2");
+        Feature3Text.Text = LocalizationService.GetString("Feature3");
+        Feature4Text.Text = LocalizationService.GetString("Feature4");
+        DeveloperTitleText.Text = LocalizationService.GetString("DeveloperTitle");
+        DeveloperRoleText.Text = LocalizationService.GetString("DeveloperRole");
+        DeveloperDescText.Text = LocalizationService.GetString("DeveloperDesc");
+        
         if (_selectedFile == null)
             StatusText.Text = LocalizationService.GetString("NoVideoSelected");
         
@@ -148,6 +159,12 @@ public sealed partial class MainPage : Page
 
     private async void MainPage_Loaded(object sender, RoutedEventArgs e)
     {
+        var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version;
+        if (AppVersionText != null)
+        {
+            AppVersionText.Text = version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v1.1.0";
+        }
+
         // Check for updates asynchronously without blocking the UI
         _ = CheckForUpdatesAsync();
 
