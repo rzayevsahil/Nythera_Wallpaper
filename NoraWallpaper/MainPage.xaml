@@ -60,6 +60,17 @@
                     <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
                 </StackPanel>
             </Border>
+
+            <!-- Update Card -->
+            <Border x:Name="UpdateContainer" Visibility="Collapsed" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1" CornerRadius="8" Padding="20">
+                <StackPanel Spacing="10">
+                    <TextBlock x:Name="UpdateStatusText" Text="A new version is available!" FontWeight="SemiBold" />
+                    <Button x:Name="DownloadUpdateButton" Content="Download and Update" Style="{ThemeResource AccentButtonStyle}" Click="DownloadUpdateButton_Click" HorizontalAlignment="Stretch" />
+                    <ProgressBar x:Name="UpdateProgressBar" Visibility="Collapsed" Minimum="0" Maximum="100" Value="0" />
+                </StackPanel>
+            </Border>
         </StackPanel>
     </Grid>
 </Page>

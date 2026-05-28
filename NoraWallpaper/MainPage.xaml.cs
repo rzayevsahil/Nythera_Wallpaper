@@ -12,6 +12,7 @@ public sealed partial class MainPage : Page
 {
     private List<WallpaperWindow> _wallpaperWindows = new List<WallpaperWindow>();
     private Windows.Storage.StorageFile _selectedFile;
+    private Services.UpdateService.ReleaseInfo _updateInfo;
 
     public MainPage()
     {
@@ -40,6 +41,9 @@ public sealed partial class MainPage : Page
 
     private async void MainPage_Loaded(object sender, RoutedEventArgs e)
     {
+        // Check for updates asynchronously without blocking the UI
+        _ = CheckForUpdatesAsync();
+
         string savedPath = SettingsService.GetWallpaperPath();
         if (!string.IsNullOrEmpty(savedPath))
         {
@@ -60,6 +64,41 @@ public sealed partial class MainPage : Page
             {
                 StatusText.Text = $"Failed to restore wallpaper: {ex.Message}";
             }
+        }
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        _updateInfo = await UpdateService.CheckForUpdatesAsync();
+        if (_updateInfo.IsUpdateAvailable)
+        {
+            UpdateContainer.Visibility = Visibility.Visible;
+            UpdateStatusText.Text = $"A new version ({_updateInfo.Version}) is available!";
+        }
+    }
+
+    private async void DownloadUpdateButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_updateInfo == null || !_updateInfo.IsUpdateAvailable) return;
+
+        DownloadUpdateButton.IsEnabled = false;
+        UpdateProgressBar.Visibility = Visibility.Visible;
+        UpdateStatusText.Text = "Downloading update... Please wait.";
+
+        try
+        {
+            var progress = new Progress<double>(percent =>
+            {
+                UpdateProgressBar.Value = percent;
+            });
+
+            await UpdateService.DownloadAndInstallUpdateAsync(_updateInfo.DownloadUrl, progress);
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText.Text = $"Update failed: {ex.Message}";
+            DownloadUpdateButton.IsEnabled = true;
+            UpdateProgressBar.Visibility = Visibility.Collapsed;
         }
     }
 

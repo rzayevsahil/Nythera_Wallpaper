@@ -50,3 +50,13 @@ Filename: "{app}\NoraWallpaper.exe"; Description: "{cm:LaunchProgram,NoraWallpap
 [UninstallRun]
 ; (Optional) Kill process before uninstalling if it is running
 Filename: "{cmd}"; Parameters: "/C taskkill /F /IM NoraWallpaper.exe"; Flags: runhidden waituntilterminated
+
+[Code]
+function InitializeSetup(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  // Kill the application silently before extracting files to prevent locking issues
+  Exec(ExpandConstant('{cmd}'), '/c taskkill /F /IM NoraWallpaper.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Result := True;
+end;
