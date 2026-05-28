@@ -169,11 +169,11 @@ public sealed partial class MainPage : Page
         if (pageIndex == 0)
         {
             // Animate Page1 to Active (Moving from Back to Front)
-            AnimateOrbit(Page1, isEntering: true, slideRight: !slideRight);
+            AnimateOrbit(Page1, isEntering: true, slideRight: slideRight);
             Page1.IsHitTestVisible = true;
             
             // Animate Page2 to Background (Moving from Front to Back)
-            AnimateOrbit(Page2, isEntering: false, slideRight: !slideRight);
+            AnimateOrbit(Page2, isEntering: false, slideRight: slideRight);
             Page2.IsHitTestVisible = false;
         }
         else
