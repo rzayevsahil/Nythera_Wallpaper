@@ -9,184 +9,207 @@
     mc:Ignorable="d">
 
     <Grid x:Name="RootGrid">
-        
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24" Width="480" Padding="32,48">
-            <!-- Header -->
-            <StackPanel Spacing="8" HorizontalAlignment="Center">
-                <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
-                    <Image x:Name="AppTitleLogo" Height="90" Stretch="Uniform" />
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            
+            <!-- PAGE 2: About (Starts in background) -->
+            <Grid x:Name="Page2" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                  Opacity="0.0" Canvas.ZIndex="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                <Grid.RenderTransform>
+                    <CompositeTransform TranslateX="0" ScaleX="0.5" ScaleY="0.5" Rotation="180" />
+                </Grid.RenderTransform>
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1" CornerRadius="8" Padding="32" Margin="0,32,0,48">
+                    <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                        <StackPanel Spacing="24">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon Glyph="&#xE946;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <TextBlock x:Name="AboutTitleText" Text="Hakkında" Grid.Column="1" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="18" />
+                            </Grid>
+                            
+                            <!-- App Info Section -->
+                            <StackPanel Spacing="8">
+                                <TextBlock x:Name="AppInfoTitle" Text="Uygulama Bilgileri" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon Glyph="&#xE7F4;" FontSize="32" Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Top" Margin="0,4,16,0" />
+                                    <StackPanel Grid.Column="1" Spacing="4">
+                                        <TextBlock Text="Nythera Wallpaper Engine" FontWeight="Bold" FontSize="16" />
+                                        <TextBlock x:Name="AppVersionText" Text="v1.1.0" Foreground="Gray" FontSize="12" />
+                                        <TextBlock x:Name="AboutAppDescText" Text="Sisteminizi yormadan masaüstünüzü yüksek kaliteli ve hareketli videolarla canlandıran, performans odaklı yeni nesil duvar kağıdı motoru." TextWrapping="Wrap" Margin="0,4,0,0" />
+                                        
+                                        <StackPanel Margin="0,8,0,0" Spacing="4">
+                                            <TextBlock x:Name="Feature1Text" Text="• Düşük RAM ve CPU kullanımı" FontSize="12" Foreground="Gray" />
+                                            <TextBlock x:Name="Feature2Text" Text="• Akıllı karanlık/aydınlık tema desteği" FontSize="12" Foreground="Gray" />
+                                            <TextBlock x:Name="Feature3Text" Text="• Otomatik arka plan güncelleme sistemi" FontSize="12" Foreground="Gray" />
+                                            <TextBlock x:Name="Feature4Text" Text="• Tam ekran oyun/uygulama algılama ile otomatik duraklatma" FontSize="12" Foreground="Gray" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+
+                            <MenuFlyoutSeparator />
+
+                            <!-- Developer Info Section -->
+                            <StackPanel Spacing="8">
+                                <TextBlock x:Name="DeveloperTitleText" Text="Geliştirici" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <PersonPicture DisplayName="Sahil Rzayev" Height="48" Margin="0,0,16,0" VerticalAlignment="Top" />
+                                    
+                                    <StackPanel Grid.Column="1" Spacing="4">
+                                        <TextBlock Text="Sahil Rzayev" FontWeight="Bold" FontSize="16" />
+                                        <TextBlock x:Name="DeveloperRoleText" Text="Software Developer" Foreground="{ThemeResource SystemAccentColor}" FontSize="13" />
+                                        <TextBlock x:Name="DeveloperDescText" Text="Modern masaüstü ve web uygulamaları tasarlayan tutkulu bir yazılım geliştirici." TextWrapping="Wrap" Margin="0,4,0,0" Foreground="Gray" />
+                                        
+                                        <StackPanel Orientation="Vertical" Spacing="8" Margin="0,12,0,0">
+                                            <HyperlinkButton NavigateUri="https://github.com/rzayevsahil" Padding="0">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Viewbox Width="14" Height="14">
+                                                        <Path Data="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" Fill="{ThemeResource TextFillColorPrimaryBrush}"/>
+                                                    </Viewbox>
+                                                    <TextBlock Text="rzayevsahil" />
+                                                </StackPanel>
+                                            </HyperlinkButton>
+                                            <HyperlinkButton NavigateUri="https://www.linkedin.com/in/sahilrzayev" Padding="0">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Viewbox Width="14" Height="14">
+                                                        <Path Data="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" Fill="{ThemeResource TextFillColorPrimaryBrush}"/>
+                                                    </Viewbox>
+                                                    <TextBlock Text="sahilrzayev" />
+                                                </StackPanel>
+                                            </HyperlinkButton>
+                                            <HyperlinkButton NavigateUri="mailto:sahilrzayev200d@gmail.com" Padding="0">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <Viewbox Width="14" Height="14">
+                                                        <Path Data="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 8.414l8.073-4.921c1.618-1.214 3.927-.059 3.927 1.964z" Fill="{ThemeResource TextFillColorPrimaryBrush}"/>
+                                                    </Viewbox>
+                                                    <TextBlock Text="sahilrzayev200d@gmail.com" />
+                                                </StackPanel>
+                                            </HyperlinkButton>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Border>
-                <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" />
-            </StackPanel>
+            </Grid>
 
-            <!-- Video Selection Card -->
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="16">
-                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                        <Button x:Name="BrowseVideoButton" Content="Browse Video" Click="BrowseVideo_Click" Width="160" />
-                        <Button x:Name="ApplyButton" Content="Apply Wallpaper" Click="ApplyWallpaper_Click" Style="{ThemeResource AccentButtonStyle}" Width="160" IsEnabled="False" />
-                    </StackPanel>
-                    <TextBlock x:Name="StatusText" Text="No video selected." Foreground="Gray" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
-                </StackPanel>
-            </Border>
+            <!-- PAGE 1: Settings (Starts active) -->
+            <Grid x:Name="Page1" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                  Opacity="1.0" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
+                <Grid.RenderTransform>
+                    <CompositeTransform TranslateX="0" ScaleX="1.0" ScaleY="1.0" />
+                </Grid.RenderTransform>
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                    <StackPanel Spacing="24" Padding="0,32,0,48">
+                        <!-- Header -->
+                        <StackPanel Spacing="8" HorizontalAlignment="Center">
+                            <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
+                                <Image x:Name="AppTitleLogo" Height="90" Stretch="Uniform" />
+                            </Border>
+                            <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" />
+                        </StackPanel>
 
-            <!-- Settings Card -->
-            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="16">
-                    <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
-                    
-                    <Grid RowSpacing="12" ColumnSpacing="20">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- Volume -->
-                        <TextBlock x:Name="VolumeText" Text="Volume:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
-                        <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" ValueChanged="VolumeSlider_ValueChanged" />
-
-                        <!-- Stretch Mode -->
-                        <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
-                        <ComboBox x:Name="StretchModeComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
-                            <ComboBoxItem Content="Fill (Doldur)" Tag="UniformToFill" />
-                            <ComboBoxItem Content="Fit (Sığdır)" Tag="Uniform" />
-                            <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
-                            <ComboBoxItem Content="Center (Ortala)" Tag="None" />
-                        </ComboBox>
-
-                        <!-- Theme -->
-                        <TextBlock x:Name="ThemeText" Text="Theme:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                        <ComboBox x:Name="ThemeComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
-                            <ComboBoxItem Content="Dark" Tag="Dark" />
-                            <ComboBoxItem Content="Light" Tag="Light" />
-                            <ComboBoxItem Content="System" Tag="Default" />
-                        </ComboBox>
-
-                        <!-- Language -->
-                        <TextBlock x:Name="LanguageText" Text="Language:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                        <ComboBox x:Name="LanguageComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
-                            <ComboBoxItem Content="English" Tag="en" />
-                            <ComboBoxItem Content="Türkçe" Tag="tr" />
-                        </ComboBox>
-                    </Grid>
-                    
-                    <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
-                </StackPanel>
-            </Border>
-
-            <!-- Update Card -->
-            <Border x:Name="UpdateContainer" Visibility="Collapsed" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1" CornerRadius="8" Padding="20">
-                <StackPanel Spacing="10">
-                    <TextBlock x:Name="UpdateStatusText" Text="A new version is available!" FontWeight="SemiBold" />
-                    <Button x:Name="DownloadUpdateButton" Content="Download and Update" Style="{ThemeResource AccentButtonStyle}" Click="DownloadUpdateButton_Click" HorizontalAlignment="Stretch" />
-                    <ProgressBar x:Name="UpdateProgressBar" Visibility="Collapsed" Minimum="0" Maximum="100" Value="0" />
-                    <TextBlock x:Name="UpdateProgressText" Visibility="Collapsed" Text="0%" HorizontalAlignment="Center" Foreground="Gray" FontSize="12" />
-                </StackPanel>
-            </Border>
-
-            <!-- About Expander -->
-            <Expander x:Name="AboutExpander" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                <Expander.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xE946;" FontSize="20" Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                        <TextBlock x:Name="AboutTitleText" Text="Hakkında" Grid.Column="1" VerticalAlignment="Center" FontWeight="SemiBold" />
-                    </Grid>
-                </Expander.Header>
-                
-                <StackPanel Spacing="24" Padding="4,16,4,4">
-                    <!-- App Info Section -->
-                    <StackPanel Spacing="8">
-                        <TextBlock x:Name="AppInfoTitle" Text="Uygulama Bilgileri" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
-                        
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <FontIcon Glyph="&#xE7F4;" FontSize="32" Foreground="{ThemeResource SystemAccentColor}" VerticalAlignment="Top" Margin="0,4,16,0" />
-                            <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Text="Nythera Wallpaper Engine" FontWeight="Bold" FontSize="16" />
-                                <TextBlock x:Name="AppVersionText" Text="v1.1.0" Foreground="Gray" FontSize="12" />
-                                <TextBlock x:Name="AboutAppDescText" Text="Sisteminizi yormadan masaüstünüzü yüksek kaliteli ve hareketli videolarla canlandıran, performans odaklı yeni nesil duvar kağıdı motoru." TextWrapping="Wrap" Margin="0,4,0,0" />
-                                
-                                <StackPanel Margin="0,8,0,0" Spacing="4">
-                                    <TextBlock x:Name="Feature1Text" Text="• Düşük RAM ve CPU kullanımı" FontSize="12" Foreground="Gray" />
-                                    <TextBlock x:Name="Feature2Text" Text="• Akıllı karanlık/aydınlık tema desteği" FontSize="12" Foreground="Gray" />
-                                    <TextBlock x:Name="Feature3Text" Text="• Otomatik arka plan güncelleme sistemi" FontSize="12" Foreground="Gray" />
-                                    <TextBlock x:Name="Feature4Text" Text="• Tam ekran oyun/uygulama algılama ile otomatik duraklatma" FontSize="12" Foreground="Gray" />
+                        <!-- Video Selection Card -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="20">
+                            <StackPanel Spacing="16">
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <Button x:Name="BrowseVideoButton" Content="Browse Video" Click="BrowseVideo_Click" Width="160" />
+                                    <Button x:Name="ApplyButton" Content="Apply Wallpaper" Click="ApplyWallpaper_Click" Style="{ThemeResource AccentButtonStyle}" Width="160" IsEnabled="False" />
                                 </StackPanel>
+                                <TextBlock x:Name="StatusText" Text="No video selected." Foreground="Gray" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
                             </StackPanel>
-                        </Grid>
-                    </StackPanel>
+                        </Border>
 
-                    <MenuFlyoutSeparator />
-
-                    <!-- Developer Info Section -->
-                    <StackPanel Spacing="8">
-                        <TextBlock x:Name="DeveloperTitleText" Text="Geliştirici" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" />
-                        
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            
-                            <PersonPicture DisplayName="Sahil Rzayev" Height="48" Margin="0,0,16,0" VerticalAlignment="Top" />
-                            
-                            <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Text="Sahil Rzayev" FontWeight="Bold" FontSize="16" />
-                                <TextBlock x:Name="DeveloperRoleText" Text="Software Developer" Foreground="{ThemeResource SystemAccentColor}" FontSize="13" />
-                                <TextBlock x:Name="DeveloperDescText" Text="Modern masaüstü ve web uygulamaları tasarlayan tutkulu bir yazılım geliştirici." TextWrapping="Wrap" Margin="0,4,0,0" Foreground="Gray" />
+                        <!-- Settings Card -->
+                        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="20">
+                            <StackPanel Spacing="16">
+                                <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
                                 
-                                <StackPanel Orientation="Vertical" Spacing="8" Margin="0,12,0,0">
-                                    <HyperlinkButton NavigateUri="https://github.com/rzayevsahil" Padding="0">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Viewbox Width="14" Height="14">
-                                                <Path Data="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" Fill="{ThemeResource TextFillColorPrimaryBrush}"/>
-                                            </Viewbox>
-                                            <TextBlock Text="rzayevsahil" />
-                                        </StackPanel>
-                                    </HyperlinkButton>
-                                    <HyperlinkButton NavigateUri="https://www.linkedin.com/in/sahilrzayev" Padding="0">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Viewbox Width="14" Height="14">
-                                                <Path Data="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" Fill="{ThemeResource TextFillColorPrimaryBrush}"/>
-                                            </Viewbox>
-                                            <TextBlock Text="sahilrzayev" />
-                                        </StackPanel>
-                                    </HyperlinkButton>
-                                    <HyperlinkButton NavigateUri="mailto:sahilrzayev200d@gmail.com" Padding="0">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Viewbox Width="14" Height="14">
-                                                <Path Data="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L12 8.414l8.073-4.921c1.618-1.214 3.927-.059 3.927 1.964z" Fill="{ThemeResource TextFillColorPrimaryBrush}"/>
-                                            </Viewbox>
-                                            <TextBlock Text="sahilrzayev200d@gmail.com" />
-                                        </StackPanel>
-                                    </HyperlinkButton>
-                                </StackPanel>
+                                <Grid RowSpacing="12" ColumnSpacing="20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Volume -->
+                                    <TextBlock x:Name="VolumeText" Text="Volume:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+                                    <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" ValueChanged="VolumeSlider_ValueChanged" />
+
+                                    <!-- Stretch Mode -->
+                                    <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                                    <ComboBox x:Name="StretchModeComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Fill (Doldur)" Tag="UniformToFill" />
+                                        <ComboBoxItem Content="Fit (Sığdır)" Tag="Uniform" />
+                                        <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
+                                        <ComboBoxItem Content="Center (Ortala)" Tag="None" />
+                                    </ComboBox>
+
+                                    <!-- Theme -->
+                                    <TextBlock x:Name="ThemeText" Text="Theme:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                                    <ComboBox x:Name="ThemeComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Dark" Tag="Dark" />
+                                        <ComboBoxItem Content="Light" Tag="Light" />
+                                        <ComboBoxItem Content="System" Tag="Default" />
+                                    </ComboBox>
+
+                                    <!-- Language -->
+                                    <TextBlock x:Name="LanguageText" Text="Language:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                                    <ComboBox x:Name="LanguageComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="English" Tag="en" />
+                                        <ComboBoxItem Content="Türkçe" Tag="tr" />
+                                    </ComboBox>
+                                </Grid>
+                                
+                                <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
                             </StackPanel>
-                        </Grid>
+                        </Border>
+
+                        <!-- Update Card -->
+                        <Border x:Name="UpdateContainer" Visibility="Collapsed" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1" CornerRadius="8" Padding="20">
+                            <StackPanel Spacing="10">
+                                <TextBlock x:Name="UpdateStatusText" Text="A new version is available!" FontWeight="SemiBold" />
+                                <Button x:Name="DownloadUpdateButton" Content="Download and Update" Style="{ThemeResource AccentButtonStyle}" Click="DownloadUpdateButton_Click" HorizontalAlignment="Stretch" />
+                                <ProgressBar x:Name="UpdateProgressBar" Visibility="Collapsed" Minimum="0" Maximum="100" Value="0" />
+                                <TextBlock x:Name="UpdateProgressText" Visibility="Collapsed" Text="0%" HorizontalAlignment="Center" Foreground="Gray" FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
                     </StackPanel>
-                </StackPanel>
-            </Expander>
-        </StackPanel>
-        </ScrollViewer>
+                </ScrollViewer>
+            </Grid>
+            
+        </Grid>
+        
+        <PipsPager x:Name="CarouselPager" NumberOfPages="2" SelectedPageIndex="0" 
+                   HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,24"
+                   SelectedIndexChanged="CarouselPager_SelectedIndexChanged" />
     </Grid>
 </Page>

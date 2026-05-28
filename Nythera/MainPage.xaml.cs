@@ -1,9 +1,13 @@
+using System;
+using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System;
-using System.Threading.Tasks;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Windows.Storage.Pickers;
-
 using Nythera.Services;
 
 namespace Nythera;
@@ -139,12 +143,129 @@ public sealed partial class MainPage : Page
 
     private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ThemeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        if (ThemeComboBox.SelectedItem is ComboBoxItem item && item.Tag is string themeTag)
         {
-            string themeTag = item.Tag.ToString();
             SettingsService.SaveTheme(themeTag);
             ApplyTheme(themeTag);
+            ElementTheme theme = themeTag switch
+            {
+                "Dark" => ElementTheme.Dark,
+                "Light" => ElementTheme.Light,
+                _ => ElementTheme.Default
+            };
+            UpdateBackgroundLogo(theme);
         }
+    }
+
+    private void CarouselPager_SelectedIndexChanged(PipsPager sender, PipsPagerSelectedIndexChangedEventArgs args)
+    {
+        NavigateToPage(sender.SelectedPageIndex);
+    }
+
+    private void NavigateToPage(int pageIndex)
+    {
+        bool slideRight = pageIndex == 1; // If moving to Page2, we slide right
+
+        if (pageIndex == 0)
+        {
+            // Animate Page1 to Active (Moving from Back to Front)
+            AnimateOrbit(Page1, isEntering: true, slideRight: !slideRight);
+            Page1.IsHitTestVisible = true;
+            
+            // Animate Page2 to Background (Moving from Front to Back)
+            AnimateOrbit(Page2, isEntering: false, slideRight: !slideRight);
+            Page2.IsHitTestVisible = false;
+        }
+        else
+        {
+            // Animate Page2 to Active (Moving from Back to Front)
+            AnimateOrbit(Page2, isEntering: true, slideRight: slideRight);
+            Page2.IsHitTestVisible = true;
+            
+            // Animate Page1 to Background (Moving from Front to Back)
+            AnimateOrbit(Page1, isEntering: false, slideRight: slideRight);
+            Page1.IsHitTestVisible = false;
+        }
+    }
+
+    private void AnimateOrbit(UIElement element, bool isEntering, bool slideRight)
+    {
+        var transform = element.RenderTransform as CompositeTransform;
+        if (transform == null) return;
+
+        // Reset rotation if it was previously spinning
+        transform.Rotation = 0;
+
+        var storyboard = new Storyboard();
+        var duration = new Duration(TimeSpan.FromMilliseconds(600));
+
+        var transXAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
+        var scaleXAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
+        var scaleYAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
+        var opacityAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
+
+        KeyTime t0 = KeyTime.FromTimeSpan(TimeSpan.Zero);
+        KeyTime tHalf = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300));
+        KeyTime tEnd = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(600));
+
+        double startS, midS, endS;
+        double startO, midO, endO;
+        double startX, midX, endX;
+        
+        // Ensure active page is on top
+        Canvas.SetZIndex(element, isEntering ? 1 : 0);
+
+        if (isEntering)
+        {
+            // From Back to Front
+            startS = 0.5; midS = 0.75; endS = 1.0;
+            startO = 0.0; midO = 0.5;  endO = 1.0;
+            startX = 0;   midX = slideRight ? 250 : -250; endX = 0;
+        }
+        else
+        {
+            // From Front to Back
+            startS = 1.0; midS = 0.75; endS = 0.5;
+            startO = 1.0; midO = 0.5;  endO = 0.0;
+            startX = 0;   midX = slideRight ? -250 : 250; endX = 0;
+        }
+
+        // TranslateX: EaseOut to the edge, EaseIn back to center to form a circular arc
+        transXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startX });
+        transXAnim.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = tHalf, Value = midX, EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } });
+        transXAnim.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = tEnd, Value = endX, EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn } });
+
+        // Scale and Opacity: Smooth linear change simulates depth (Z-axis)
+        scaleXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startS });
+        scaleXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tHalf, Value = midS });
+        scaleXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tEnd, Value = endS });
+
+        scaleYAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startS });
+        scaleYAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tHalf, Value = midS });
+        scaleYAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tEnd, Value = endS });
+
+        opacityAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startO });
+        opacityAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tHalf, Value = midO });
+        opacityAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tEnd, Value = endO });
+
+        Storyboard.SetTarget(transXAnim, transform);
+        Storyboard.SetTargetProperty(transXAnim, "TranslateX");
+
+        Storyboard.SetTarget(scaleXAnim, transform);
+        Storyboard.SetTargetProperty(scaleXAnim, "ScaleX");
+
+        Storyboard.SetTarget(scaleYAnim, transform);
+        Storyboard.SetTargetProperty(scaleYAnim, "ScaleY");
+
+        Storyboard.SetTarget(opacityAnim, element);
+        Storyboard.SetTargetProperty(opacityAnim, "Opacity");
+
+        storyboard.Children.Add(transXAnim);
+        storyboard.Children.Add(scaleXAnim);
+        storyboard.Children.Add(scaleYAnim);
+        storyboard.Children.Add(opacityAnim);
+        
+        storyboard.Begin();
     }
 
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
