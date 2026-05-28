@@ -474,4 +474,48 @@ public sealed partial class MainPage : Page
             }
         }
     }
+
+    private double _pointerStartX;
+    private bool _isSwiping;
+
+    private void RootGrid_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        _pointerStartX = e.GetCurrentPoint(RootGrid).Position.X;
+        _isSwiping = true;
+    }
+
+    private void RootGrid_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!_isSwiping) return;
+
+        double currentX = e.GetCurrentPoint(RootGrid).Position.X;
+        double deltaX = currentX - _pointerStartX;
+
+        // 50 pixels is a good threshold for a deliberate swipe
+        if (Math.Abs(deltaX) > 50)
+        {
+            _isSwiping = false; // Prevent multiple triggers during the same continuous swipe
+
+            if (deltaX > 0 && CarouselPager.SelectedPageIndex > 0)
+            {
+                // Swiped right -> go to previous page
+                CarouselPager.SelectedPageIndex -= 1;
+            }
+            else if (deltaX < 0 && CarouselPager.SelectedPageIndex < CarouselPager.NumberOfPages - 1)
+            {
+                // Swiped left -> go to next page
+                CarouselPager.SelectedPageIndex += 1;
+            }
+        }
+    }
+
+    private void RootGrid_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        _isSwiping = false;
+    }
+
+    private void RootGrid_PointerCanceled(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        _isSwiping = false;
+    }
 }

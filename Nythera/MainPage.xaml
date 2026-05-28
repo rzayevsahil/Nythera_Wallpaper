@@ -8,7 +8,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="RootGrid">
+    <Grid x:Name="RootGrid" Background="Transparent"
+          PointerPressed="RootGrid_PointerPressed"
+          PointerMoved="RootGrid_PointerMoved"
+          PointerReleased="RootGrid_PointerReleased"
+          PointerCanceled="RootGrid_PointerCanceled"
+          PointerCaptureLost="RootGrid_PointerCanceled">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             
             <!-- PAGE 2: About (Starts in background) -->
