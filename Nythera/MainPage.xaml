@@ -17,7 +17,7 @@
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             
             <!-- PAGE 3: About (Starts in background left) -->
-            <Grid x:Name="Page3" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <Grid x:Name="Page3" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12"
                   Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
@@ -113,10 +113,16 @@
                         </StackPanel>
                     </ScrollViewer>
                 </Border>
+                <!-- Blur Overlay -->
+                <Border x:Name="Page3BlurOverlay" CornerRadius="12" IsHitTestVisible="False" Opacity="0.6">
+                    <Border.Background>
+                        <AcrylicBrush TintColor="Black" TintOpacity="0.4" FallbackColor="Transparent" />
+                    </Border.Background>
+                </Border>
             </Grid>
 
             <!-- PAGE 1: Video Selection (Starts active center) -->
-            <Grid x:Name="Page1" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <Grid x:Name="Page1" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12"
                   Opacity="1.0" Canvas.ZIndex="2" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
                 <Grid.RenderTransform>
@@ -183,10 +189,16 @@
 
                     </StackPanel>
                 </ScrollViewer>
+                <!-- Blur Overlay -->
+                <Border x:Name="Page1BlurOverlay" CornerRadius="12" IsHitTestVisible="False" Opacity="0.0">
+                    <Border.Background>
+                        <AcrylicBrush TintColor="Black" TintOpacity="0.4" FallbackColor="Transparent" />
+                    </Border.Background>
+                </Border>
             </Grid>
 
             <!-- PAGE 2: Settings (Starts in background right) -->
-            <Grid x:Name="Page2" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <Grid x:Name="Page2" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12"
                   Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
@@ -234,6 +246,12 @@
 
                     </StackPanel>
                 </ScrollViewer>
+                <!-- Blur Overlay -->
+                <Border x:Name="Page2BlurOverlay" CornerRadius="12" IsHitTestVisible="False" Opacity="0.6">
+                    <Border.Background>
+                        <AcrylicBrush TintColor="Black" TintOpacity="0.4" FallbackColor="Transparent" />
+                    </Border.Background>
+                </Border>
             </Grid>
             
         </Grid>

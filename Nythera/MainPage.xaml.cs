@@ -182,16 +182,17 @@ public sealed partial class MainPage : Page
 
             double targetScale = offset == 0 ? 1.0 : 0.8;
             double targetOpacity = offset == 0 ? 1.0 : 0.4;
+            double blurOpacity = offset == 0 ? 0.0 : 0.6;
             double targetX = offset * 220;
             int zIndex = offset == 0 ? 2 : 1;
 
-            AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex);
+            AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex, blurOpacity);
             
             pages[i].IsHitTestVisible = (offset == 0);
         }
     }
 
-    private void AnimateCoverFlow(UIElement element, double targetScale, double targetTranslateX, double targetOpacity, int zIndex)
+    private void AnimateCoverFlow(UIElement element, double targetScale, double targetTranslateX, double targetOpacity, int zIndex, double blurOpacity = 0.0)
     {
         Canvas.SetZIndex(element, zIndex);
 
@@ -224,6 +225,18 @@ public sealed partial class MainPage : Page
         storyboard.Children.Add(transXAnim);
         storyboard.Children.Add(scaleXAnim);
         storyboard.Children.Add(scaleYAnim);
+        var fwElement = element as FrameworkElement;
+        if (fwElement != null)
+        {
+            var blurOverlay = (Border)fwElement.FindName(fwElement.Name + "BlurOverlay");
+            if (blurOverlay != null)
+            {
+                var blurAnim = new DoubleAnimation { To = blurOpacity, Duration = duration, EasingFunction = easing };
+                Storyboard.SetTarget(blurAnim, blurOverlay);
+                Storyboard.SetTargetProperty(blurAnim, "Opacity");
+                storyboard.Children.Add(blurAnim);
+            }
+        }
         storyboard.Children.Add(opacityAnim);
         
         storyboard.Begin();
