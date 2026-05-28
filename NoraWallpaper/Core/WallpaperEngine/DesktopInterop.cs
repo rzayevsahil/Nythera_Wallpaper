@@ -1,8 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
-using NoraWallpaper.Native;
+using Nythera.Native;
 
-namespace NoraWallpaper.Core.WallpaperEngine;
+namespace Nythera.Core.WallpaperEngine;
 
 public class DesktopInterop
 {

@@ -1,4 +1,4 @@
-# Nora Wallpaper - Modern Video Duvar Kağıdı Uygulaması Planı
+# Nythera - Modern Video Duvar Kağıdı Uygulaması Planı
 
 Bu belge, Windows 11 hissiyatını yansıtan, düşük sistem kaynağı tüketen, modern ve anime odaklı bir canlı duvar kağıdı uygulamasının (MVP) teknik mimarisini ve geliştirme yol haritasını içermektedir.
 
@@ -19,30 +19,30 @@ Başlangıç için en ideal, performanslı ve Windows ekosistemine en uygun tekn
 Uygulamanın sürdürülebilir olması için Clean Architecture prensiplerine yakın, modüler bir yapı kurulacaktır:
 
 ```text
-NoraWallpaper/
+Nythera/
 │
-├── 📁 NoraWallpaper.App/ (Ana Başlangıç Projesi - WinUI 3)
+├── 📁 Nythera.App/ (Ana Başlangıç Projesi - WinUI 3)
 │   ├── 📁 UI/
 │   │   ├── 📁 Pages/       (Dashboard, Settings, Gallery vb.)
 │   │   ├── 📁 Components/  (Video Kartları, Butonlar, Modal'lar)
 │   │   └── 📁 Themes/      (Renk paletleri, Fluent stilleri)
 │   └── App.xaml
 │
-├── 📁 NoraWallpaper.Core/ (İş Mantığı ve Yöneticiler)
+├── 📁 Nythera.Core/ (İş Mantığı ve Yöneticiler)
 │   ├── 📁 WallpaperEngine/ (WorkerW hack'i ve pencere yönetimi)
 │   ├── 📁 VideoPlayer/     (VLC/MPV wrapper sınıfları)
 │   ├── 📁 MonitorManager/  (Çoklu ekran tespiti ve yönetimi)
 │   └── 📁 PerformanceManager/(Oyun açıldığında durdurma vs.)
 │
-├── 📁 NoraWallpaper.Services/ (Arka Plan Servisleri)
+├── 📁 Nythera.Services/ (Arka Plan Servisleri)
 │   ├── SettingsService     (JSON/SQLite tabanlı ayar kaydı)
 │   ├── WallpaperService    (Aktif duvar kağıdını yönetme)
 │   └── StartupService      (Windows açılışına ekleme)
 │
-├── 📁 NoraWallpaper.Native/ (Windows API Çağrıları)
+├── 📁 Nythera.Native/ (Windows API Çağrıları)
 │   └── WindowsApi.cs       (User32.dll vb. PInvoke tanımlamaları)
 │
-└── 📁 NoraWallpaper.Assets/ (Uygulama ikonları, default videolar)
+└── 📁 Nythera.Assets/ (Uygulama ikonları, default videolar)
 ```
 
 ## 3. Geliştirme Yol Haritası

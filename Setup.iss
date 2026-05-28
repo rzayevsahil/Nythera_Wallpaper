@@ -5,7 +5,7 @@
 ; App Information
 AppName=Nythera
 AppVersion=1.0.0
-AppPublisher=Nora Studios
+AppPublisher=Nythera Studios
 AppPublisherURL=https://github.com/rzayevsahil/walpaper-for-pc
 AppSupportURL=https://github.com/rzayevsahil/walpaper-for-pc
 AppUpdatesURL=https://github.com/rzayevsahil/walpaper-for-pc
@@ -19,7 +19,7 @@ DefaultGroupName=Nythera
 ; Output Settings
 OutputDir=.\Installer
 OutputBaseFilename=Nythera_Setup_v1.0.0
-SetupIconFile=.\NoraWallpaper\Assets\AppIcon.ico
+SetupIconFile=.\Nythera\Assets\AppIcon.ico
 UninstallDisplayIcon={app}\Nythera.exe
 
 ; Compression Settings (Makes the setup file smaller)
@@ -35,7 +35,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; Copy all published files from the publish folder to the installation directory
-Source: ".\NoraWallpaper\bin\Release\net10.0-windows10.0.26100.0\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: ".\Nythera\bin\Release\net10.0-windows10.0.26100.0\win-x64\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; Create Start Menu Shortcut

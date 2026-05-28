@@ -2,10 +2,10 @@ using Microsoft.UI.Xaml;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using System;
-using NoraWallpaper.Core.WallpaperEngine;
-using NoraWallpaper.Native;
+using Nythera.Core.WallpaperEngine;
+using Nythera.Native;
 
-namespace NoraWallpaper;
+namespace Nythera;
 
 public sealed partial class WallpaperWindow : Window
 {

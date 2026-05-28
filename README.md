@@ -37,7 +37,7 @@ Projeyi derlemek ve çalıştırmak için sisteminizde **.NET 8.0 SDK** (veya ü
 
 ```bash
 # Proje klasörüne gidin (Go to the project folder)
-cd NoraWallpaper
+cd Nythera
 
 # Bağımlılıkları temizleyin ve projeyi çalıştırın (Clean and Run)
 dotnet clean

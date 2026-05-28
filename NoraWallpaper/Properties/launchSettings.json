@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "NoraWallpaper (Package)": {
+    "Nythera (Package)": {
       "commandName": "MsixPackage"
     },
-    "NoraWallpaper (Unpackaged)": {
+    "Nythera (Unpackaged)": {
       "commandName": "Project"
     }
   }

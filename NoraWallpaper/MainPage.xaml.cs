@@ -4,9 +4,9 @@ using System;
 using System.Threading.Tasks;
 using Windows.Storage.Pickers;
 
-using NoraWallpaper.Services;
+using Nythera.Services;
 
-namespace NoraWallpaper;
+namespace Nythera;
 
 public sealed partial class MainPage : Page
 {

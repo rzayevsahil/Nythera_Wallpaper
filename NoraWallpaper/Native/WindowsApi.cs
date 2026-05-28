@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace NoraWallpaper.Native;
+namespace Nythera.Native;
 
 public static class WindowsApi
 {

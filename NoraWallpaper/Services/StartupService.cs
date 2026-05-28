@@ -2,7 +2,7 @@ using Microsoft.Win32;
 using System;
 using System.IO;
 
-namespace NoraWallpaper.Services;
+namespace Nythera.Services;
 
 public class StartupService
 {

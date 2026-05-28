@@ -1,9 +1,9 @@
 using System;
 using System.Text;
 using System.Threading;
-using NoraWallpaper.Native;
+using Nythera.Native;
 
-namespace NoraWallpaper.Core.PerformanceManager;
+namespace Nythera.Core.PerformanceManager;
 
 public class FullScreenDetector
 {

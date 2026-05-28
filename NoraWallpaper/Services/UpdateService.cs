@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace NoraWallpaper.Services;
+namespace Nythera.Services;
 
 public class UpdateService
 {

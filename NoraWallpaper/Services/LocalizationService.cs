@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NoraWallpaper.Services;
+namespace Nythera.Services;
 
 public static class LocalizationService
 {
