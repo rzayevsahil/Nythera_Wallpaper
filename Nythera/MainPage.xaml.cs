@@ -617,7 +617,7 @@ public sealed partial class MainPage : Page
     {
         if (_updateInfo == null || !_updateInfo.IsUpdateAvailable) return;
 
-        DownloadUpdateButton.IsEnabled = false;
+        DownloadUpdateButton.IsHitTestVisible = false;
         DownloadButtonText.Text = "0%";
         UpdateStatusText.Text = LocalizationService.GetString("Downloading");
 
@@ -639,7 +639,7 @@ public sealed partial class MainPage : Page
         catch (Exception ex)
         {
             UpdateStatusText.Text = $"Update failed: {ex.Message}";
-            DownloadUpdateButton.IsEnabled = true;
+            DownloadUpdateButton.IsHitTestVisible = true;
             DownloadButtonText.Text = LocalizationService.GetString("DownloadUpdate");
             DownloadProgressFill.Width = 0;
         }
