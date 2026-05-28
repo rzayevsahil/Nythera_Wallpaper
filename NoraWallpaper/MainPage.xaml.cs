@@ -32,11 +32,85 @@ public sealed partial class MainPage : Page
             }
         }
         if (StretchModeComboBox.SelectedItem == null && StretchModeComboBox.Items.Count > 0)
+            StretchModeComboBox.SelectedIndex = 0;
+
+        // Initialize Theme
+        string savedTheme = SettingsService.GetTheme();
+        foreach (ComboBoxItem item in ThemeComboBox.Items)
         {
-            StretchModeComboBox.SelectedIndex = 0; // Default to first item
+            if (item.Tag.ToString() == savedTheme)
+            {
+                ThemeComboBox.SelectedItem = item;
+                break;
+            }
         }
+        ApplyTheme(savedTheme);
+
+        // Initialize Language
+        string savedLang = SettingsService.GetLanguage();
+        foreach (ComboBoxItem item in LanguageComboBox.Items)
+        {
+            if (item.Tag.ToString() == savedLang)
+            {
+                LanguageComboBox.SelectedItem = item;
+                break;
+            }
+        }
+        UpdateLanguageUI();
         
         this.Loaded += MainPage_Loaded;
+    }
+
+    private void ApplyTheme(string themeStr)
+    {
+        if (MainWindow.Instance != null && MainWindow.Instance.Content is FrameworkElement rootElement)
+        {
+            if (Enum.TryParse(themeStr, out ElementTheme theme))
+            {
+                rootElement.RequestedTheme = theme;
+            }
+        }
+    }
+
+    private void UpdateLanguageUI()
+    {
+        AppTitle.Text = LocalizationService.GetString("AppTitle");
+        AppDescription.Text = LocalizationService.GetString("AppDescription");
+        BrowseVideoButton.Content = LocalizationService.GetString("BrowseVideo");
+        ApplyButton.Content = LocalizationService.GetString("ApplyWallpaper");
+        SettingsTitle.Text = LocalizationService.GetString("Settings");
+        VolumeText.Text = LocalizationService.GetString("Volume");
+        ChooseFitText.Text = LocalizationService.GetString("ChooseFit");
+        StartupToggle.Header = LocalizationService.GetString("LaunchStartup");
+        ThemeText.Text = LocalizationService.GetString("Theme");
+        LanguageText.Text = LocalizationService.GetString("Language");
+        DownloadUpdateButton.Content = LocalizationService.GetString("DownloadUpdate");
+        
+        if (_selectedFile == null)
+            StatusText.Text = LocalizationService.GetString("NoVideoSelected");
+        
+        if (_updateInfo != null && _updateInfo.IsUpdateAvailable)
+            UpdateStatusText.Text = LocalizationService.GetString("UpdateAvailable");
+    }
+
+    private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ThemeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            string themeTag = item.Tag.ToString();
+            SettingsService.SaveTheme(themeTag);
+            ApplyTheme(themeTag);
+        }
+    }
+
+    private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (LanguageComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            string langTag = item.Tag.ToString();
+            SettingsService.SaveLanguage(langTag);
+            UpdateLanguageUI();
+        }
     }
 
     private async void MainPage_Loaded(object sender, RoutedEventArgs e)
@@ -53,7 +127,7 @@ public sealed partial class MainPage : Page
                 if (file != null)
                 {
                     _selectedFile = file;
-                    StatusText.Text = $"Restored: {_selectedFile.Name}";
+                    StatusText.Text = $"{LocalizationService.GetString("Restored")} {_selectedFile.Name}";
                     ApplyButton.IsEnabled = true;
                     
                     // Auto-apply saved wallpaper
@@ -73,7 +147,7 @@ public sealed partial class MainPage : Page
         if (_updateInfo.IsUpdateAvailable)
         {
             UpdateContainer.Visibility = Visibility.Visible;
-            UpdateStatusText.Text = $"A new version ({_updateInfo.Version}) is available!";
+            UpdateStatusText.Text = LocalizationService.GetString("UpdateAvailable");
         }
     }
 
@@ -83,7 +157,7 @@ public sealed partial class MainPage : Page
 
         DownloadUpdateButton.IsEnabled = false;
         UpdateProgressBar.Visibility = Visibility.Visible;
-        UpdateStatusText.Text = "Downloading update... Please wait.";
+        UpdateStatusText.Text = LocalizationService.GetString("Downloading");
 
         try
         {
@@ -121,12 +195,12 @@ public sealed partial class MainPage : Page
             _selectedFile = await picker.PickSingleFileAsync();
             if (_selectedFile != null)
             {
-                StatusText.Text = $"Selected: {_selectedFile.Name} - Ready to apply.";
+                StatusText.Text = $"{LocalizationService.GetString("Selected")} {_selectedFile.Name}";
                 ApplyButton.IsEnabled = true;
             }
             else
             {
-                StatusText.Text = "Operation cancelled.";
+                StatusText.Text = LocalizationService.GetString("NoVideoSelected");
             }
         }
         catch (Exception ex)

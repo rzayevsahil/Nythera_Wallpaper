@@ -74,4 +74,50 @@ public class SettingsService
         }
         return "UniformToFill"; // Default
     }
+
+    private static readonly string ThemePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "NoraWallpaper",
+        "theme.txt"
+    );
+
+    public static void SaveTheme(string theme)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ThemePath));
+            File.WriteAllText(ThemePath, theme);
+        }
+        catch (Exception ex) { }
+    }
+
+    public static string GetTheme()
+    {
+        if (File.Exists(ThemePath))
+            return File.ReadAllText(ThemePath).Trim();
+        return "Dark"; // Default
+    }
+
+    private static readonly string LanguagePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "NoraWallpaper",
+        "language.txt"
+    );
+
+    public static void SaveLanguage(string language)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(LanguagePath));
+            File.WriteAllText(LanguagePath, language);
+        }
+        catch (Exception ex) { }
+    }
+
+    public static string GetLanguage()
+    {
+        if (File.Exists(LanguagePath))
+            return File.ReadAllText(LanguagePath).Trim();
+        return "en"; // Default
+    }
 }

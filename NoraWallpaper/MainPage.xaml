@@ -8,18 +8,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <!--
-        This is the main content area of your application.
-        Add your UI elements here — for example, controls, layouts, and data-bound views.
-        Use 'dotnet new winui-page' to create additional pages and navigate to them via
-        the Frame in MainWindow (RootFrame).
-    -->
     <Grid Padding="32">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="32" Width="400">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24" Width="450">
             <!-- Header -->
             <StackPanel Spacing="8" HorizontalAlignment="Center">
-                <TextBlock Text="Nora Wallpaper" Style="{ThemeResource TitleTextBlockStyle}" HorizontalAlignment="Center" FontWeight="Bold" />
-                <TextBlock Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" />
+                <TextBlock x:Name="AppTitle" Text="Nora Wallpaper" Style="{ThemeResource TitleTextBlockStyle}" HorizontalAlignment="Center" FontWeight="Bold" />
+                <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" />
             </StackPanel>
 
             <!-- Video Selection Card -->
@@ -28,8 +22,8 @@
                     BorderThickness="1" CornerRadius="8" Padding="20">
                 <StackPanel Spacing="16">
                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                        <Button Content="Browse Video" Click="BrowseVideo_Click" Width="140" />
-                        <Button x:Name="ApplyButton" Content="Apply Wallpaper" Click="ApplyWallpaper_Click" Style="{ThemeResource AccentButtonStyle}" Width="140" IsEnabled="False" />
+                        <Button x:Name="BrowseVideoButton" Content="Browse Video" Click="BrowseVideo_Click" Width="160" />
+                        <Button x:Name="ApplyButton" Content="Apply Wallpaper" Click="ApplyWallpaper_Click" Style="{ThemeResource AccentButtonStyle}" Width="160" IsEnabled="False" />
                     </StackPanel>
                     <TextBlock x:Name="StatusText" Text="No video selected." Foreground="Gray" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
                 </StackPanel>
@@ -40,22 +34,48 @@
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1" CornerRadius="8" Padding="20">
                 <StackPanel Spacing="16">
-                    <TextBlock Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
+                    <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
                     
-                    <StackPanel Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
-                        <TextBlock Text="Volume:" VerticalAlignment="Center" Width="80" />
-                        <Slider x:Name="VolumeSlider" Width="200" Minimum="0" Maximum="100" Value="0" ValueChanged="VolumeSlider_ValueChanged" />
-                    </StackPanel>
+                    <Grid RowSpacing="12" ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                    <StackPanel Orientation="Horizontal" Spacing="20" VerticalAlignment="Center">
-                        <TextBlock Text="Choose a fit:" VerticalAlignment="Center" Width="80" />
-                        <ComboBox x:Name="StretchModeComboBox" Width="200" SelectionChanged="StretchModeComboBox_SelectionChanged">
+                        <!-- Volume -->
+                        <TextBlock x:Name="VolumeText" Text="Volume:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+                        <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" ValueChanged="VolumeSlider_ValueChanged" />
+
+                        <!-- Stretch Mode -->
+                        <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                        <ComboBox x:Name="StretchModeComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
                             <ComboBoxItem Content="Fill (Doldur)" Tag="UniformToFill" />
                             <ComboBoxItem Content="Fit (Sığdır)" Tag="Uniform" />
                             <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
                             <ComboBoxItem Content="Center (Ortala)" Tag="None" />
                         </ComboBox>
-                    </StackPanel>
+
+                        <!-- Theme -->
+                        <TextBlock x:Name="ThemeText" Text="Theme:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                        <ComboBox x:Name="ThemeComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Dark" Tag="Dark" />
+                            <ComboBoxItem Content="Light" Tag="Light" />
+                            <ComboBoxItem Content="System" Tag="Default" />
+                        </ComboBox>
+
+                        <!-- Language -->
+                        <TextBlock x:Name="LanguageText" Text="Language:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                        <ComboBox x:Name="LanguageComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
+                            <ComboBoxItem Content="English" Tag="en" />
+                            <ComboBoxItem Content="Türkçe" Tag="tr" />
+                        </ComboBox>
+                    </Grid>
                     
                     <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
                 </StackPanel>
