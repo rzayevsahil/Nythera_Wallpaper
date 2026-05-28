@@ -258,6 +258,29 @@ public sealed partial class MainPage : Page
         {
             AppVersionText.Text = version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v1.1.0";
         }
+        
+        // Dynamically set the Virtual Desktop size for perfect preview
+        try
+        {
+            var displayArea = Microsoft.UI.Windowing.DisplayArea.Primary;
+            if (displayArea != null && VirtualDesktopGrid != null && PreviewBorder != null)
+            {
+                double screenWidth = displayArea.OuterBounds.Width;
+                double screenHeight = displayArea.OuterBounds.Height;
+                
+                VirtualDesktopGrid.Width = screenWidth;
+                VirtualDesktopGrid.Height = screenHeight;
+
+                // Make the Border match the exact aspect ratio of the user's screen
+                // Max width available in the Page1 stack panel is 432
+                double targetWidth = 432.0;
+                if (screenWidth > 0)
+                {
+                    PreviewBorder.Height = targetWidth * (screenHeight / screenWidth);
+                }
+            }
+        }
+        catch { }
 
         // Check for updates asynchronously without blocking the UI
         _ = CheckForUpdatesAsync();
@@ -453,6 +476,11 @@ public sealed partial class MainPage : Page
             
             if (Enum.TryParse(stretchTag, out Microsoft.UI.Xaml.Media.Stretch stretchValue))
             {
+                if (PreviewPlayer != null)
+                {
+                    PreviewPlayer.Stretch = stretchValue;
+                }
+                
                 foreach (var win in _wallpaperWindows)
                 {
                     win.SetStretchMode(stretchValue);

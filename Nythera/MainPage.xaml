@@ -176,9 +176,13 @@
                                 </Grid>
                                 
                                 <!-- Video Preview -->
-                                <Border CornerRadius="8" Margin="0,8,0,0" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" Background="Black" Height="180">
+                                <Border x:Name="PreviewBorder" CornerRadius="8" Margin="0,8,0,0" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" Background="Black" Height="243">
                                     <Grid CornerRadius="8">
-                                        <MediaPlayerElement x:Name="PreviewPlayer" AutoPlay="True" AreTransportControlsEnabled="False" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                        <Viewbox Stretch="Uniform">
+                                            <Grid x:Name="VirtualDesktopGrid" Width="1920" Height="1080" Background="Transparent">
+                                                <MediaPlayerElement x:Name="PreviewPlayer" AutoPlay="True" AreTransportControlsEnabled="False" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                            </Grid>
+                                        </Viewbox>
                                         <FontIcon x:Name="PreviewPlaceholderIcon" Glyph="&#xE714;" FontSize="48" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Grid>
                                 </Border>
