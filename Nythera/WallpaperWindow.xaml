@@ -12,5 +12,8 @@
                             AutoPlay="True" 
                             AreTransportControlsEnabled="False"
                             Stretch="UniformToFill" />
+        <!-- Video Effects Overlays -->
+        <Rectangle x:Name="ColorOverlay" Fill="Transparent" IsHitTestVisible="False" />
+        <Rectangle x:Name="BrightnessOverlay" Fill="Black" Opacity="0" IsHitTestVisible="False" />
     </Grid>
 </Window>

@@ -175,6 +175,67 @@ public class SettingsService
         return 1.0; // Default
     }
 
+    private static readonly string BrightnessPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "brightness.txt"
+    );
+
+    public static void SaveBrightness(double brightness)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(BrightnessPath));
+            File.WriteAllText(BrightnessPath, brightness.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        }
+        catch { }
+    }
+
+    public static double GetBrightness()
+    {
+        try
+        {
+            if (File.Exists(BrightnessPath))
+            {
+                if (double.TryParse(File.ReadAllText(BrightnessPath).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double brightness))
+                {
+                    return brightness;
+                }
+            }
+        }
+        catch { }
+        return 100.0; // Default is full brightness (no dimming)
+    }
+
+    private static readonly string VideoFilterPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "videofilter.txt"
+    );
+
+    public static void SaveVideoFilter(string filter)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(VideoFilterPath));
+            File.WriteAllText(VideoFilterPath, filter);
+        }
+        catch { }
+    }
+
+    public static string GetVideoFilter()
+    {
+        try
+        {
+            if (File.Exists(VideoFilterPath))
+            {
+                return File.ReadAllText(VideoFilterPath).Trim();
+            }
+        }
+        catch { }
+        return "None"; // Default
+    }
+
     private static readonly string LanguagePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Nythera",

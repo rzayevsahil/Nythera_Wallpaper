@@ -88,6 +88,51 @@ public sealed partial class WallpaperWindow : Window
         catch { }
     }
     
+    public void SetBrightness(double brightness)
+    {
+        try
+        {
+            // brightness is 0-100. 100 means fully bright (opacity 0), 0 means fully dark (opacity 1)
+            double opacity = 1.0 - (brightness / 100.0);
+            // clamp
+            opacity = Math.Max(0.0, Math.Min(1.0, opacity));
+            BrightnessOverlay.Opacity = opacity;
+        }
+        catch { }
+    }
+    
+    public void SetVideoFilter(string filterName)
+    {
+        try
+        {
+            switch(filterName)
+            {
+                case "Warm":
+                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
+                    ColorOverlay.Opacity = 0.15;
+                    break;
+                case "Cool":
+                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DeepSkyBlue);
+                    ColorOverlay.Opacity = 0.15;
+                    break;
+                case "Matrix":
+                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LimeGreen);
+                    ColorOverlay.Opacity = 0.15;
+                    break;
+                case "Cyberpunk":
+                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Fuchsia);
+                    ColorOverlay.Opacity = 0.15;
+                    break;
+                case "None":
+                default:
+                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                    ColorOverlay.Opacity = 0;
+                    break;
+            }
+        }
+        catch { }
+    }
+    
     public void Cleanup()
     {
         string debugFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "monitor_debug.txt");

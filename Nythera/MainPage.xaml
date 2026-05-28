@@ -298,6 +298,8 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <!-- Volume -->
@@ -315,9 +317,23 @@
                                         <ComboBoxItem x:Name="Speed20" Content="2.0x" Tag="2.0" />
                                     </ComboBox>
 
+                                    <!-- Brightness -->
+                                    <TextBlock x:Name="BrightnessText" Text="Parlaklık:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                                    <Slider x:Name="BrightnessSlider" Grid.Row="2" Grid.Column="1" Minimum="10" Maximum="100" Value="100" ValueChanged="BrightnessSlider_ValueChanged" />
+
+                                    <!-- Video Filter -->
+                                    <TextBlock x:Name="ColorOverlayText" Text="Renk Filtresi:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                                    <ComboBox x:Name="ColorOverlayComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ColorOverlayComboBox_SelectionChanged">
+                                        <ComboBoxItem x:Name="FilterNone" Content="Yok" Tag="None" />
+                                        <ComboBoxItem x:Name="FilterWarm" Content="Sıcak" Tag="Warm" />
+                                        <ComboBoxItem x:Name="FilterCool" Content="Soğuk" Tag="Cool" />
+                                        <ComboBoxItem x:Name="FilterMatrix" Content="Matrix (Yeşil)" Tag="Matrix" />
+                                        <ComboBoxItem x:Name="FilterCyberpunk" Content="Cyberpunk" Tag="Cyberpunk" />
+                                    </ComboBox>
+
                                     <!-- Stretch Mode -->
-                                    <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                                    <ComboBox x:Name="StretchModeComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
+                                    <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
+                                    <ComboBox x:Name="StretchModeComboBox" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
                                         <ComboBoxItem Content="Fill (Doldur)" Tag="UniformToFill" />
                                         <ComboBoxItem Content="Fit (Sığdır)" Tag="Uniform" />
                                         <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
@@ -325,8 +341,8 @@
                                     </ComboBox>
                                     
                                     <!-- Target Monitor -->
-                                    <TextBlock x:Name="TargetMonitorText" Text="Monitor:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                                    <ComboBox x:Name="TargetMonitorComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="TargetMonitorComboBox_SelectionChanged">
+                                    <TextBlock x:Name="TargetMonitorText" Text="Monitor:" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" />
+                                    <ComboBox x:Name="TargetMonitorComboBox" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="TargetMonitorComboBox_SelectionChanged">
                                         <ComboBoxItem Content="All Monitors (Tüm Ekranlar)" Tag="All" />
                                     </ComboBox>
                                 </Grid>
@@ -337,6 +353,9 @@
                                         <Viewbox Stretch="Uniform">
                                             <Grid x:Name="VirtualDesktopGrid" Width="1920" Height="1080" Background="Transparent">
                                                 <MediaPlayerElement x:Name="PreviewPlayer" AutoPlay="True" AreTransportControlsEnabled="False" Stretch="UniformToFill" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                                <!-- Preview Overlays -->
+                                                <Rectangle x:Name="PreviewColorOverlay" Fill="Transparent" IsHitTestVisible="False" />
+                                                <Rectangle x:Name="PreviewBrightnessOverlay" Fill="Black" Opacity="0" IsHitTestVisible="False" />
                                             </Grid>
                                         </Viewbox>
                                         <FontIcon x:Name="PreviewPlaceholderIcon" Glyph="&#xE714;" FontSize="48" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" />

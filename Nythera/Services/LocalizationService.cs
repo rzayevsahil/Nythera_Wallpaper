@@ -73,7 +73,14 @@ public static class LocalizationService
         { "Speed10", "1.0x (Normal)" },
         { "Speed125", "1.25x" },
         { "Speed15", "1.5x" },
-        { "Speed20", "2.0x" }
+        { "Speed20", "2.0x" },
+        { "Brightness", "Parlaklık:" },
+        { "VideoFilter", "Renk Filtresi:" },
+        { "FilterNone", "Yok" },
+        { "FilterWarm", "Sıcak (Sarı/Turuncu)" },
+        { "FilterCool", "Soğuk (Mavi)" },
+        { "FilterMatrix", "Matrix (Yeşil)" },
+        { "FilterCyberpunk", "Cyberpunk (Mor/Pembe)" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -145,7 +152,14 @@ public static class LocalizationService
         { "Speed10", "1.0x (Normal)" },
         { "Speed125", "1.25x" },
         { "Speed15", "1.5x" },
-        { "Speed20", "2.0x" }
+        { "Speed20", "2.0x" },
+        { "Brightness", "Brightness:" },
+        { "VideoFilter", "Color Filter:" },
+        { "FilterNone", "None" },
+        { "FilterWarm", "Warm (Orange)" },
+        { "FilterCool", "Cool (Blue)" },
+        { "FilterMatrix", "Matrix (Green)" },
+        { "FilterCyberpunk", "Cyberpunk (Purple)" }
     };
 
     public static string GetString(string key)

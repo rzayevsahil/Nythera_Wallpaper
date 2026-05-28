@@ -120,6 +120,29 @@ public sealed partial class MainPage : Page
         if (SpeedComboBox.SelectedItem == null && SpeedComboBox.Items.Count > 0)
             SpeedComboBox.SelectedIndex = 2; // Default to 1.0x
 
+        // Initialize Brightness
+        double savedBrightness = SettingsService.GetBrightness();
+        if (BrightnessSlider != null)
+        {
+            BrightnessSlider.Value = savedBrightness;
+        }
+
+        // Initialize Video Filter
+        string savedFilter = SettingsService.GetVideoFilter();
+        if (ColorOverlayComboBox != null)
+        {
+            foreach (ComboBoxItem item in ColorOverlayComboBox.Items)
+            {
+                if (item.Tag?.ToString() == savedFilter)
+                {
+                    ColorOverlayComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+            if (ColorOverlayComboBox.SelectedItem == null && ColorOverlayComboBox.Items.Count > 0)
+                ColorOverlayComboBox.SelectedIndex = 0;
+        }
+
         // Initialize Theme
         string savedTheme = SettingsService.GetTheme();
         foreach (ComboBoxItem item in ThemeComboBox.Items)
@@ -272,6 +295,15 @@ public sealed partial class MainPage : Page
         if (Speed15 != null) Speed15.Content = LocalizationService.GetString("Speed15");
         if (Speed20 != null) Speed20.Content = LocalizationService.GetString("Speed20");
             
+        if (BrightnessText != null) BrightnessText.Text = LocalizationService.GetString("Brightness");
+        
+        if (ColorOverlayText != null) ColorOverlayText.Text = LocalizationService.GetString("VideoFilter");
+        if (FilterNone != null) FilterNone.Content = LocalizationService.GetString("FilterNone");
+        if (FilterWarm != null) FilterWarm.Content = LocalizationService.GetString("FilterWarm");
+        if (FilterCool != null) FilterCool.Content = LocalizationService.GetString("FilterCool");
+        if (FilterMatrix != null) FilterMatrix.Content = LocalizationService.GetString("FilterMatrix");
+        if (FilterCyberpunk != null) FilterCyberpunk.Content = LocalizationService.GetString("FilterCyberpunk");
+
         if (Interval1m != null) Interval1m.Content = LocalizationService.GetString("Min1");
         if (Interval5m != null) Interval5m.Content = LocalizationService.GetString("Min5");
         if (Interval15m != null) Interval15m.Content = LocalizationService.GetString("Min15");
@@ -1048,6 +1080,18 @@ public sealed partial class MainPage : Page
                 // Apply volume
                 wallpaperWindow.SetVolume(VolumeSlider.Value / 100.0);
 
+                // Apply Brightness
+                if (BrightnessSlider != null)
+                {
+                    wallpaperWindow.SetBrightness(BrightnessSlider.Value);
+                }
+                
+                // Apply Video Filter
+                if (ColorOverlayComboBox != null && ColorOverlayComboBox.SelectedItem is ComboBoxItem filterItem && filterItem.Tag != null)
+                {
+                    wallpaperWindow.SetVideoFilter(filterItem.Tag.ToString());
+                }
+
                 return true;
             }, IntPtr.Zero);
 
@@ -1126,6 +1170,81 @@ public sealed partial class MainPage : Page
                         {
                             win.SetPlaybackSpeed(speed);
                         }
+                    }
+                }
+            }
+        }
+        catch { }
+    }
+
+    private void BrightnessSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+    {
+        try
+        {
+            double brightness = e.NewValue;
+            SettingsService.SaveBrightness(brightness);
+            
+            double opacity = 1.0 - (brightness / 100.0);
+            opacity = Math.Max(0.0, Math.Min(1.0, opacity));
+            
+            if (PreviewBrightnessOverlay != null)
+            {
+                PreviewBrightnessOverlay.Opacity = opacity;
+            }
+            
+            if (_wallpaperWindows != null)
+            {
+                foreach (var win in _wallpaperWindows.Values)
+                {
+                    win.SetBrightness(brightness);
+                }
+            }
+        }
+        catch { }
+    }
+    
+    private void ColorOverlayComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        try
+        {
+            if (ColorOverlayComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+            {
+                string filter = item.Tag.ToString();
+                SettingsService.SaveVideoFilter(filter);
+                
+                if (PreviewColorOverlay != null)
+                {
+                    switch(filter)
+                    {
+                        case "Warm":
+                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
+                            PreviewColorOverlay.Opacity = 0.15;
+                            break;
+                        case "Cool":
+                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DeepSkyBlue);
+                            PreviewColorOverlay.Opacity = 0.15;
+                            break;
+                        case "Matrix":
+                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LimeGreen);
+                            PreviewColorOverlay.Opacity = 0.15;
+                            break;
+                        case "Cyberpunk":
+                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Fuchsia);
+                            PreviewColorOverlay.Opacity = 0.15;
+                            break;
+                        case "None":
+                        default:
+                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                            PreviewColorOverlay.Opacity = 0;
+                            break;
+                    }
+                }
+                
+                if (_wallpaperWindows != null)
+                {
+                    foreach (var win in _wallpaperWindows.Values)
+                    {
+                        win.SetVideoFilter(filter);
                     }
                 }
             }
