@@ -189,11 +189,17 @@
                                 <StackPanel Spacing="8">
                                     <Grid>
                                         <TextBlock x:Name="DefaultVideosTitle" Text="Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-                                        <ComboBox x:Name="VideoFilterComboBox" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="VideoFilterComboBox_SelectionChanged" Width="120" VerticalAlignment="Center">
-                                            <ComboBoxItem Content="Tümü" Tag="All" />
-                                            <ComboBoxItem Content="Favoriler" Tag="Favorites" />
-                                            <ComboBoxItem Content="Eklenenler" Tag="Custom" />
-                                        </ComboBox>
+                                        <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Right">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <TextBlock x:Name="PlaylistModeTitle" Text="Slayt Modu:" FontSize="12" VerticalAlignment="Center" Foreground="Gray" />
+                                                <ToggleSwitch x:Name="PlaylistModeToggle" OffContent="Kapalı" OnContent="Açık" Toggled="PlaylistModeToggle_Toggled" VerticalAlignment="Center" Margin="0" />
+                                            </StackPanel>
+                                            <ComboBox x:Name="VideoFilterComboBox" SelectedIndex="0" SelectionChanged="VideoFilterComboBox_SelectionChanged" Width="120" VerticalAlignment="Center">
+                                                <ComboBoxItem Content="Tümü" Tag="All" />
+                                                <ComboBoxItem Content="Favoriler" Tag="Favorites" />
+                                                <ComboBoxItem Content="Eklenenler" Tag="Custom" />
+                                            </ComboBox>
+                                        </StackPanel>
                                     </Grid>
                                     <ListView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Enabled" Height="115" Padding="0,0,0,12">
                                         <ListView.ItemsPanel>
@@ -223,6 +229,42 @@
                                             </DataTemplate>
                                         </ListView.ItemTemplate>
                                     </ListView>
+
+                                    <!-- Playlist Settings Panel -->
+                                    <Border x:Name="PlaylistSettingsPanel" Visibility="Collapsed" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" CornerRadius="8" Padding="16" Margin="0,-8,0,8">
+                                        <Grid ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Spacing="4">
+                                                <TextBlock x:Name="PlaylistIntervalTitle" Text="Değişim Süresi" FontSize="12" Foreground="Gray" />
+                                                <ComboBox x:Name="PlaylistIntervalComboBox" SelectedIndex="2" Width="120">
+                                                    <ComboBoxItem x:Name="Interval1m" Content="1 Dakika" Tag="1" />
+                                                    <ComboBoxItem x:Name="Interval5m" Content="5 Dakika" Tag="5" />
+                                                    <ComboBoxItem x:Name="Interval15m" Content="15 Dakika" Tag="15" />
+                                                    <ComboBoxItem x:Name="Interval30m" Content="30 Dakika" Tag="30" />
+                                                    <ComboBoxItem x:Name="Interval1h" Content="1 Saat" Tag="60" />
+                                                    <ComboBoxItem x:Name="Interval3h" Content="3 Saat" Tag="180" />
+                                                    <ComboBoxItem x:Name="Interval6h" Content="6 Saat" Tag="360" />
+                                                    <ComboBoxItem x:Name="Interval12h" Content="12 Saat" Tag="720" />
+                                                    <ComboBoxItem x:Name="Interval24h" Content="24 Saat" Tag="1440" />
+                                                </ComboBox>
+                                            </StackPanel>
+                                            
+                                            <StackPanel Grid.Column="1" Spacing="4">
+                                                <TextBlock x:Name="PlaylistOrderTitle" Text="Çalma Sırası" FontSize="12" Foreground="Gray" />
+                                                <ComboBox x:Name="PlaylistOrderComboBox" SelectedIndex="0" Width="120">
+                                                    <ComboBoxItem x:Name="OrderSequential" Content="Sırasıyla" Tag="Sequential" />
+                                                    <ComboBoxItem x:Name="OrderRandom" Content="Rastgele" Tag="Random" />
+                                                </ComboBox>
+                                            </StackPanel>
+                                            
+                                            <Button x:Name="ApplyPlaylistButton" Grid.Column="2" Content="Uygula" Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Click="ApplyPlaylistButton_Click" />
+                                        </Grid>
+                                    </Border>
                                 </StackPanel>
                                 
                                 <Grid>

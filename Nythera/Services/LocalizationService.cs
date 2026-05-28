@@ -50,7 +50,23 @@ public static class LocalizationService
         { "AllMonitorsShort", "Tümü" },
         { "MonitorShort", "M{0}" },
         { "VideoReady", "Video hazır" },
-        { "WallpaperApplied", "Duvar kağıdı uygulandı" }
+        { "WallpaperApplied", "Duvar kağıdı uygulandı" },
+        { "PlaylistMode", "Slayt Modu:" },
+        { "PlaylistInterval", "Değişim Süresi" },
+        { "PlaylistOrder", "Çalma Sırası" },
+        { "ApplyPlaylist", "Uygula" },
+        { "PlaylistApplied", "Çalma listesi ({0} video) başarıyla uygulandı!" },
+        { "Min1", "1 Dakika" },
+        { "Min5", "5 Dakika" },
+        { "Min15", "15 Dakika" },
+        { "Min30", "30 Dakika" },
+        { "Hour1", "1 Saat" },
+        { "Hour3", "3 Saat" },
+        { "Hour6", "6 Saat" },
+        { "Hour12", "12 Saat" },
+        { "Hour24", "24 Saat" },
+        { "OrderSeq", "Sırasıyla" },
+        { "OrderRnd", "Rastgele" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -99,7 +115,23 @@ public static class LocalizationService
         { "AllMonitorsShort", "All" },
         { "MonitorShort", "M{0}" },
         { "VideoReady", "Video ready" },
-        { "WallpaperApplied", "Wallpaper applied" }
+        { "WallpaperApplied", "Wallpaper applied" },
+        { "PlaylistMode", "Slideshow Mode:" },
+        { "PlaylistInterval", "Change Interval" },
+        { "PlaylistOrder", "Playback Order" },
+        { "ApplyPlaylist", "Apply" },
+        { "PlaylistApplied", "Playlist ({0} videos) successfully applied!" },
+        { "Min1", "1 Minute" },
+        { "Min5", "5 Minutes" },
+        { "Min15", "15 Minutes" },
+        { "Min30", "30 Minutes" },
+        { "Hour1", "1 Hour" },
+        { "Hour3", "3 Hours" },
+        { "Hour6", "6 Hours" },
+        { "Hour12", "12 Hours" },
+        { "Hour24", "24 Hours" },
+        { "OrderSeq", "Sequential" },
+        { "OrderRnd", "Random" }
     };
 
     public static string GetString(string key)

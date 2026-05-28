@@ -81,6 +81,7 @@ public sealed partial class MainPage : Page
     private Dictionary<string, WallpaperWindow> _wallpaperWindows = new Dictionary<string, WallpaperWindow>();
     private Windows.Storage.StorageFile _selectedFile;
     private Services.UpdateService.ReleaseInfo _updateInfo;
+    private DispatcherTimer _playlistTimer;
     
     private System.Collections.ObjectModel.ObservableCollection<DefaultVideo> _allVideos = new();
     private System.Collections.ObjectModel.ObservableCollection<DefaultVideo> _filteredVideos = new();
@@ -241,6 +242,28 @@ public sealed partial class MainPage : Page
             AppliedBadgeText.Text = LocalizationService.GetString("Applied");
         }
         
+        if (PlaylistModeTitle != null)
+            PlaylistModeTitle.Text = LocalizationService.GetString("PlaylistMode");
+        if (PlaylistIntervalTitle != null)
+            PlaylistIntervalTitle.Text = LocalizationService.GetString("PlaylistInterval");
+        if (PlaylistOrderTitle != null)
+            PlaylistOrderTitle.Text = LocalizationService.GetString("PlaylistOrder");
+        if (ApplyPlaylistButton != null)
+            ApplyPlaylistButton.Content = LocalizationService.GetString("ApplyPlaylist");
+            
+        if (Interval1m != null) Interval1m.Content = LocalizationService.GetString("Min1");
+        if (Interval5m != null) Interval5m.Content = LocalizationService.GetString("Min5");
+        if (Interval15m != null) Interval15m.Content = LocalizationService.GetString("Min15");
+        if (Interval30m != null) Interval30m.Content = LocalizationService.GetString("Min30");
+        if (Interval1h != null) Interval1h.Content = LocalizationService.GetString("Hour1");
+        if (Interval3h != null) Interval3h.Content = LocalizationService.GetString("Hour3");
+        if (Interval6h != null) Interval6h.Content = LocalizationService.GetString("Hour6");
+        if (Interval12h != null) Interval12h.Content = LocalizationService.GetString("Hour12");
+        if (Interval24h != null) Interval24h.Content = LocalizationService.GetString("Hour24");
+        
+        if (OrderSequential != null) OrderSequential.Content = LocalizationService.GetString("OrderSeq");
+        if (OrderRandom != null) OrderRandom.Content = LocalizationService.GetString("OrderRnd");
+        
         UpdateVideoListBadges();
     }
 
@@ -397,6 +420,14 @@ public sealed partial class MainPage : Page
             PreviewPlayer.MediaPlayer.Volume = 0;
             PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
         }
+
+        PlaylistService.LoadPlaylists();
+        _playlistTimer = new DispatcherTimer();
+        _playlistTimer.Interval = TimeSpan.FromMinutes(1);
+        _playlistTimer.Tick += PlaylistTimer_Tick;
+        _playlistTimer.Start();
+        
+        PlaylistTimer_Tick(null, null);
 
         InitializeMonitors();
         
@@ -1135,5 +1166,107 @@ public sealed partial class MainPage : Page
     private void RootGrid_PointerCanceled(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
         _isSwiping = false;
+    }
+
+    private void PlaylistTimer_Tick(object sender, object e)
+    {
+        var playlists = PlaylistService.GetAllPlaylists();
+        bool hasChanges = false;
+        foreach (var kvp in playlists)
+        {
+            var config = kvp.Value;
+            if (config.VideoPaths.Count == 0) continue;
+            
+            if (config.LastChangeTime == DateTime.MinValue || (DateTime.Now - config.LastChangeTime).TotalMinutes >= config.IntervalMinutes)
+            {
+                string nextVideoPath;
+                if (config.IsRandom)
+                {
+                    var rand = new Random();
+                    nextVideoPath = config.VideoPaths[rand.Next(config.VideoPaths.Count)];
+                }
+                else
+                {
+                    config.CurrentIndex++;
+                    if (config.CurrentIndex >= config.VideoPaths.Count)
+                        config.CurrentIndex = 0;
+                    nextVideoPath = config.VideoPaths[config.CurrentIndex];
+                }
+                
+                config.LastChangeTime = DateTime.Now;
+                PlaylistService.SaveAll();
+                
+                SettingsService.SaveWallpaperPath(kvp.Key, nextVideoPath);
+                
+                string stretchMode = SettingsService.GetStretchMode() ?? "UniformToFill";
+                
+                // Set the flag to indicate we updated something
+                hasChanges = true;
+            }
+        }
+        
+        if (hasChanges)
+        {
+            ApplyWallpaper_Click(null, null);
+        }
+        
+        UpdateVideoListBadges();
+    }
+
+    private void PlaylistModeToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (PlaylistModeToggle.IsOn)
+        {
+            DefaultVideosGrid.SelectionMode = ListViewSelectionMode.Multiple;
+            PlaylistSettingsPanel.Visibility = Visibility.Visible;
+            ApplyButton.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            DefaultVideosGrid.SelectionMode = ListViewSelectionMode.Single;
+            PlaylistSettingsPanel.Visibility = Visibility.Collapsed;
+            ApplyButton.Visibility = Visibility.Visible;
+        }
+    }
+
+    private void ApplyPlaylistButton_Click(object sender, RoutedEventArgs e)
+    {
+        var selectedItems = DefaultVideosGrid.SelectedItems;
+        if (selectedItems.Count == 0) return;
+
+        var paths = new List<string>();
+        foreach (var item in selectedItems)
+        {
+            if (item is DefaultVideo dv) paths.Add(dv.VideoPath);
+        }
+
+        string targetMonitor = TargetMonitorComboBox.SelectedItem is ComboBoxItem cbItem && cbItem.Tag != null ? cbItem.Tag.ToString() : "All";
+        
+        int interval = 15;
+        if (PlaylistIntervalComboBox.SelectedItem is ComboBoxItem intervalItem && intervalItem.Tag != null)
+        {
+            int.TryParse(intervalItem.Tag.ToString(), out interval);
+        }
+        
+        bool isRandom = false;
+        if (PlaylistOrderComboBox.SelectedItem is ComboBoxItem orderItem && orderItem.Tag != null)
+        {
+            isRandom = orderItem.Tag.ToString() == "Random";
+        }
+        
+        var config = new PlaylistConfig
+        {
+            VideoPaths = paths,
+            IntervalMinutes = interval,
+            IsRandom = isRandom,
+            LastChangeTime = DateTime.MinValue,
+            CurrentIndex = -1
+        };
+        
+        PlaylistService.SavePlaylist(targetMonitor, config);
+        
+        PlaylistTimer_Tick(null, null);
+        
+        StatusText.Text = string.Format(LocalizationService.GetString("PlaylistApplied"), paths.Count);
     }
 }
