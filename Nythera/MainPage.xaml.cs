@@ -544,19 +544,10 @@ public sealed partial class MainPage : Page
                     // Fetch real thumbnail asynchronously
                     LoadThumbnailAsync(videoObj, file);
                 }
-                
-                if (DebugPathText != null)
-                {
-                    DebugPathText.Text = $"[Bulunan: {files.Length}] {videosDir}";
-                }
             }
             else
             {
                 logContent += $"Directory DOES NOT EXIST after all fallbacks.\n";
-                if (DebugPathText != null)
-                {
-                    DebugPathText.Text = $"[Klasör Yok] {videosDir}";
-                }
             }
             
             DefaultVideosGrid.ItemsSource = defaults;
@@ -566,10 +557,6 @@ public sealed partial class MainPage : Page
         {
             string crashLog = Path.Combine(Environment.CurrentDirectory, "crash_log.txt");
             File.WriteAllText(crashLog, ex.ToString());
-            if (DebugPathText != null)
-            {
-                DebugPathText.Text = "HATA OLUŞTU!";
-            }
         }
     }
 

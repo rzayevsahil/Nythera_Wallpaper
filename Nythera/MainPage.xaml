@@ -183,17 +183,14 @@
                         <Border CornerRadius="8" Padding="0">
                             <StackPanel Spacing="16">
                                 <StackPanel Spacing="8">
-                                    <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <TextBlock x:Name="DefaultVideosTitle" Text="Varsayılan Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock x:Name="DebugPathText" Foreground="Red" FontSize="10" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                    <GridView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="100">
-                                        <GridView.ItemsPanel>
+                                    <TextBlock x:Name="DefaultVideosTitle" Text="Varsayılan Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <ListView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Enabled" Height="100">
+                                        <ListView.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <ItemsStackPanel Orientation="Horizontal" />
                                             </ItemsPanelTemplate>
-                                        </GridView.ItemsPanel>
-                                        <GridView.ItemTemplate>
+                                        </ListView.ItemsPanel>
+                                        <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="local:DefaultVideo">
                                                 <Grid Width="140" Height="80" CornerRadius="6" Margin="0,0,8,0">
                                                     <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
@@ -202,8 +199,8 @@
                                                     </Border>
                                                 </Grid>
                                             </DataTemplate>
-                                        </GridView.ItemTemplate>
-                                    </GridView>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
                                 </StackPanel>
                                 
                                 <Grid>
