@@ -20,7 +20,7 @@
         </Grid.RowDefinitions>
         
         <!-- Header outside carousel -->
-        <StackPanel Grid.Row="0" Spacing="8" HorizontalAlignment="Center" Margin="0,48,0,12">
+        <StackPanel Grid.Row="0" Spacing="8" HorizontalAlignment="Center" Margin="0,24,0,12">
             <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
                 <Image x:Name="AppTitleLogo" Height="120" Stretch="Uniform" />
             </Border>
@@ -29,7 +29,7 @@
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="0,4,0,0">
             
             <!-- PAGE 3: About (Starts in background left) -->
-            <Grid x:Name="Page3" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <Grid x:Name="Page3" Width="480" Height="560" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
                   Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
@@ -134,7 +134,7 @@
             </Grid>
 
             <!-- PAGE 1: Video Selection (Starts active center) -->
-            <Grid x:Name="Page1" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <Grid x:Name="Page1" Width="480" Height="560" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
                   Opacity="1.0" Canvas.ZIndex="2" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
                 <Grid.RenderTransform>
@@ -279,7 +279,7 @@
             </Grid>
 
             <!-- PAGE 2: Settings (Starts in background right) -->
-            <Grid x:Name="Page2" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <Grid x:Name="Page2" Width="480" Height="560" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
                   Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
