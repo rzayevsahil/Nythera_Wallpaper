@@ -14,6 +14,9 @@ Nythera, Windows işletim sistemi için geliştirilmiş, yüksek performanslı, 
 - **Windows Başlangıcında Çalışma:** İsteğe bağlı olarak Windows ile birlikte başlar ve son seçtiğiniz duvar kağıdını otomatik olarak yükler.
 - **Sistem Tepsisi (System Tray) Entegrasyonu:** Arka planda sessizce çalışır. Tepsiden yönetilebilir, arayüz (dashboard) kapatılsa bile video oynamaya devam eder.
 - **Özelleştirilebilir Sığdırma:** Videoyu ekrana Doldur (Fill), Sığdır (Fit), Genişlet (Stretch) veya Ortala (Center) seçenekleriyle boyutlandırabilirsiniz.
+- **Dinamik Galeri ve Küçük Resimler:** Eklenen videoların küçük resimlerini (thumbnail) otomatik oluşturarak yatay kaydırılabilir modern galeride sunar.
+- **Otomatik Güncelleme Sistemi:** Yeni sürümler çıktığında arka planda GitHub üzerinden uygulamanın kendini otomatik olarak güncellemesini sağlar.
+- **Çoklu Dil Desteği:** Türkçe ve İngilizce gibi diller ile uygulamanın kendi dilinizde çalışmasını sağlar.
 
 ---
 
@@ -28,6 +31,9 @@ Nythera is a high-performance, open-source **Video Wallpaper Engine** built spec
 - **Launch on Startup:** Optionally starts with Windows and auto-loads your last applied video wallpaper.
 - **System Tray Integration:** Runs silently in the background. Hiding the dashboard keeps the wallpaper running smoothly.
 - **Customizable Video Fit:** Choose how the video spans across your screen (Fill, Fit, Stretch, or Center).
+- **Dynamic Thumbnail Gallery:** Automatically generates and displays thumbnails for your local videos in a modern, horizontally scrollable gallery.
+- **Auto-Update System:** Automatically checks for and installs new updates seamlessly from GitHub Releases.
+- **Multi-Language Support:** Localized user experience supporting multiple languages including English and Turkish.
 
 ---
 
