@@ -154,7 +154,7 @@
                                 <TextBlock x:Name="DeveloperRoleText" Text="Software Developer" Foreground="{ThemeResource SystemAccentColor}" FontSize="13" />
                                 <TextBlock x:Name="DeveloperDescText" Text="Modern masaüstü ve web uygulamaları tasarlayan tutkulu bir yazılım geliştirici." TextWrapping="Wrap" Margin="0,4,0,0" Foreground="Gray" />
                                 
-                                <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,12,0,0">
+                                <StackPanel Orientation="Vertical" Spacing="8" Margin="0,12,0,0">
                                     <HyperlinkButton NavigateUri="https://github.com/rzayevsahil" Padding="0">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <Viewbox Width="14" Height="14">
