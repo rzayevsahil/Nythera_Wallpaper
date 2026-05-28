@@ -6,9 +6,9 @@
 AppName=Nythera
 AppVersion=1.0.0
 AppPublisher=Nythera Studios
-AppPublisherURL=https://github.com/rzayevsahil/walpaper-for-pc
-AppSupportURL=https://github.com/rzayevsahil/walpaper-for-pc
-AppUpdatesURL=https://github.com/rzayevsahil/walpaper-for-pc
+AppPublisherURL=https://github.com/rzayevsahil/Nythera_Wallpaper
+AppSupportURL=https://github.com/rzayevsahil/Nythera_Wallpaper
+AppUpdatesURL=https://github.com/rzayevsahil/Nythera_Wallpaper
 
 ; Default Installation Folder (e.g. C:\Program Files\Nythera)
 DefaultDirName={autopf}\Nythera

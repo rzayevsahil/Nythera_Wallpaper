@@ -12,7 +12,7 @@ public class UpdateService
 {
     private const string CurrentVersion = "v1.0.0";
     private const string GithubRepoOwner = "rzayevsahil";
-    private const string GithubRepoName = "walpaper-for-pc";
+    private const string GithubRepoName = "Nythera_Wallpaper";
     
     public class ReleaseInfo
     {
