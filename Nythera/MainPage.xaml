@@ -22,7 +22,7 @@
         <!-- Header outside carousel -->
         <StackPanel Grid.Row="0" Spacing="8" HorizontalAlignment="Center" Margin="0,48,0,12">
             <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
-                <Image x:Name="AppTitleLogo" Height="90" Stretch="Uniform" />
+                <Image x:Name="AppTitleLogo" Height="120" Stretch="Uniform" />
             </Border>
         </StackPanel>
 
@@ -142,7 +142,42 @@
                 </Grid.RenderTransform>
                 <ScrollViewer VerticalScrollBarVisibility="Hidden">
                     <StackPanel Spacing="24" Padding="24">
-                        <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" Margin="0,16,0,0" />
+                        <!-- Update Banner (top of page, visible immediately) -->
+                        <Border x:Name="UpdateContainer" Visibility="Collapsed" CornerRadius="8"
+                                Background="{ThemeResource SystemAccentColor}" Padding="12,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock x:Name="UpdateStatusText" Text="Yeni bir güncelleme mevcut!" FontWeight="SemiBold" Foreground="White" FontSize="13" />
+                                </StackPanel>
+                                <Button x:Name="DownloadUpdateButton"
+                                        Grid.Column="1"
+                                        Click="DownloadUpdateButton_Click"
+                                        HorizontalContentAlignment="Stretch"
+                                        Padding="0"
+                                        Width="180">
+                                    <Grid Height="32" HorizontalAlignment="Stretch">
+                                        <Rectangle x:Name="DownloadProgressFill"
+                                                   HorizontalAlignment="Left"
+                                                   Fill="{ThemeResource SystemAccentColor}"
+                                                   Opacity="0.35"
+                                                   Width="0"
+                                                   RadiusX="4" RadiusY="4" />
+                                        <TextBlock x:Name="DownloadButtonText"
+                                                   Text="İndir ve Güncelle"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13" />
+                                    </Grid>
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" Margin="0,8,0,0" />
 
                         <!-- Video Selection Card -->
                         <Border CornerRadius="8" Padding="0">
@@ -199,36 +234,7 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Update Card -->
-                        <Border x:Name="UpdateContainer" Visibility="Collapsed" CornerRadius="8" Padding="0">
-                            <StackPanel Spacing="10">
-                                <TextBlock x:Name="UpdateStatusText" Text="A new version is available!" FontWeight="SemiBold" />
-                                <!-- Download button with built-in progress fill -->
-                                <Button x:Name="DownloadUpdateButton"
-                                        Click="DownloadUpdateButton_Click"
-                                        HorizontalAlignment="Stretch"
-                                        HorizontalContentAlignment="Stretch"
-                                        Padding="0"
-                                        Style="{ThemeResource AccentButtonStyle}">
-                                    <Grid Height="36" HorizontalAlignment="Stretch">
-                                        <!-- Progress fill layer (clips from left) -->
-                                        <Rectangle x:Name="DownloadProgressFill"
-                                                   HorizontalAlignment="Left"
-                                                   Fill="{ThemeResource SystemAccentColor}"
-                                                   Opacity="1"
-                                                   Width="0"
-                                                   RadiusX="4" RadiusY="4" />
-                                        <!-- Button label / progress text -->
-                                        <TextBlock x:Name="DownloadButtonText"
-                                                   Text="İndir ve Güncelle"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontWeight="SemiBold"
-                                                   FontSize="14" />
-                                    </Grid>
-                                </Button>
-                            </StackPanel>
-                        </Border>
+
 
                     </StackPanel>
                 </ScrollViewer>
