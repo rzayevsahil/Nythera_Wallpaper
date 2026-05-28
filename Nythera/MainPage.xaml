@@ -184,7 +184,7 @@
                             <StackPanel Spacing="16">
                                 <StackPanel Spacing="8">
                                     <TextBlock x:Name="DefaultVideosTitle" Text="Varsayılan Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    <ListView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Enabled" Height="100">
+                                    <ListView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Enabled" Height="115" Padding="0,0,0,12">
                                         <ListView.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <ItemsStackPanel Orientation="Horizontal" />
