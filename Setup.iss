@@ -1,9 +1,9 @@
 ; Nythera Inno Setup Script
 ; This script creates a professional Windows Installer (Setup.exe) for Nythera
 
-#define AppExe ".\Nythera\bin\Release\net10.0-windows10.0.26100.0\win-x64\publish\Nythera.exe"
+#define AppExe SourcePath + "Nythera\bin\Release\net10.0-windows10.0.26100.0\win-x64\publish\Nythera.exe"
 #dim Version[4]
-#expr GetVersionNumbers(AppExe, Version[0], Version[1], Version[2], Version[3])
+#expr GetVersionComponents(AppExe, Version[0], Version[1], Version[2], Version[3])
 #define AppVer Str(Version[0]) + "." + Str(Version[1]) + "." + Str(Version[2])
 
 [Setup]
