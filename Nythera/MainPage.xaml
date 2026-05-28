@@ -14,7 +14,19 @@
           PointerReleased="RootGrid_PointerReleased"
           PointerCanceled="RootGrid_PointerCanceled"
           PointerCaptureLost="RootGrid_PointerCanceled">
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Header outside carousel -->
+        <StackPanel Grid.Row="0" Spacing="8" HorizontalAlignment="Center" Margin="0,48,0,12">
+            <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
+                <Image x:Name="AppTitleLogo" Height="90" Stretch="Uniform" />
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             
             <!-- PAGE 3: About (Starts in background left) -->
             <Grid x:Name="Page3" Width="480" Height="540" VerticalAlignment="Center" HorizontalAlignment="Center" 
@@ -128,13 +140,7 @@
                 </Grid.RenderTransform>
                 <ScrollViewer VerticalScrollBarVisibility="Hidden">
                     <StackPanel Spacing="24" Padding="24">
-                        <!-- Header -->
-                        <StackPanel Spacing="8" HorizontalAlignment="Center">
-                            <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
-                                <Image x:Name="AppTitleLogo" Height="90" Stretch="Uniform" />
-                            </Border>
-                            <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" />
-                        </StackPanel>
+                        <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" Margin="0,16,0,0" />
 
                         <!-- Video Selection Card -->
                         <Border CornerRadius="8" Padding="0">
@@ -248,7 +254,7 @@
             
         </Grid>
         
-        <PipsPager x:Name="CarouselPager" NumberOfPages="3" SelectedPageIndex="0" WrapMode="Wrap"
+        <PipsPager x:Name="CarouselPager" Grid.Row="1" NumberOfPages="3" SelectedPageIndex="0" WrapMode="Wrap"
                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,24"
                    SelectedIndexChanged="CarouselPager_SelectedIndexChanged" />
     </Grid>
