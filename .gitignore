@@ -1,0 +1,42 @@
+﻿# =============================================
+# Nythera - Root .gitignore
+# =============================================
+
+# Installer output (exe, setup files)
+Installer/
+*.exe
+*.msi
+
+# .NET / MSBuild
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+.vs/
+*.user
+*.suo
+
+# NuGet
+packages/
+*.nupkg
+project.lock.json
+
+# MSIX packaging
+AppPackages/
+*.msix
+*.msixupload
+*.appx
+*.appxbundle
+
+# Publish output
+publish/
+*.pubxml
+PublishScripts/
+
+# Logs
+*.log
+*.binlog
+
+# OS
+Thumbs.db
+.DS_Store
