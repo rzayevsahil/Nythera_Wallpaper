@@ -19,8 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Assets\AppIcon.ico" />
-    <Content Include="Assets\Background.png" />
+    <Content Include="Assets\**" />
   </ItemGroup>
 
   <ItemGroup>

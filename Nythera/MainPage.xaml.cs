@@ -68,13 +68,44 @@ public sealed partial class MainPage : Page
             if (Enum.TryParse(themeStr, out ElementTheme theme))
             {
                 rootElement.RequestedTheme = theme;
+                UpdateBackgroundLogo(theme);
             }
         }
     }
 
+    private void UpdateBackgroundLogo(ElementTheme theme)
+    {
+        bool isDark = true;
+        if (theme == ElementTheme.Light) isDark = false;
+        else if (theme == ElementTheme.Default)
+        {
+            isDark = Application.Current.RequestedTheme == ApplicationTheme.Dark;
+        }
+
+        string logoPath = isDark ? "ms-appx:///Assets/logo_dark.png" : "ms-appx:///Assets/logo_light.png";
+        
+        if (RootGrid != null)
+        {
+            if (isDark)
+            {
+                RootGrid.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
+            }
+            else
+            {
+                RootGrid.Background = null;
+            }
+        }
+        
+        try
+        {
+            var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(logoPath));
+            AppTitleLogo.Source = bitmapImage;
+        }
+        catch { }
+    }
+
     private void UpdateLanguageUI()
     {
-        AppTitle.Text = LocalizationService.GetString("AppTitle");
         AppDescription.Text = LocalizationService.GetString("AppDescription");
         BrowseVideoButton.Content = LocalizationService.GetString("BrowseVideo");
         ApplyButton.Content = LocalizationService.GetString("ApplyWallpaper");

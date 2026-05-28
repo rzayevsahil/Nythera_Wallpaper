@@ -8,14 +8,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Padding="32">
-        <Grid.Background>
-            <ImageBrush ImageSource="ms-appx:///Assets/Background.png" Stretch="UniformToFill" Opacity="0.4" />
-        </Grid.Background>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24" Width="450">
+    <Grid x:Name="RootGrid">
+        
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="24" Width="450" Padding="32">
             <!-- Header -->
             <StackPanel Spacing="8" HorizontalAlignment="Center">
-                <TextBlock x:Name="AppTitle" Text="Nythera" Style="{ThemeResource TitleTextBlockStyle}" HorizontalAlignment="Center" FontWeight="Bold" />
+                <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
+                    <Image x:Name="AppTitleLogo" Height="90" Stretch="Uniform" />
+                </Border>
                 <TextBlock x:Name="AppDescription" Text="Select a video to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" />
             </StackPanel>
 
