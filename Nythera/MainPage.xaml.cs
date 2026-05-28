@@ -592,6 +592,11 @@ public sealed partial class MainPage : Page
                     StatusText.Text = $"{LocalizationService.GetString("VideoReady")}: {selected.Title}";
                     ApplyButton.IsEnabled = true;
                     
+                    PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+                    PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
+                    PreviewPlayer.MediaPlayer.Volume = 0;
+                    PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
+                    
                     // Auto-apply on selection
                     ApplyWallpaper_Click(null, null);
                 }
