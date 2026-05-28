@@ -90,10 +90,31 @@ public static class WindowsApi
     public static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
     [DllImport("user32.dll")]
-    public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
+    public static extern bool InvalidateRect(IntPtr hWnd, IntPtr lpRect, bool bErase);
 
     [DllImport("user32.dll")]
-    public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFO lpmi);
+    public static extern bool UpdateWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern bool RedrawWindow(IntPtr hWnd, IntPtr lprcUpdate, IntPtr hrgnUpdate, uint flags);
+
+    public const uint RDW_INVALIDATE = 0x0001;
+    public const uint RDW_ERASE = 0x0004;
+    public const uint RDW_ALLCHILDREN = 0x0080;
+    public const uint RDW_UPDATENOW = 0x0100;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+
+    [DllImport("user32.dll")]
+    public static extern int MapWindowPoints(IntPtr hwndFrom, IntPtr hwndTo, ref POINT lpPoints, uint cPoints);
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr MonitorFromWindow(IntPtr hwnd, uint dwFlags);
 
     public const uint MONITOR_DEFAULTTOPRIMARY = 1;
     public const uint MONITOR_DEFAULTTONEAREST = 2;
@@ -108,13 +129,18 @@ public static class WindowsApi
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    public struct MONITORINFO
+    public struct MONITORINFOEX
     {
         public int cbSize;
         public RECT rcMonitor;
         public RECT rcWork;
         public uint dwFlags;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string szDevice;
     }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFOEX lpmi);
 
     public delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
 

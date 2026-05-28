@@ -120,4 +120,27 @@ public class SettingsService
             return File.ReadAllText(LanguagePath).Trim();
         return "en"; // Default
     }
+
+    private static readonly string TargetMonitorPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "targetmonitor.txt"
+    );
+
+    public static void SaveTargetMonitor(string monitorId)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(TargetMonitorPath));
+            File.WriteAllText(TargetMonitorPath, monitorId);
+        }
+        catch (Exception ex) { }
+    }
+
+    public static string GetTargetMonitor()
+    {
+        if (File.Exists(TargetMonitorPath))
+            return File.ReadAllText(TargetMonitorPath).Trim();
+        return "All"; // Default
+    }
 }

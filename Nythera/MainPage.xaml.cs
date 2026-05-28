@@ -14,7 +14,17 @@ namespace Nythera;
 
 public sealed partial class MainPage : Page
 {
-    private List<WallpaperWindow> _wallpaperWindows = new List<WallpaperWindow>();
+    private class MonitorInfo
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+    
+    private bool _isInitializing = true;
+    private List<MonitorInfo> _monitors = new List<MonitorInfo>();
+    private Dictionary<string, WallpaperWindow> _wallpaperWindows = new Dictionary<string, WallpaperWindow>();
     private Windows.Storage.StorageFile _selectedFile;
     private Services.UpdateService.ReleaseInfo _updateInfo;
 
@@ -259,29 +269,7 @@ public sealed partial class MainPage : Page
             AppVersionText.Text = version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v1.1.0";
         }
         
-        // Dynamically set the Virtual Desktop size for perfect preview
-        try
-        {
-            var displayArea = Microsoft.UI.Windowing.DisplayArea.Primary;
-            if (displayArea != null && VirtualDesktopGrid != null && PreviewBorder != null)
-            {
-                double screenWidth = displayArea.OuterBounds.Width;
-                double screenHeight = displayArea.OuterBounds.Height;
-                
-                VirtualDesktopGrid.Width = screenWidth;
-                VirtualDesktopGrid.Height = screenHeight;
-
-                // Make the Border match the exact aspect ratio of the user's screen
-                // Max width available in the Page1 stack panel is 432
-                double targetWidth = 432.0;
-                if (screenWidth > 0)
-                {
-                    PreviewBorder.Height = targetWidth * (screenHeight / screenWidth);
-                }
-            }
-        }
-        catch { }
-
+        // We will set the preview size in UpdatePreviewBounds() instead of here.
         // Check for updates asynchronously without blocking the UI
         _ = CheckForUpdatesAsync();
 
@@ -313,6 +301,103 @@ public sealed partial class MainPage : Page
             PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
             PreviewPlayer.MediaPlayer.Volume = 0;
             PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
+        }
+
+        InitializeMonitors();
+        
+        _isInitializing = false;
+    }
+
+    private void InitializeMonitors()
+    {
+        _monitors.Clear();
+        int monitorCount = 0;
+        Native.WindowsApi.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref Native.WindowsApi.RECT lprcMonitor, IntPtr dwData)
+        {
+            monitorCount++;
+            int w = lprcMonitor.Right - lprcMonitor.Left;
+            int h = lprcMonitor.Bottom - lprcMonitor.Top;
+            
+            _monitors.Add(new MonitorInfo { Id = monitorCount.ToString(), Name = $"Monitor {monitorCount}", Width = w, Height = h });
+            
+            var item = new ComboBoxItem { Content = $"Monitor {monitorCount} ({w}x{h})", Tag = monitorCount.ToString() };
+            TargetMonitorComboBox.Items.Add(item);
+            return true;
+        }, IntPtr.Zero);
+
+        string savedMonitor = SettingsService.GetTargetMonitor();
+        foreach (ComboBoxItem item in TargetMonitorComboBox.Items)
+        {
+            if (item.Tag.ToString() == savedMonitor)
+            {
+                TargetMonitorComboBox.SelectedItem = item;
+                break;
+            }
+        }
+        if (TargetMonitorComboBox.SelectedItem == null && TargetMonitorComboBox.Items.Count > 0)
+            TargetMonitorComboBox.SelectedIndex = 0;
+            
+        UpdatePreviewBounds(TargetMonitorComboBox.SelectedItem is ComboBoxItem cbItem && cbItem.Tag != null ? cbItem.Tag.ToString() : "All");
+    }
+
+    private void UpdatePreviewBounds(string targetMonitor)
+    {
+        if (VirtualDesktopGrid == null || PreviewBorder == null || PreviewInfoText == null) return;
+        
+        int targetWidth = 1920;
+        int targetHeight = 1080;
+        string previewText = "";
+        
+        if (targetMonitor == "All")
+        {
+            // Use primary monitor as fallback for "All"
+            try
+            {
+                var displayArea = Microsoft.UI.Windowing.DisplayArea.Primary;
+                if (displayArea != null)
+                {
+                    targetWidth = displayArea.OuterBounds.Width;
+                    targetHeight = displayArea.OuterBounds.Height;
+                }
+            }
+            catch { }
+            previewText = $"Önizleme: Tüm Ekranlar (Ana Ekran baz alındı: {targetWidth}x{targetHeight})";
+        }
+        else
+        {
+            var mon = _monitors.Find(m => m.Id == targetMonitor);
+            if (mon != null)
+            {
+                targetWidth = mon.Width;
+                targetHeight = mon.Height;
+                previewText = $"Önizleme: {mon.Name} ({targetWidth}x{targetHeight})";
+            }
+        }
+        
+        VirtualDesktopGrid.Width = targetWidth;
+        VirtualDesktopGrid.Height = targetHeight;
+        
+        if (targetWidth > 0)
+        {
+            double fixedWidth = 432.0;
+            PreviewBorder.Height = fixedWidth * ((double)targetHeight / targetWidth);
+        }
+        
+        PreviewInfoText.Text = previewText;
+    }
+
+    private void TargetMonitorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (TargetMonitorComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            string tag = item.Tag.ToString();
+            SettingsService.SaveTargetMonitor(tag);
+            UpdatePreviewBounds(tag);
+            
+            if (_selectedFile != null && !_isInitializing)
+            {
+                ApplyWallpaper_Click(null, null);
+            }
         }
     }
 
@@ -398,24 +483,47 @@ public sealed partial class MainPage : Page
         
         try
         {
-            // Close existing windows
-            foreach (var win in _wallpaperWindows)
-            {
-                win.Close();
-            }
-            _wallpaperWindows.Clear();
+            // We will invalidate WorkerW at the end of the method after all windows are repositioned
+            
+            // Mark all existing windows as 'unseen' this pass so we can clean up disconnected ones
+            var unseenMonitors = new HashSet<string>(_wallpaperWindows.Keys);
+
+            string targetMonitor = SettingsService.GetTargetMonitor();
+            int currentMonitorIndex = 0;
+
+            string debugFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "monitor_debug.txt");
+            System.IO.File.AppendAllText(debugFile, $"\n--- ApplyWallpaper_Click called. TargetMonitor: {targetMonitor} ---\n");
 
             // Enumerate monitors and create a window for each
             Native.WindowsApi.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref Native.WindowsApi.RECT lprcMonitor, IntPtr dwData)
             {
+                currentMonitorIndex++;
+                System.IO.File.AppendAllText(debugFile, $"Found Monitor {currentMonitorIndex} at ({lprcMonitor.Left}, {lprcMonitor.Top}) with size {lprcMonitor.Right - lprcMonitor.Left}x{lprcMonitor.Bottom - lprcMonitor.Top}\n");
+
+                string monitorId = currentMonitorIndex.ToString();
+                unseenMonitors.Remove(monitorId);
+
+                if (!_wallpaperWindows.TryGetValue(monitorId, out WallpaperWindow wallpaperWindow))
+                {
+                    wallpaperWindow = new WallpaperWindow();
+                    _wallpaperWindows[monitorId] = wallpaperWindow;
+                }
+
+                if (targetMonitor != "All" && targetMonitor != monitorId)
+                {
+                    System.IO.File.AppendAllText(debugFile, $" -> Hiding Monitor {currentMonitorIndex} because Target is {targetMonitor}\n");
+                    wallpaperWindow.HideWindow();
+                    return true;
+                }
+                
+                System.IO.File.AppendAllText(debugFile, $" -> Applying to Monitor {currentMonitorIndex}!\n");
                 int x = lprcMonitor.Left;
                 int y = lprcMonitor.Top;
                 int width = lprcMonitor.Right - lprcMonitor.Left;
                 int height = lprcMonitor.Bottom - lprcMonitor.Top;
 
-                var wallpaperWindow = new WallpaperWindow();
                 wallpaperWindow.AttachToDesktop(x, y, width, height);
-                wallpaperWindow.Activate();
+                wallpaperWindow.ShowWindow();
                 wallpaperWindow.PlayVideo(_selectedFile);
                 
                 // Apply saved stretch mode
@@ -430,9 +538,29 @@ public sealed partial class MainPage : Page
                 // Apply volume
                 wallpaperWindow.SetVolume(VolumeSlider.Value / 100.0);
 
-                _wallpaperWindows.Add(wallpaperWindow);
                 return true;
             }, IntPtr.Zero);
+
+            // Cleanup windows for monitors that no longer exist
+            foreach (var id in unseenMonitors)
+            {
+                try
+                {
+                    _wallpaperWindows[id].Cleanup();
+                    _wallpaperWindows[id].Close();
+                }
+                catch { }
+                _wallpaperWindows.Remove(id);
+            }
+
+            // Force WorkerW to redraw its background (clear ghost frames) AFTER all windows are adjusted
+            IntPtr workerW = Native.WindowsApi.FindWindowEx(IntPtr.Zero, IntPtr.Zero, "WorkerW", null);
+            if (workerW != IntPtr.Zero)
+            {
+                // Force a full redraw of the desktop background behind the windows
+                Native.WindowsApi.InvalidateRect(workerW, IntPtr.Zero, true);
+                Native.WindowsApi.UpdateWindow(workerW);
+            }
 
             SettingsService.SaveWallpaperPath(_selectedFile.Path);
             
@@ -446,7 +574,7 @@ public sealed partial class MainPage : Page
 
     private void VolumeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
     {
-        foreach (var win in _wallpaperWindows)
+        foreach (var win in _wallpaperWindows.Values)
         {
             // Slider is 0-100, MediaPlayer volume is 0.0-1.0
             win.SetVolume(e.NewValue / 100.0);
@@ -481,7 +609,7 @@ public sealed partial class MainPage : Page
                     PreviewPlayer.Stretch = stretchValue;
                 }
                 
-                foreach (var win in _wallpaperWindows)
+                foreach (var win in _wallpaperWindows.Values)
                 {
                     win.SetStretchMode(stretchValue);
                 }

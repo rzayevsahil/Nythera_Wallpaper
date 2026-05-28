@@ -52,8 +52,8 @@ public class FullScreenDetector
         IntPtr hMonitor = WindowsApi.MonitorFromWindow(hWnd, WindowsApi.MONITOR_DEFAULTTONEAREST);
         if (hMonitor != IntPtr.Zero)
         {
-            WindowsApi.MONITORINFO monitorInfo = new WindowsApi.MONITORINFO();
-            monitorInfo.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(typeof(WindowsApi.MONITORINFO));
+            WindowsApi.MONITORINFOEX monitorInfo = new WindowsApi.MONITORINFOEX();
+            monitorInfo.cbSize = System.Runtime.InteropServices.Marshal.SizeOf(typeof(WindowsApi.MONITORINFOEX));
             
             if (WindowsApi.GetMonitorInfo(hMonitor, ref monitorInfo))
             {

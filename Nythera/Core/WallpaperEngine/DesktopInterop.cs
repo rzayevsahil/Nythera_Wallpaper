@@ -43,7 +43,10 @@ public class DesktopInterop
 
     public static void SetAsDesktopBackground(IntPtr hWnd)
     {
+        string debugFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "monitor_debug.txt");
+        
         IntPtr workerW = GetWorkerW();
+        System.IO.File.AppendAllText(debugFile, $"SetAsDesktopBackground called. hwnd={hWnd}, workerW={workerW}\n");
         if (workerW != IntPtr.Zero)
         {
             // Update the window style to be a child window, removing borders etc.

@@ -159,6 +159,7 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <!-- Volume -->
@@ -173,6 +174,12 @@
                                         <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
                                         <ComboBoxItem Content="Center (Ortala)" Tag="None" />
                                     </ComboBox>
+                                    
+                                    <!-- Target Monitor -->
+                                    <TextBlock x:Name="TargetMonitorText" Text="Monitor:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                                    <ComboBox x:Name="TargetMonitorComboBox" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="TargetMonitorComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="All Monitors (Tüm Ekranlar)" Tag="All" />
+                                    </ComboBox>
                                 </Grid>
                                 
                                 <!-- Video Preview -->
@@ -186,6 +193,7 @@
                                         <FontIcon x:Name="PreviewPlaceholderIcon" Glyph="&#xE714;" FontSize="48" Foreground="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Grid>
                                 </Border>
+                                <TextBlock x:Name="PreviewInfoText" Text="Önizleme: Ana Ekran" Foreground="Gray" FontSize="12" HorizontalAlignment="Center" />
                             </StackPanel>
                         </Border>
 
