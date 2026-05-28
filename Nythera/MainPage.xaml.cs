@@ -652,7 +652,7 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async void TargetMonitorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void TargetMonitorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (TargetMonitorComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
         {
@@ -662,35 +662,6 @@ public sealed partial class MainPage : Page
             
             if (!_isInitializing)
             {
-                string assignedPath = SettingsService.GetWallpaperPath(tag);
-                if (string.IsNullOrEmpty(assignedPath) || !System.IO.File.Exists(assignedPath))
-                {
-                    assignedPath = SettingsService.GetWallpaperPath("All");
-                }
-
-                if (!string.IsNullOrEmpty(assignedPath) && System.IO.File.Exists(assignedPath))
-                {
-                    try
-                    {
-                        var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(assignedPath);
-                        _selectedFile = file;
-                        
-                        if (PreviewPlayer != null)
-                        {
-                            PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
-                            PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
-                            PreviewPlayer.MediaPlayer.Volume = 0;
-                            PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
-                        }
-                        
-                        var existing = System.Linq.Enumerable.FirstOrDefault(_allVideos, v => v.VideoPath == assignedPath);
-                        if (existing != null && DefaultVideosGrid != null)
-                        {
-                            DefaultVideosGrid.SelectedItem = existing;
-                        }
-                    }
-                    catch { }
-                }
                 UpdateAppliedBadge();
             }
         }
