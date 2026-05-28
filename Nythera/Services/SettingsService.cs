@@ -17,12 +17,41 @@ public class SettingsService
         "stretchmode.txt"
     );
 
-    public static void SaveWallpaperPath(string path)
+    private static readonly string MonitorSettingsPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "monitor_settings.txt"
+    );
+
+    public static void SaveWallpaperPath(string monitorId, string path)
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath));
-            File.WriteAllText(SettingsPath, path);
+            Directory.CreateDirectory(Path.GetDirectoryName(MonitorSettingsPath));
+            var settings = new System.Collections.Generic.Dictionary<string, string>();
+            if (File.Exists(MonitorSettingsPath))
+            {
+                var lines = File.ReadAllLines(MonitorSettingsPath);
+                foreach (var line in lines)
+                {
+                    var parts = line.Split('=', 2);
+                    if (parts.Length == 2)
+                        settings[parts[0]] = parts[1];
+                }
+            }
+            settings[monitorId] = path;
+            var newLines = new System.Collections.Generic.List<string>();
+            foreach (var kvp in settings)
+            {
+                newLines.Add($"{kvp.Key}={kvp.Value}");
+            }
+            File.WriteAllLines(MonitorSettingsPath, newLines);
+            
+            // Also save to legacy settings.txt for backwards compatibility if it's "All"
+            if (monitorId == "All")
+            {
+                File.WriteAllText(SettingsPath, path);
+            }
         }
         catch (Exception ex)
         {
@@ -30,10 +59,21 @@ public class SettingsService
         }
     }
 
-    public static string GetWallpaperPath()
+    public static string GetWallpaperPath(string monitorId)
     {
         try
         {
+            if (File.Exists(MonitorSettingsPath))
+            {
+                var lines = File.ReadAllLines(MonitorSettingsPath);
+                foreach (var line in lines)
+                {
+                    var parts = line.Split('=', 2);
+                    if (parts.Length == 2 && parts[0] == monitorId)
+                        return parts[1];
+                }
+            }
+            // Fallback to legacy settings.txt
             if (File.Exists(SettingsPath))
             {
                 return File.ReadAllText(SettingsPath).Trim();
@@ -44,6 +84,11 @@ public class SettingsService
             Console.WriteLine($"Failed to load settings: {ex.Message}");
         }
         return null;
+    }
+
+    public static string GetWallpaperPath()
+    {
+        return GetWallpaperPath("All");
     }
 
     public static void SaveStretchMode(string stretchMode)

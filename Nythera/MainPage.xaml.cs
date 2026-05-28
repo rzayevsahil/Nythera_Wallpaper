@@ -46,6 +46,23 @@ public class DefaultVideo : System.ComponentModel.INotifyPropertyChanged
         }
     }
 
+    private string _appliedMonitorsText;
+    public string AppliedMonitorsText
+    {
+        get => _appliedMonitorsText;
+        set
+        {
+            if (_appliedMonitorsText != value)
+            {
+                _appliedMonitorsText = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(AppliedMonitorsText)));
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsApplied)));
+            }
+        }
+    }
+
+    public bool IsApplied => !string.IsNullOrEmpty(AppliedMonitorsText);
+
     public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 }
 
@@ -377,6 +394,7 @@ public sealed partial class MainPage : Page
         InitializeMonitors();
         
         _isInitializing = false;
+        UpdateAppliedBadge();
     }
 
     private void InitializeMonitors()
@@ -458,7 +476,83 @@ public sealed partial class MainPage : Page
         PreviewInfoText.Text = previewText;
     }
 
-    private void TargetMonitorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void UpdateVideoListBadges()
+    {
+        string allPath = SettingsService.GetWallpaperPath("All");
+        var monitorPaths = new Dictionary<string, string>();
+        
+        foreach (var mon in _monitors)
+        {
+            string p = SettingsService.GetWallpaperPath(mon.Id);
+            if (string.IsNullOrEmpty(p)) p = allPath;
+            monitorPaths[mon.Id] = p;
+        }
+
+        foreach (var video in _allVideos)
+        {
+            var matchedMonitors = new List<string>();
+            bool appliedToAll = true;
+            
+            if (_monitors.Count == 0) appliedToAll = false;
+            
+            foreach (var mon in _monitors)
+            {
+                if (!video.VideoPath.Equals(monitorPaths[mon.Id], StringComparison.OrdinalIgnoreCase))
+                {
+                    appliedToAll = false;
+                    break;
+                }
+            }
+
+            if (appliedToAll && _monitors.Count > 0)
+            {
+                video.AppliedMonitorsText = "Tümü";
+            }
+            else
+            {
+                foreach (var mon in _monitors)
+                {
+                    if (video.VideoPath.Equals(monitorPaths[mon.Id], StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchedMonitors.Add($"M{mon.Id}");
+                    }
+                }
+                
+                if (matchedMonitors.Count > 0)
+                {
+                    video.AppliedMonitorsText = string.Join(", ", matchedMonitors);
+                }
+                else
+                {
+                    video.AppliedMonitorsText = string.Empty;
+                }
+            }
+        }
+    }
+
+    private void UpdateAppliedBadge()
+    {
+        if (AppliedBadge == null || _selectedFile == null) return;
+        
+        string targetMonitor = SettingsService.GetTargetMonitor();
+        string assignedPath = SettingsService.GetWallpaperPath(targetMonitor);
+        
+        if (string.IsNullOrEmpty(assignedPath) && targetMonitor != "All")
+        {
+            assignedPath = SettingsService.GetWallpaperPath("All");
+        }
+        
+        if (!string.IsNullOrEmpty(assignedPath) && _selectedFile.Path.Equals(assignedPath, StringComparison.OrdinalIgnoreCase))
+        {
+            AppliedBadge.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            AppliedBadge.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private async void TargetMonitorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (TargetMonitorComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
         {
@@ -466,9 +560,38 @@ public sealed partial class MainPage : Page
             SettingsService.SaveTargetMonitor(tag);
             UpdatePreviewBounds(tag);
             
-            if (_selectedFile != null && !_isInitializing)
+            if (!_isInitializing)
             {
-                ApplyWallpaper_Click(null, null);
+                string assignedPath = SettingsService.GetWallpaperPath(tag);
+                if (string.IsNullOrEmpty(assignedPath) || !System.IO.File.Exists(assignedPath))
+                {
+                    assignedPath = SettingsService.GetWallpaperPath("All");
+                }
+
+                if (!string.IsNullOrEmpty(assignedPath) && System.IO.File.Exists(assignedPath))
+                {
+                    try
+                    {
+                        var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(assignedPath);
+                        _selectedFile = file;
+                        
+                        if (PreviewPlayer != null)
+                        {
+                            PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+                            PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
+                            PreviewPlayer.MediaPlayer.Volume = 0;
+                            PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
+                        }
+                        
+                        var existing = System.Linq.Enumerable.FirstOrDefault(_allVideos, v => v.VideoPath == assignedPath);
+                        if (existing != null && DefaultVideosGrid != null)
+                        {
+                            DefaultVideosGrid.SelectedItem = existing;
+                        }
+                    }
+                    catch { }
+                }
+                UpdateAppliedBadge();
             }
         }
     }
@@ -600,6 +723,7 @@ public sealed partial class MainPage : Page
             
             FilterVideos();
             DefaultVideosGrid.ItemsSource = _filteredVideos;
+            UpdateVideoListBadges();
             File.WriteAllText(logPath, logContent);
         }
         catch (Exception ex)
@@ -647,6 +771,8 @@ public sealed partial class MainPage : Page
                     PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
                     PreviewPlayer.MediaPlayer.Volume = 0;
                     PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
+                    
+                    UpdateAppliedBadge();
                 }
                 catch (Exception ex)
                 {
@@ -719,6 +845,7 @@ public sealed partial class MainPage : Page
                 {
                     DefaultVideosGrid.SelectedItem = existing;
                 }
+                UpdateAppliedBadge();
             }
             else
             {
@@ -778,10 +905,8 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void ApplyWallpaper_Click(object sender, RoutedEventArgs e)
+    private async void ApplyWallpaper_Click(object sender, RoutedEventArgs e)
     {
-        if (_selectedFile == null) return;
-        
         try
         {
             // We will invalidate WorkerW at the end of the method after all windows are repositioned
@@ -790,8 +915,14 @@ public sealed partial class MainPage : Page
             var unseenMonitors = new HashSet<string>(_wallpaperWindows.Keys);
 
             string targetMonitor = SettingsService.GetTargetMonitor();
-            int currentMonitorIndex = 0;
+            
+            // If user explicitly clicked Apply, save the selected video to the target monitor(s)
+            if (sender != null && _selectedFile != null)
+            {
+                SettingsService.SaveWallpaperPath(targetMonitor, _selectedFile.Path);
+            }
 
+            int currentMonitorIndex = 0;
             string debugFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "monitor_debug.txt");
             System.IO.File.AppendAllText(debugFile, $"\n--- ApplyWallpaper_Click called. TargetMonitor: {targetMonitor} ---\n");
 
@@ -810,14 +941,30 @@ public sealed partial class MainPage : Page
                     _wallpaperWindows[monitorId] = wallpaperWindow;
                 }
 
-                if (targetMonitor != "All" && targetMonitor != monitorId)
+                // Determine which video to play on this monitor
+                string pathToPlay = null;
+                if (targetMonitor == "All")
                 {
-                    System.IO.File.AppendAllText(debugFile, $" -> Hiding Monitor {currentMonitorIndex} because Target is {targetMonitor}\n");
+                    pathToPlay = SettingsService.GetWallpaperPath("All");
+                }
+                else
+                {
+                    pathToPlay = SettingsService.GetWallpaperPath(monitorId);
+                    if (string.IsNullOrEmpty(pathToPlay))
+                    {
+                        // Fallback to "All" if no specific wallpaper is set for this monitor
+                        pathToPlay = SettingsService.GetWallpaperPath("All");
+                    }
+                }
+
+                if (string.IsNullOrEmpty(pathToPlay) || !System.IO.File.Exists(pathToPlay))
+                {
+                    System.IO.File.AppendAllText(debugFile, $" -> Hiding Monitor {currentMonitorIndex} because no valid wallpaper path was found.\n");
                     wallpaperWindow.HideWindow();
                     return true;
                 }
                 
-                System.IO.File.AppendAllText(debugFile, $" -> Applying to Monitor {currentMonitorIndex}!\n");
+                System.IO.File.AppendAllText(debugFile, $" -> Applying {pathToPlay} to Monitor {currentMonitorIndex}!\n");
                 int x = lprcMonitor.Left;
                 int y = lprcMonitor.Top;
                 int width = lprcMonitor.Right - lprcMonitor.Left;
@@ -825,7 +972,10 @@ public sealed partial class MainPage : Page
 
                 wallpaperWindow.AttachToDesktop(x, y, width, height);
                 wallpaperWindow.ShowWindow();
-                wallpaperWindow.PlayVideo(_selectedFile);
+                
+                // We use async here, but EnumDisplayMonitors callback is synchronous.
+                // PlayVideo async execution inside synchronous callback is fine since it doesn't await here.
+                _ = PlayVideoOnWindowAsync(wallpaperWindow, pathToPlay);
                 
                 // Apply saved stretch mode
                 if (StretchModeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
@@ -863,14 +1013,28 @@ public sealed partial class MainPage : Page
                 Native.WindowsApi.UpdateWindow(workerW);
             }
 
-            SettingsService.SaveWallpaperPath(_selectedFile.Path);
+            if (sender != null && _selectedFile != null)
+            {
+                StatusText.Text = $"Wallpaper applied: {_selectedFile.Name}";
+            }
             
-            StatusText.Text = $"Wallpaper applied: {_selectedFile.Name}";
+            UpdateAppliedBadge();
+            UpdateVideoListBadges();
         }
         catch (Exception ex)
         {
             StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
         }
+    }
+
+    private async Task PlayVideoOnWindowAsync(WallpaperWindow wallpaperWindow, string pathToPlay)
+    {
+        try
+        {
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(pathToPlay);
+            wallpaperWindow.PlayVideo(file);
+        }
+        catch { }
     }
 
     private void VolumeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
