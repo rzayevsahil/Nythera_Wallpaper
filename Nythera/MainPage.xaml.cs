@@ -569,13 +569,22 @@ public sealed partial class MainPage : Page
 
     private void UpdateVideoListBadges()
     {
+        string targetMonitor = SettingsService.GetTargetMonitor();
         string allPath = SettingsService.GetWallpaperPath("All");
         var monitorPaths = new Dictionary<string, string>();
         
         foreach (var mon in _monitors)
         {
-            string p = SettingsService.GetWallpaperPath(mon.Id);
-            if (string.IsNullOrEmpty(p)) p = allPath;
+            string p = null;
+            if (targetMonitor == "All")
+            {
+                p = allPath;
+            }
+            else
+            {
+                p = SettingsService.GetWallpaperPath(mon.Id);
+                if (string.IsNullOrEmpty(p)) p = allPath;
+            }
             monitorPaths[mon.Id] = p;
         }
 
@@ -1011,6 +1020,15 @@ public sealed partial class MainPage : Page
             if (sender != null && _selectedFile != null)
             {
                 SettingsService.SaveWallpaperPath(targetMonitor, _selectedFile.Path);
+                
+                if (targetMonitor == "All")
+                {
+                    // Clear individual monitor settings so "All" takes full precedence
+                    foreach (var mon in _monitors)
+                    {
+                        SettingsService.SaveWallpaperPath(mon.Id, "");
+                    }
+                }
             }
 
             int currentMonitorIndex = 0;
