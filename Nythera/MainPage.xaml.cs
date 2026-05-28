@@ -283,6 +283,14 @@ public sealed partial class MainPage : Page
                 StatusText.Text = $"Failed to restore wallpaper: {ex.Message}";
             }
         }
+        
+        if (_selectedFile != null)
+        {
+            PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+            PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
+            PreviewPlayer.MediaPlayer.Volume = 0;
+            PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
+        }
     }
 
     private async Task CheckForUpdatesAsync()
@@ -344,6 +352,11 @@ public sealed partial class MainPage : Page
             {
                 StatusText.Text = $"{LocalizationService.GetString("Selected")} {_selectedFile.Name}";
                 ApplyButton.IsEnabled = true;
+                
+                PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+                PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
+                PreviewPlayer.MediaPlayer.Volume = 0;
+                PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
             }
             else
             {
