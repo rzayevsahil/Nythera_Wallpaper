@@ -596,9 +596,6 @@ public sealed partial class MainPage : Page
                     PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
                     PreviewPlayer.MediaPlayer.Volume = 0;
                     PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
-                    
-                    // Auto-apply on selection
-                    ApplyWallpaper_Click(null, null);
                 }
                 catch (Exception ex)
                 {
