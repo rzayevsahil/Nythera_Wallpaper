@@ -49,8 +49,10 @@ Name: "{group}\Nythera"; Filename: "{app}\Nythera.exe"; IconFilename: "{app}\Nyt
 Name: "{autodesktop}\Nythera"; Filename: "{app}\Nythera.exe"; IconFilename: "{app}\Nythera.exe"; Tasks: desktopicon
 
 [Run]
-; Run the app automatically after installation finishes
+; Run the app automatically after installation finishes (manual install checkbox)
 Filename: "{app}\Nythera.exe"; Description: "{cm:LaunchProgram,Nythera}"; Flags: nowait postinstall skipifsilent
+; Run the app automatically after silent installation finishes
+Filename: "{app}\Nythera.exe"; Flags: nowait; Check: IsAutoRestart
 
 [UninstallRun]
 ; (Optional) Kill process before uninstalling if it is running
@@ -64,4 +66,19 @@ begin
   // Kill the application silently before extracting files to prevent locking issues
   Exec(ExpandConstant('{cmd}'), '/c taskkill /F /IM Nythera.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Result := True;
+end;
+
+function IsAutoRestart: Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 1 to ParamCount do
+  begin
+    if CompareText(ParamStr(I), '/AUTORESTART') = 0 then
+    begin
+      Result := True;
+      Exit;
+    end;
+  end;
 end;

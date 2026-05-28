@@ -114,7 +114,7 @@ public class UpdateService
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = tempPath,
-                    Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS /SP-",
+                    Arguments = "/VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS /SP- /AUTORESTART",
                     UseShellExecute = true
                 }
             };

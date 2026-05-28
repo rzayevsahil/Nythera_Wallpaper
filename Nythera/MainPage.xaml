@@ -93,6 +93,7 @@
                     <TextBlock x:Name="UpdateStatusText" Text="A new version is available!" FontWeight="SemiBold" />
                     <Button x:Name="DownloadUpdateButton" Content="Download and Update" Style="{ThemeResource AccentButtonStyle}" Click="DownloadUpdateButton_Click" HorizontalAlignment="Stretch" />
                     <ProgressBar x:Name="UpdateProgressBar" Visibility="Collapsed" Minimum="0" Maximum="100" Value="0" />
+                    <TextBlock x:Name="UpdateProgressText" Visibility="Collapsed" Text="0%" HorizontalAlignment="Center" Foreground="Gray" FontSize="12" />
                 </StackPanel>
             </Border>
 

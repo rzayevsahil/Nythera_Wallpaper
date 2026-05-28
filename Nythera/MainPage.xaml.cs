@@ -207,6 +207,7 @@ public sealed partial class MainPage : Page
 
         DownloadUpdateButton.IsEnabled = false;
         UpdateProgressBar.Visibility = Visibility.Visible;
+        UpdateProgressText.Visibility = Visibility.Visible;
         UpdateStatusText.Text = LocalizationService.GetString("Downloading");
 
         try
@@ -214,6 +215,7 @@ public sealed partial class MainPage : Page
             var progress = new Progress<double>(percent =>
             {
                 UpdateProgressBar.Value = percent;
+                UpdateProgressText.Text = $"{percent:F0}%";
             });
 
             await UpdateService.DownloadAndInstallUpdateAsync(_updateInfo.DownloadUrl, progress);
@@ -223,6 +225,7 @@ public sealed partial class MainPage : Page
             UpdateStatusText.Text = $"Update failed: {ex.Message}";
             DownloadUpdateButton.IsEnabled = true;
             UpdateProgressBar.Visibility = Visibility.Collapsed;
+            UpdateProgressText.Visibility = Visibility.Collapsed;
         }
     }
 
