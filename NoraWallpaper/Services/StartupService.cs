@@ -14,7 +14,7 @@ public class StartupService
         {
             using RegistryKey key = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
-            key.SetValue(AppName, $"\"{exePath}\"");
+            key.SetValue(AppName, $"\"{exePath}\" --hidden");
         }
         catch (Exception ex)
         {

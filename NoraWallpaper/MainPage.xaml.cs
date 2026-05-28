@@ -118,8 +118,8 @@ public sealed partial class MainPage : Page
                 int height = lprcMonitor.Bottom - lprcMonitor.Top;
 
                 var wallpaperWindow = new WallpaperWindow();
-                wallpaperWindow.Activate();
                 wallpaperWindow.AttachToDesktop(x, y, width, height);
+                wallpaperWindow.Activate();
                 wallpaperWindow.PlayVideo(_selectedFile);
                 
                 // Apply saved stretch mode

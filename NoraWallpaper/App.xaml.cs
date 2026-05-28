@@ -41,7 +41,12 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         _window = new MainWindow();
-        _window.Activate();
+        
+        bool isHidden = System.Linq.Enumerable.Contains(System.Environment.GetCommandLineArgs(), "--hidden");
+        if (!isHidden)
+        {
+            _window.Activate();
+        }
         
         // Initialize tray icon in code-behind
         var menuFlyout = new Microsoft.UI.Xaml.Controls.MenuFlyout();
