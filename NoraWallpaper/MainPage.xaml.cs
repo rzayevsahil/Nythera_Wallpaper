@@ -82,6 +82,8 @@ public sealed partial class MainPage : Page
         VolumeText.Text = LocalizationService.GetString("Volume");
         ChooseFitText.Text = LocalizationService.GetString("ChooseFit");
         StartupToggle.Header = LocalizationService.GetString("LaunchStartup");
+        StartupToggle.OnContent = LocalizationService.GetString("On");
+        StartupToggle.OffContent = LocalizationService.GetString("Off");
         ThemeText.Text = LocalizationService.GetString("Theme");
         LanguageText.Text = LocalizationService.GetString("Language");
         DownloadUpdateButton.Content = LocalizationService.GetString("DownloadUpdate");
@@ -200,12 +202,12 @@ public sealed partial class MainPage : Page
             }
             else
             {
-                StatusText.Text = LocalizationService.GetString("NoVideoSelected");
+                StatusText.Text = LocalizationService.GetString("OperationCancelled");
             }
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Error: {ex.ToString()}";
+            StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
         }
     }
 
@@ -257,7 +259,7 @@ public sealed partial class MainPage : Page
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Error applying wallpaper: {ex.ToString()}";
+            StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
         }
     }
 
@@ -275,12 +277,12 @@ public sealed partial class MainPage : Page
         if (StartupToggle.IsOn)
         {
             StartupService.EnableStartup();
-            StatusText.Text = "Launch on startup enabled.";
+            StatusText.Text = LocalizationService.GetString("StartupEnabled");
         }
         else
         {
             StartupService.DisableStartup();
-            StatusText.Text = "Launch on startup disabled.";
+            StatusText.Text = LocalizationService.GetString("StartupDisabled");
         }
     }
 

@@ -21,7 +21,13 @@ public static class LocalizationService
         { "DownloadUpdate", "İndir ve Güncelle" },
         { "Downloading", "Güncelleme indiriliyor... Lütfen bekleyin." },
         { "Restored", "Geri yüklendi:" },
-        { "Selected", "Seçildi:" }
+        { "Selected", "Seçildi:" },
+        { "StartupEnabled", "Windows başlangıcında başlatılacak." },
+        { "StartupDisabled", "Windows başlangıcında başlatılmayacak." },
+        { "On", "Açık" },
+        { "Off", "Kapalı" },
+        { "OperationCancelled", "İşlem iptal edildi." },
+        { "ErrorApplying", "Hata:" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -41,7 +47,13 @@ public static class LocalizationService
         { "DownloadUpdate", "Download and Update" },
         { "Downloading", "Downloading update... Please wait." },
         { "Restored", "Restored:" },
-        { "Selected", "Selected:" }
+        { "Selected", "Selected:" },
+        { "StartupEnabled", "Will launch on Windows startup." },
+        { "StartupDisabled", "Will not launch on Windows startup." },
+        { "On", "On" },
+        { "Off", "Off" },
+        { "OperationCancelled", "Operation cancelled." },
+        { "ErrorApplying", "Error applying:" }
     };
 
     public static string GetString(string key)
