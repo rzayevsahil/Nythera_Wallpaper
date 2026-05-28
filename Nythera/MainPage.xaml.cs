@@ -131,7 +131,8 @@ public sealed partial class MainPage : Page
         StartupToggle.OffContent = LocalizationService.GetString("Off");
         ThemeText.Text = LocalizationService.GetString("Theme");
         LanguageText.Text = LocalizationService.GetString("Language");
-        DownloadUpdateButton.Content = LocalizationService.GetString("DownloadUpdate");
+        if (DownloadButtonText != null)
+            DownloadButtonText.Text = LocalizationService.GetString("DownloadUpdate");
         
         AboutTitleText.Text = LocalizationService.GetString("AboutTitle");
         AppInfoTitle.Text = LocalizationService.GetString("AppInfoTitle");
@@ -444,16 +445,20 @@ public sealed partial class MainPage : Page
         if (_updateInfo == null || !_updateInfo.IsUpdateAvailable) return;
 
         DownloadUpdateButton.IsEnabled = false;
-        UpdateProgressBar.Visibility = Visibility.Visible;
-        UpdateProgressText.Visibility = Visibility.Visible;
+        DownloadButtonText.Text = "0%";
         UpdateStatusText.Text = LocalizationService.GetString("Downloading");
 
         try
         {
             var progress = new Progress<double>(percent =>
             {
-                UpdateProgressBar.Value = percent;
-                UpdateProgressText.Text = $"{percent:F0}%";
+                // Update label
+                DownloadButtonText.Text = $"{percent:F0}%";
+                
+                // Animate the fill rectangle width proportionally to button width
+                double buttonWidth = DownloadUpdateButton.ActualWidth;
+                if (buttonWidth > 0)
+                    DownloadProgressFill.Width = buttonWidth * (percent / 100.0);
             });
 
             await UpdateService.DownloadAndInstallUpdateAsync(_updateInfo.DownloadUrl, progress);
@@ -462,8 +467,8 @@ public sealed partial class MainPage : Page
         {
             UpdateStatusText.Text = $"Update failed: {ex.Message}";
             DownloadUpdateButton.IsEnabled = true;
-            UpdateProgressBar.Visibility = Visibility.Collapsed;
-            UpdateProgressText.Visibility = Visibility.Collapsed;
+            DownloadButtonText.Text = LocalizationService.GetString("DownloadUpdate");
+            DownloadProgressFill.Width = 0;
         }
     }
 

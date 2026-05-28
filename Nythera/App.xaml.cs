@@ -69,6 +69,16 @@ public partial class App : Application
         };
         _trayIcon.ForceCreate();
         
+        // XamlRoot must be set on the flyout for click events to fire in WinUI 3.
+        // Hook into window's Activated event (fires after content is loaded).
+        _window.Activated += (s, e) =>
+        {
+            if (_window.Content?.XamlRoot != null && menuFlyout.XamlRoot == null)
+            {
+                menuFlyout.XamlRoot = _window.Content.XamlRoot;
+            }
+        };
+        
         System.AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
     }
 
