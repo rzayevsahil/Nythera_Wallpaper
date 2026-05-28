@@ -182,8 +182,43 @@
                         <!-- Video Selection Card -->
                         <Border CornerRadius="8" Padding="0">
                             <StackPanel Spacing="16">
+                                <StackPanel Spacing="8">
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock x:Name="DefaultVideosTitle" Text="Varsayılan Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock x:Name="DebugPathText" Foreground="Red" FontSize="10" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                    <GridView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="100">
+                                        <GridView.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <ItemsStackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </GridView.ItemsPanel>
+                                        <GridView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:DefaultVideo">
+                                                <Grid Width="140" Height="80" CornerRadius="6" Margin="0,0,8,0">
+                                                    <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
+                                                    <Border Background="#99000000" VerticalAlignment="Bottom">
+                                                        <TextBlock Text="{x:Bind Title}" Foreground="White" FontSize="11" Margin="6,4" TextTrimming="CharacterEllipsis" />
+                                                    </Border>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </GridView.ItemTemplate>
+                                    </GridView>
+                                </StackPanel>
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Rectangle Grid.Column="0" Height="1" Fill="Gray" Opacity="0.3" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="VEYA" Foreground="Gray" FontSize="11" Margin="12,0" VerticalAlignment="Center" />
+                                    <Rectangle Grid.Column="2" Height="1" Fill="Gray" Opacity="0.3" VerticalAlignment="Center" />
+                                </Grid>
+
                                 <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                                    <Button x:Name="BrowseVideoButton" Content="Browse Video" Click="BrowseVideo_Click" Width="160" />
+                                    <Button x:Name="BrowseVideoButton" Content="Kendi Videonu Seç" Click="BrowseVideo_Click" Width="160" />
                                     <Button x:Name="ApplyButton" Content="Apply Wallpaper" Click="ApplyWallpaper_Click" Style="{ThemeResource AccentButtonStyle}" Width="160" IsEnabled="False" />
                                 </StackPanel>
                                 <TextBlock x:Name="StatusText" Text="No video selected." Foreground="Gray" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />

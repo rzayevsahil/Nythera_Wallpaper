@@ -1,0 +1,4 @@
+LoadDefaultVideos started.
+Base path: C:\Users\sahil\source\cursor-ai\walpaper-for-pc\Nythera\bin\Debug\net10.0-windows10.0.26100.0\win-x64\
+Initial videosDir: C:\Users\sahil\source\cursor-ai\walpaper-for-pc\Nythera\bin\Debug\net10.0-windows10.0.26100.0\win-x64\Assets\Videos (Exists: True)
+Found 24 mp4 files.

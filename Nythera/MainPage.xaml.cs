@@ -12,6 +12,25 @@ using Nythera.Services;
 
 namespace Nythera;
 
+public class DefaultVideo : System.ComponentModel.INotifyPropertyChanged
+{
+    public string Title { get; set; }
+    public string VideoPath { get; set; }
+
+    private Microsoft.UI.Xaml.Media.ImageSource _thumbnail;
+    public Microsoft.UI.Xaml.Media.ImageSource Thumbnail
+    {
+        get => _thumbnail;
+        set
+        {
+            _thumbnail = value;
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Thumbnail)));
+        }
+    }
+
+    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+}
+
 public sealed partial class MainPage : Page
 {
     private class MonitorInfo
@@ -297,6 +316,8 @@ public sealed partial class MainPage : Page
             AppVersionText.Text = version != null ? $"v{version.Major}.{version.Minor}.{version.Build}" : "v1.1.0";
         }
         
+        LoadDefaultVideos();
+        
         // We will set the preview size in UpdatePreviewBounds() instead of here.
         // Check for updates asynchronously without blocking the UI
         _ = CheckForUpdatesAsync();
@@ -469,6 +490,133 @@ public sealed partial class MainPage : Page
             DownloadUpdateButton.IsEnabled = true;
             DownloadButtonText.Text = LocalizationService.GetString("DownloadUpdate");
             DownloadProgressFill.Width = 0;
+        }
+    }
+
+    private void LoadDefaultVideos()
+    {
+        try
+        {
+            var defaults = new System.Collections.ObjectModel.ObservableCollection<DefaultVideo>();
+            string logPath = Path.Combine(Environment.CurrentDirectory, "debug_log.txt");
+            string logContent = "LoadDefaultVideos started.\n";
+            
+            string basePath = AppContext.BaseDirectory;
+            string videosDir = Path.Combine(basePath, "Assets", "Videos");
+            logContent += $"Base path: {basePath}\n";
+            logContent += $"Initial videosDir: {videosDir} (Exists: {Directory.Exists(videosDir)})\n";
+            
+            // Fallback for dotnet run context where Assets might be in the project root
+            if (!Directory.Exists(videosDir))
+            {
+                videosDir = Path.Combine(Environment.CurrentDirectory, "Assets", "Videos");
+                logContent += $"Fallback 1: {videosDir} (Exists: {Directory.Exists(videosDir)})\n";
+            }
+            // Fallback for Assembly location
+            if (!Directory.Exists(videosDir))
+            {
+                string? assemblyDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                if (assemblyDir != null)
+                {
+                    videosDir = Path.Combine(assemblyDir, "Assets", "Videos");
+                    logContent += $"Fallback 2: {videosDir} (Exists: {Directory.Exists(videosDir)})\n";
+                }
+            }
+            
+            if (Directory.Exists(videosDir))
+            {
+                var files = Directory.GetFiles(videosDir, "*.mp4");
+                logContent += $"Found {files.Length} mp4 files.\n";
+                var fallbackBitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/logo1.png"));
+                foreach (var file in files)
+                {
+                    string fileName = Path.GetFileName(file);
+                    if (fileName == "cyberpunk.mp4" || fileName == "cozy_room.mp4") continue;
+
+                    var videoObj = new DefaultVideo
+                    {
+                        Title = Path.GetFileNameWithoutExtension(file),
+                        Thumbnail = fallbackBitmap,
+                        VideoPath = file
+                    };
+                    defaults.Add(videoObj);
+                    
+                    // Fetch real thumbnail asynchronously
+                    LoadThumbnailAsync(videoObj, file);
+                }
+                
+                if (DebugPathText != null)
+                {
+                    DebugPathText.Text = $"[Bulunan: {files.Length}] {videosDir}";
+                }
+            }
+            else
+            {
+                logContent += $"Directory DOES NOT EXIST after all fallbacks.\n";
+                if (DebugPathText != null)
+                {
+                    DebugPathText.Text = $"[Klasör Yok] {videosDir}";
+                }
+            }
+            
+            DefaultVideosGrid.ItemsSource = defaults;
+            File.WriteAllText(logPath, logContent);
+        }
+        catch (Exception ex)
+        {
+            string crashLog = Path.Combine(Environment.CurrentDirectory, "crash_log.txt");
+            File.WriteAllText(crashLog, ex.ToString());
+            if (DebugPathText != null)
+            {
+                DebugPathText.Text = "HATA OLUŞTU!";
+            }
+        }
+    }
+
+    private async void LoadThumbnailAsync(DefaultVideo videoObj, string filePath)
+    {
+        try
+        {
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
+            var thumb = await file.GetThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.VideosView, 200, Windows.Storage.FileProperties.ThumbnailOptions.UseCurrentScale);
+            if (thumb != null)
+            {
+                var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                // To avoid cross-thread UI updates issues if not on UI thread, we use DispatcherQueue
+                DispatcherQueue.TryEnqueue(async () =>
+                {
+                    await bitmap.SetSourceAsync(thumb);
+                    videoObj.Thumbnail = bitmap;
+                });
+            }
+        }
+        catch { }
+    }
+
+    private async void DefaultVideosGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DefaultVideosGrid.SelectedItem is DefaultVideo selected)
+        {
+            if (File.Exists(selected.VideoPath))
+            {
+                try
+                {
+                    _selectedFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(selected.VideoPath);
+                    StatusText.Text = $"{LocalizationService.GetString("VideoReady")}: {selected.Title}";
+                    ApplyButton.IsEnabled = true;
+                    
+                    // Auto-apply on selection
+                    ApplyWallpaper_Click(null, null);
+                }
+                catch (Exception ex)
+                {
+                    StatusText.Text = $"Error: {ex.Message}";
+                }
+            }
+            else
+            {
+                StatusText.Text = "Video dosyası bulunamadı. Lütfen Assets/Videos içine gerekli MP4'leri ekleyin.";
+            }
         }
     }
 
