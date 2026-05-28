@@ -183,7 +183,14 @@
                         <Border CornerRadius="8" Padding="0">
                             <StackPanel Spacing="16">
                                 <StackPanel Spacing="8">
-                                    <TextBlock x:Name="DefaultVideosTitle" Text="Varsayılan Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    <Grid>
+                                        <TextBlock x:Name="DefaultVideosTitle" Text="Videolar" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                        <ComboBox x:Name="VideoFilterComboBox" HorizontalAlignment="Right" SelectedIndex="0" SelectionChanged="VideoFilterComboBox_SelectionChanged" Width="120" VerticalAlignment="Center">
+                                            <ComboBoxItem Content="Tümü" Tag="All" />
+                                            <ComboBoxItem Content="Favoriler" Tag="Favorites" />
+                                            <ComboBoxItem Content="Eklenenler" Tag="Custom" />
+                                        </ComboBox>
+                                    </Grid>
                                     <ListView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.HorizontalScrollMode="Enabled" Height="115" Padding="0,0,0,12">
                                         <ListView.ItemsPanel>
                                             <ItemsPanelTemplate>
@@ -192,8 +199,14 @@
                                         </ListView.ItemsPanel>
                                         <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="local:DefaultVideo">
-                                                <Grid Width="140" Height="80" CornerRadius="6" Margin="0,0,8,0">
+                                                <Grid Width="140" Height="80" CornerRadius="6" Margin="0,0,8,0" Background="#1AFFFFFF">
                                                     <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
+                                                    
+                                                    <!-- Favorite Button -->
+                                                    <Button Background="#66000000" Padding="4" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="4" CornerRadius="16" Click="FavoriteButton_Click" Tag="{x:Bind VideoPath}">
+                                                        <FontIcon Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" FontSize="12" Foreground="White" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                                                    </Button>
+
                                                     <Border Background="#99000000" VerticalAlignment="Bottom">
                                                         <TextBlock Text="{x:Bind Title}" Foreground="White" FontSize="11" Margin="6,4" TextTrimming="CharacterEllipsis" />
                                                     </Border>

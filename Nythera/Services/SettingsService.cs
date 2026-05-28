@@ -143,4 +143,39 @@ public class SettingsService
             return File.ReadAllText(TargetMonitorPath).Trim();
         return "All"; // Default
     }
+
+    private static readonly string FavoritesPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "favorites.txt"
+    );
+
+    public static System.Collections.Generic.HashSet<string> GetFavorites()
+    {
+        var favorites = new System.Collections.Generic.HashSet<string>();
+        try
+        {
+            if (File.Exists(FavoritesPath))
+            {
+                var lines = File.ReadAllLines(FavoritesPath);
+                foreach (var line in lines)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
+                        favorites.Add(line.Trim());
+                }
+            }
+        }
+        catch { }
+        return favorites;
+    }
+
+    public static void SaveFavorites(System.Collections.Generic.HashSet<string> favorites)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FavoritesPath));
+            File.WriteAllLines(FavoritesPath, favorites);
+        }
+        catch { }
+    }
 }

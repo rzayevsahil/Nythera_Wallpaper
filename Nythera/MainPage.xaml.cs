@@ -16,6 +16,24 @@ public class DefaultVideo : System.ComponentModel.INotifyPropertyChanged
 {
     public string Title { get; set; }
     public string VideoPath { get; set; }
+    public bool IsCustom { get; set; }
+
+    private bool _isFavorite;
+    public bool IsFavorite
+    {
+        get => _isFavorite;
+        set
+        {
+            if (_isFavorite != value)
+            {
+                _isFavorite = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsFavorite)));
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(FavoriteIcon)));
+            }
+        }
+    }
+
+    public string FavoriteIcon => IsFavorite ? "\uEB52" : "\uEB51";
 
     private Microsoft.UI.Xaml.Media.ImageSource _thumbnail;
     public Microsoft.UI.Xaml.Media.ImageSource Thumbnail
@@ -46,6 +64,10 @@ public sealed partial class MainPage : Page
     private Dictionary<string, WallpaperWindow> _wallpaperWindows = new Dictionary<string, WallpaperWindow>();
     private Windows.Storage.StorageFile _selectedFile;
     private Services.UpdateService.ReleaseInfo _updateInfo;
+    
+    private System.Collections.ObjectModel.ObservableCollection<DefaultVideo> _allVideos = new();
+    private System.Collections.ObjectModel.ObservableCollection<DefaultVideo> _filteredVideos = new();
+    private string _currentFilter = "All";
 
     public MainPage()
     {
@@ -497,7 +519,8 @@ public sealed partial class MainPage : Page
     {
         try
         {
-            var defaults = new System.Collections.ObjectModel.ObservableCollection<DefaultVideo>();
+            _allVideos.Clear();
+            var favorites = SettingsService.GetFavorites();
             string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
             Directory.CreateDirectory(appData);
             string logPath = Path.Combine(appData, "debug_log.txt");
@@ -525,11 +548,13 @@ public sealed partial class MainPage : Page
                 }
             }
             
+            
+            var fallbackBitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/logo1.png"));
+            
             if (Directory.Exists(videosDir))
             {
                 var files = Directory.GetFiles(videosDir, "*.mp4");
                 logContent += $"Found {files.Length} mp4 files.\n";
-                var fallbackBitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/logo1.png"));
                 foreach (var file in files)
                 {
                     string fileName = Path.GetFileName(file);
@@ -538,10 +563,11 @@ public sealed partial class MainPage : Page
                     var videoObj = new DefaultVideo
                     {
                         Title = Path.GetFileNameWithoutExtension(file),
-                        Thumbnail = fallbackBitmap,
-                        VideoPath = file
+                        VideoPath = file,
+                        IsCustom = false,
+                        IsFavorite = favorites.Contains(file)
                     };
-                    defaults.Add(videoObj);
+                    _allVideos.Add(videoObj);
                     
                     // Fetch real thumbnail asynchronously
                     LoadThumbnailAsync(videoObj, file);
@@ -552,7 +578,28 @@ public sealed partial class MainPage : Page
                 logContent += $"Directory DOES NOT EXIST after all fallbacks.\n";
             }
             
-            DefaultVideosGrid.ItemsSource = defaults;
+            // Load custom user videos
+            string customVideosDir = Path.Combine(appData, "CustomVideos");
+            Directory.CreateDirectory(customVideosDir);
+            if (Directory.Exists(customVideosDir))
+            {
+                var customFiles = Directory.GetFiles(customVideosDir, "*.mp4");
+                foreach (var file in customFiles)
+                {
+                    var videoObj = new DefaultVideo
+                    {
+                        Title = Path.GetFileNameWithoutExtension(file),
+                        VideoPath = file,
+                        IsCustom = true,
+                        IsFavorite = favorites.Contains(file)
+                    };
+                    _allVideos.Add(videoObj);
+                    LoadThumbnailAsync(videoObj, file);
+                }
+            }
+            
+            FilterVideos();
+            DefaultVideosGrid.ItemsSource = _filteredVideos;
             File.WriteAllText(logPath, logContent);
         }
         catch (Exception ex)
@@ -639,6 +686,39 @@ public sealed partial class MainPage : Page
                 PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
                 PreviewPlayer.MediaPlayer.Volume = 0;
                 PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
+
+                // Copy to CustomVideos to persist
+                string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
+                string customVideosDir = Path.Combine(appData, "CustomVideos");
+                Directory.CreateDirectory(customVideosDir);
+                
+                string destinationPath = Path.Combine(customVideosDir, _selectedFile.Name);
+                if (_selectedFile.Path != destinationPath)
+                {
+                    try {
+                        File.Copy(_selectedFile.Path, destinationPath, true);
+                    } catch { } // Ignore if locked or already exists
+                }
+                
+                var existing = System.Linq.Enumerable.FirstOrDefault(_allVideos, v => v.VideoPath == destinationPath);
+                if (existing == null)
+                {
+                    var videoObj = new DefaultVideo
+                    {
+                        Title = Path.GetFileNameWithoutExtension(destinationPath),
+                        VideoPath = destinationPath,
+                        IsCustom = true,
+                        IsFavorite = SettingsService.GetFavorites().Contains(destinationPath)
+                    };
+                    _allVideos.Add(videoObj);
+                    LoadThumbnailAsync(videoObj, destinationPath);
+                    FilterVideos();
+                    DefaultVideosGrid.SelectedItem = videoObj;
+                }
+                else
+                {
+                    DefaultVideosGrid.SelectedItem = existing;
+                }
             }
             else
             {
@@ -648,6 +728,53 @@ public sealed partial class MainPage : Page
         catch (Exception ex)
         {
             StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
+        }
+    }
+
+    private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string videoPath)
+        {
+            var video = System.Linq.Enumerable.FirstOrDefault(_allVideos, v => v.VideoPath == videoPath);
+            if (video != null)
+            {
+                video.IsFavorite = !video.IsFavorite;
+                var favorites = SettingsService.GetFavorites();
+                if (video.IsFavorite)
+                    favorites.Add(videoPath);
+                else
+                    favorites.Remove(videoPath);
+                
+                SettingsService.SaveFavorites(favorites);
+                
+                if (_currentFilter == "Favorites" && !video.IsFavorite)
+                {
+                    _filteredVideos.Remove(video);
+                }
+            }
+        }
+    }
+
+    private void VideoFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ComboBox cb && cb.SelectedItem is ComboBoxItem item && item.Tag is string filter)
+        {
+            _currentFilter = filter;
+            FilterVideos();
+        }
+    }
+
+    private void FilterVideos()
+    {
+        _filteredVideos.Clear();
+        foreach (var v in _allVideos)
+        {
+            if (_currentFilter == "All" ||
+                (_currentFilter == "Favorites" && v.IsFavorite) ||
+                (_currentFilter == "Custom" && v.IsCustom))
+            {
+                _filteredVideos.Add(v);
+            }
         }
     }
 
