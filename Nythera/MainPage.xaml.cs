@@ -469,15 +469,19 @@ public sealed partial class MainPage : Page
         {
             _isSwiping = false; // Prevent multiple triggers during the same continuous swipe
 
-            if (deltaX > 0 && CarouselPager.SelectedPageIndex > 0)
+            if (deltaX > 0)
             {
                 // Swiped right -> go to previous page
-                CarouselPager.SelectedPageIndex -= 1;
+                int newIndex = CarouselPager.SelectedPageIndex - 1;
+                if (newIndex < 0) newIndex = CarouselPager.NumberOfPages - 1;
+                CarouselPager.SelectedPageIndex = newIndex;
             }
-            else if (deltaX < 0 && CarouselPager.SelectedPageIndex < CarouselPager.NumberOfPages - 1)
+            else if (deltaX < 0)
             {
                 // Swiped left -> go to next page
-                CarouselPager.SelectedPageIndex += 1;
+                int newIndex = CarouselPager.SelectedPageIndex + 1;
+                if (newIndex >= CarouselPager.NumberOfPages) newIndex = 0;
+                CarouselPager.SelectedPageIndex = newIndex;
             }
         }
     }
