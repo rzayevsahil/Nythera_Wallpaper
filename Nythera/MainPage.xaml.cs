@@ -168,102 +168,46 @@ public sealed partial class MainPage : Page
     {
         if (newIndex == _currentPageIndex) return;
 
-        bool slideRight = newIndex > _currentPageIndex;
-        int oldIndex = _currentPageIndex;
         _currentPageIndex = newIndex;
 
         UIElement[] pages = { Page1, Page2, Page3 };
+        int numPages = pages.Length;
 
-        for (int i = 0; i < pages.Length; i++)
+        for (int i = 0; i < numPages; i++)
         {
-            if (i == newIndex)
-            {
-                // Active page entering
-                AnimateOrbit(pages[i], isEntering: true, slideRight: slideRight);
-                pages[i].IsHitTestVisible = true;
-            }
-            else if (i == oldIndex)
-            {
-                // Old active page exiting
-                AnimateOrbit(pages[i], isEntering: false, slideRight: slideRight);
-                pages[i].IsHitTestVisible = false;
-            }
-            else
-            {
-                // Keep other pages in background
-                var transform = pages[i].RenderTransform as CompositeTransform;
-                if (transform != null)
-                {
-                    transform.TranslateX = 0;
-                    transform.ScaleX = 0.5;
-                    transform.ScaleY = 0.5;
-                    transform.Rotation = 180;
-                }
-                pages[i].Opacity = 0.0;
-                pages[i].IsHitTestVisible = false;
-            }
+            int offset = i - newIndex;
+            // Wrap the offset so it is always -1, 0, or 1 for 3 pages
+            if (offset > 1) offset -= numPages;
+            if (offset < -1) offset += numPages;
+
+            double targetScale = offset == 0 ? 1.0 : 0.8;
+            double targetOpacity = offset == 0 ? 1.0 : 0.4;
+            double targetX = offset * 220;
+            int zIndex = offset == 0 ? 2 : 1;
+
+            AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex);
+            
+            pages[i].IsHitTestVisible = (offset == 0);
         }
     }
 
-    private void AnimateOrbit(UIElement element, bool isEntering, bool slideRight)
+    private void AnimateCoverFlow(UIElement element, double targetScale, double targetTranslateX, double targetOpacity, int zIndex)
     {
+        Canvas.SetZIndex(element, zIndex);
+
         var transform = element.RenderTransform as CompositeTransform;
         if (transform == null) return;
 
-        // Reset rotation if it was previously spinning
         transform.Rotation = 0;
 
         var storyboard = new Storyboard();
-        var duration = new Duration(TimeSpan.FromMilliseconds(600));
+        var duration = new Duration(TimeSpan.FromMilliseconds(500));
+        var easing = new ExponentialEase { EasingMode = EasingMode.EaseOut, Exponent = 4.0 };
 
-        var transXAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
-        var scaleXAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
-        var scaleYAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
-        var opacityAnim = new DoubleAnimationUsingKeyFrames { Duration = duration };
-
-        KeyTime t0 = KeyTime.FromTimeSpan(TimeSpan.Zero);
-        KeyTime tHalf = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300));
-        KeyTime tEnd = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(600));
-
-        double startS, midS, endS;
-        double startO, midO, endO;
-        double startX, midX, endX;
-        
-        // Ensure active page is on top
-        Canvas.SetZIndex(element, isEntering ? 1 : 0);
-
-        if (isEntering)
-        {
-            // From Back to Front
-            startS = 0.5; midS = 0.75; endS = 1.0;
-            startO = 0.0; midO = 0.5;  endO = 1.0;
-            startX = 0;   midX = slideRight ? 250 : -250; endX = 0;
-        }
-        else
-        {
-            // From Front to Back
-            startS = 1.0; midS = 0.75; endS = 0.5;
-            startO = 1.0; midO = 0.5;  endO = 0.0;
-            startX = 0;   midX = slideRight ? -250 : 250; endX = 0;
-        }
-
-        // TranslateX: EaseOut to the edge, EaseIn back to center to form a circular arc
-        transXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startX });
-        transXAnim.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = tHalf, Value = midX, EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut } });
-        transXAnim.KeyFrames.Add(new EasingDoubleKeyFrame { KeyTime = tEnd, Value = endX, EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn } });
-
-        // Scale and Opacity: Smooth linear change simulates depth (Z-axis)
-        scaleXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startS });
-        scaleXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tHalf, Value = midS });
-        scaleXAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tEnd, Value = endS });
-
-        scaleYAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startS });
-        scaleYAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tHalf, Value = midS });
-        scaleYAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tEnd, Value = endS });
-
-        opacityAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = t0, Value = startO });
-        opacityAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tHalf, Value = midO });
-        opacityAnim.KeyFrames.Add(new LinearDoubleKeyFrame { KeyTime = tEnd, Value = endO });
+        var transXAnim = new DoubleAnimation { To = targetTranslateX, Duration = duration, EasingFunction = easing };
+        var scaleXAnim = new DoubleAnimation { To = targetScale, Duration = duration, EasingFunction = easing };
+        var scaleYAnim = new DoubleAnimation { To = targetScale, Duration = duration, EasingFunction = easing };
+        var opacityAnim = new DoubleAnimation { To = targetOpacity, Duration = duration, EasingFunction = easing };
 
         Storyboard.SetTarget(transXAnim, transform);
         Storyboard.SetTargetProperty(transXAnim, "TranslateX");
@@ -284,7 +228,6 @@ public sealed partial class MainPage : Page
         
         storyboard.Begin();
     }
-
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (LanguageComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)

@@ -16,11 +16,12 @@
           PointerCaptureLost="RootGrid_PointerCanceled">
         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             
-            <!-- PAGE 3: About (Starts in background) -->
+            <!-- PAGE 3: About (Starts in background left) -->
             <Grid x:Name="Page3" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                  Opacity="0.0" Canvas.ZIndex="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12"
+                  Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
-                    <CompositeTransform TranslateX="0" ScaleX="0.5" ScaleY="0.5" Rotation="180" />
+                    <CompositeTransform TranslateX="-220" ScaleX="0.8" ScaleY="0.8" />
                 </Grid.RenderTransform>
                 <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" 
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -114,9 +115,10 @@
                 </Border>
             </Grid>
 
-            <!-- PAGE 1: Settings (Starts active) -->
+            <!-- PAGE 1: Video Selection (Starts active center) -->
             <Grid x:Name="Page1" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                  Opacity="1.0" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
+                  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12"
+                  Opacity="1.0" Canvas.ZIndex="2" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
                 <Grid.RenderTransform>
                     <CompositeTransform TranslateX="0" ScaleX="1.0" ScaleY="1.0" />
                 </Grid.RenderTransform>
@@ -183,11 +185,12 @@
                 </ScrollViewer>
             </Grid>
 
-            <!-- PAGE 2: Settings (Starts in background) -->
+            <!-- PAGE 2: Settings (Starts in background right) -->
             <Grid x:Name="Page2" Width="480" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                  Opacity="0.0" Canvas.ZIndex="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" CornerRadius="12"
+                  Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
-                    <CompositeTransform TranslateX="0" ScaleX="0.5" ScaleY="0.5" Rotation="180" />
+                    <CompositeTransform TranslateX="220" ScaleX="0.8" ScaleY="0.8" />
                 </Grid.RenderTransform>
                 <ScrollViewer VerticalScrollBarVisibility="Hidden">
                     <StackPanel Spacing="24" Padding="0,32,0,48">
