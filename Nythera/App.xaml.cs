@@ -43,7 +43,24 @@ public partial class App : Application
         _window = new MainWindow();
         
         bool isHidden = System.Linq.Enumerable.Contains(System.Environment.GetCommandLineArgs(), "--hidden");
-        if (!isHidden)
+        if (isHidden)
+        {
+            // WinUI 3 requires the window to be activated at least once to initialize XamlRoot.
+            // If started hidden (e.g. from startup), move it off-screen, activate to get XamlRoot, then hide.
+            _window.AppWindow.Move(new Windows.Graphics.PointInt32(-32000, -32000));
+            _window.Activate();
+            _window.AppWindow.Hide();
+            
+            // Move it back to center for when the user eventually opens it
+            var displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(_window.AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary);
+            if (displayArea != null)
+            {
+                int x = (displayArea.WorkArea.Width - _window.AppWindow.Size.Width) / 2;
+                int y = (displayArea.WorkArea.Height - _window.AppWindow.Size.Height) / 2;
+                _window.AppWindow.Move(new Windows.Graphics.PointInt32(x, y));
+            }
+        }
+        else
         {
             _window.Activate();
         }
@@ -52,13 +69,32 @@ public partial class App : Application
         var menuFlyout = new Microsoft.UI.Xaml.Controls.MenuFlyout();
         
         var dashboardItem = new Microsoft.UI.Xaml.Controls.MenuFlyoutItem { Text = "Dashboard" };
-        dashboardItem.Click += TrayDashboard_Click;
+        dashboardItem.Command = new RelayCommand(() =>
+        {
+            if (_window != null)
+            {
+                var displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(_window.AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary);
+                if (displayArea != null)
+                {
+                    int x = (displayArea.WorkArea.Width - _window.AppWindow.Size.Width) / 2;
+                    int y = (displayArea.WorkArea.Height - _window.AppWindow.Size.Height) / 2;
+                    _window.AppWindow.Move(new Windows.Graphics.PointInt32(x, y));
+                }
+                _window.AppWindow.Show();
+                _window.Activate();
+            }
+        });
         menuFlyout.Items.Add(dashboardItem);
         
         menuFlyout.Items.Add(new Microsoft.UI.Xaml.Controls.MenuFlyoutSeparator());
         
         var quitItem = new Microsoft.UI.Xaml.Controls.MenuFlyoutItem { Text = "Quit" };
-        quitItem.Click += TrayQuit_Click;
+        quitItem.Command = new RelayCommand(() =>
+        {
+            _trayIcon?.Dispose();
+            Core.WallpaperEngine.DesktopInterop.RestoreDesktop();
+            Environment.Exit(0);
+        });
         menuFlyout.Items.Add(quitItem);
 
         _trayIcon = new H.NotifyIcon.TaskbarIcon
@@ -70,7 +106,12 @@ public partial class App : Application
         _trayIcon.ForceCreate();
         
         // XamlRoot must be set on the flyout for click events to fire in WinUI 3.
-        // Hook into window's Activated event (fires after content is loaded).
+        if (_window.Content?.XamlRoot != null)
+        {
+            menuFlyout.XamlRoot = _window.Content.XamlRoot;
+        }
+
+        // Hook into window's Activated event just in case it takes a moment
         _window.Activated += (s, e) =>
         {
             if (_window.Content?.XamlRoot != null && menuFlyout.XamlRoot == null)
@@ -102,4 +143,13 @@ public partial class App : Application
     {
         Core.WallpaperEngine.DesktopInterop.RestoreDesktop();
     }
+}
+
+public class RelayCommand : System.Windows.Input.ICommand
+{
+    private readonly System.Action _execute;
+    public RelayCommand(System.Action execute) => _execute = execute;
+    public event System.EventHandler? CanExecuteChanged { add { } remove { } }
+    public bool CanExecute(object? parameter) => true;
+    public void Execute(object? parameter) => _execute();
 }
