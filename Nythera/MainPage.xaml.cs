@@ -498,7 +498,9 @@ public sealed partial class MainPage : Page
         try
         {
             var defaults = new System.Collections.ObjectModel.ObservableCollection<DefaultVideo>();
-            string logPath = Path.Combine(Environment.CurrentDirectory, "debug_log.txt");
+            string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
+            Directory.CreateDirectory(appData);
+            string logPath = Path.Combine(appData, "debug_log.txt");
             string logContent = "LoadDefaultVideos started.\n";
             
             string basePath = AppContext.BaseDirectory;
@@ -555,7 +557,9 @@ public sealed partial class MainPage : Page
         }
         catch (Exception ex)
         {
-            string crashLog = Path.Combine(Environment.CurrentDirectory, "crash_log.txt");
+            string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
+            Directory.CreateDirectory(appData);
+            string crashLog = Path.Combine(appData, "crash_log.txt");
             File.WriteAllText(crashLog, ex.ToString());
         }
     }
