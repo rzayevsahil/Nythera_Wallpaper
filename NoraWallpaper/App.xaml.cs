@@ -63,7 +63,7 @@ public partial class App : Application
 
         _trayIcon = new H.NotifyIcon.TaskbarIcon
         {
-            ToolTipText = "Nora Wallpaper Engine",
+            ToolTipText = "Nythera",
             IconSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new System.Uri("ms-appx:///Assets/AppIcon.ico")),
             ContextFlyout = menuFlyout
         };

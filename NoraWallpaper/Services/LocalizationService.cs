@@ -6,7 +6,7 @@ public static class LocalizationService
 {
     private static readonly Dictionary<string, string> _tr = new()
     {
-        { "AppTitle", "Nora Duvar Kağıdı" },
+        { "AppTitle", "Nythera" },
         { "AppDescription", "Masaüstü arka planınız olarak ayarlamak için bir video seçin." },
         { "BrowseVideo", "Video Seç" },
         { "ApplyWallpaper", "Duvar Kağıdını Uygula" },
@@ -26,7 +26,7 @@ public static class LocalizationService
 
     private static readonly Dictionary<string, string> _en = new()
     {
-        { "AppTitle", "Nora Wallpaper" },
+        { "AppTitle", "Nythera" },
         { "AppDescription", "Select a video to set as your desktop background." },
         { "BrowseVideo", "Browse Video" },
         { "ApplyWallpaper", "Apply Wallpaper" },

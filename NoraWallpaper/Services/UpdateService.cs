@@ -26,7 +26,7 @@ public class UpdateService
         try
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("NoraWallpaper-Updater");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Nythera-Updater");
             
             string url = $"https://api.github.com/repos/{GithubRepoOwner}/{GithubRepoName}/releases/latest";
             var response = await client.GetStringAsync(url);
@@ -73,7 +73,7 @@ public class UpdateService
         try
         {
             using var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("NoraWallpaper-Updater");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Nythera-Updater");
 
             using var response = await client.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
@@ -81,7 +81,7 @@ public class UpdateService
             var totalBytes = response.Content.Headers.ContentLength ?? -1L;
             var canReportProgress = totalBytes != -1 && progress != null;
 
-            string tempPath = Path.Combine(Path.GetTempPath(), "NoraWallpaper_Update.exe");
+            string tempPath = Path.Combine(Path.GetTempPath(), "Nythera_Update.exe");
 
             using var contentStream = await response.Content.ReadAsStreamAsync();
             using var fileStream = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);

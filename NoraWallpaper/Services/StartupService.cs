@@ -6,7 +6,7 @@ namespace NoraWallpaper.Services;
 
 public class StartupService
 {
-    private const string AppName = "NoraWallpaper";
+    private const string AppName = "Nythera";
 
     public static void EnableStartup()
     {

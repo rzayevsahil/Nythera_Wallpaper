@@ -7,13 +7,13 @@ public class SettingsService
 {
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "NoraWallpaper",
+        "Nythera",
         "settings.txt"
     );
 
     private static readonly string StretchModePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "NoraWallpaper",
+        "Nythera",
         "stretchmode.txt"
     );
 
@@ -77,7 +77,7 @@ public class SettingsService
 
     private static readonly string ThemePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "NoraWallpaper",
+        "Nythera",
         "theme.txt"
     );
 
@@ -100,7 +100,7 @@ public class SettingsService
 
     private static readonly string LanguagePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "NoraWallpaper",
+        "Nythera",
         "language.txt"
     );
 

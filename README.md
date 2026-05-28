@@ -1,11 +1,11 @@
-# NoraWallpaper 🌸
+# Nythera 🌸
 
 [![WinUI 3](https://img.shields.io/badge/WinUI_3-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://learn.microsoft.com/windows/apps/winui/winui3/)
 [![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)](https://docs.microsoft.com/dotnet/csharp/)
 
 *(English below)*
 
-NoraWallpaper, Windows işletim sistemi için geliştirilmiş, yüksek performanslı, açık kaynaklı bir **Video Duvar Kağıdı Motoru (Video Wallpaper Engine)** uygulamasıdır. WinUI 3 ve Fluent Design prensipleri kullanılarak modern bir arayüzle inşa edilmiştir.
+Nythera, Windows işletim sistemi için geliştirilmiş, yüksek performanslı, açık kaynaklı bir **Video Duvar Kağıdı Motoru (Video Wallpaper Engine)** uygulamasıdır. WinUI 3 ve Fluent Design prensipleri kullanılarak modern bir arayüzle inşa edilmiştir.
 
 ## Özellikler (Features) 🚀
 - **Video Duvar Kağıdı:** `.mp4`, `.webm` ve `.mkv` formatındaki videoları doğrudan masaüstü arka planı olarak oynatır.
@@ -19,7 +19,7 @@ NoraWallpaper, Windows işletim sistemi için geliştirilmiş, yüksek performan
 
 ## English 🇬🇧
 
-NoraWallpaper is a high-performance, open-source **Video Wallpaper Engine** built specifically for Windows. It utilizes WinUI 3 and Fluent Design principles to deliver a seamless, modern, and lightweight experience.
+Nythera is a high-performance, open-source **Video Wallpaper Engine** built specifically for Windows. It utilizes WinUI 3 and Fluent Design principles to deliver a seamless, modern, and lightweight experience.
 
 ## Key Features 🚀
 - **Video Wallpapers:** Play `.mp4`, `.webm`, and `.mkv` videos directly as your desktop background.

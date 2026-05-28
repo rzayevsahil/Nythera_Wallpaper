@@ -1,26 +1,26 @@
-; NoraWallpaper Inno Setup Script
-; This script creates a professional Windows Installer (Setup.exe) for NoraWallpaper
+; Nythera Inno Setup Script
+; This script creates a professional Windows Installer (Setup.exe) for Nythera
 
 [Setup]
 ; App Information
-AppName=NoraWallpaper
+AppName=Nythera
 AppVersion=1.0.0
 AppPublisher=Nora Studios
 AppPublisherURL=https://github.com/rzayevsahil/walpaper-for-pc
 AppSupportURL=https://github.com/rzayevsahil/walpaper-for-pc
 AppUpdatesURL=https://github.com/rzayevsahil/walpaper-for-pc
 
-; Default Installation Folder (e.g. C:\Program Files\NoraWallpaper)
-DefaultDirName={autopf}\NoraWallpaper
+; Default Installation Folder (e.g. C:\Program Files\Nythera)
+DefaultDirName={autopf}\Nythera
 
 ; Start Menu Folder
-DefaultGroupName=NoraWallpaper
+DefaultGroupName=Nythera
 
 ; Output Settings
 OutputDir=.\Installer
-OutputBaseFilename=NoraWallpaper_Setup_v1.0.0
+OutputBaseFilename=Nythera_Setup_v1.0.0
 SetupIconFile=.\NoraWallpaper\Assets\AppIcon.ico
-UninstallDisplayIcon={app}\NoraWallpaper.exe
+UninstallDisplayIcon={app}\Nythera.exe
 
 ; Compression Settings (Makes the setup file smaller)
 Compression=lzma2/ultra64
@@ -39,17 +39,17 @@ Source: ".\NoraWallpaper\bin\Release\net10.0-windows10.0.26100.0\win-x64\publish
 
 [Icons]
 ; Create Start Menu Shortcut
-Name: "{group}\NoraWallpaper"; Filename: "{app}\NoraWallpaper.exe"; IconFilename: "{app}\NoraWallpaper.exe"
+Name: "{group}\Nythera"; Filename: "{app}\Nythera.exe"; IconFilename: "{app}\Nythera.exe"
 ; Create Desktop Shortcut (if user checked the box)
-Name: "{autodesktop}\NoraWallpaper"; Filename: "{app}\NoraWallpaper.exe"; IconFilename: "{app}\NoraWallpaper.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Nythera"; Filename: "{app}\Nythera.exe"; IconFilename: "{app}\Nythera.exe"; Tasks: desktopicon
 
 [Run]
 ; Run the app automatically after installation finishes
-Filename: "{app}\NoraWallpaper.exe"; Description: "{cm:LaunchProgram,NoraWallpaper}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Nythera.exe"; Description: "{cm:LaunchProgram,Nythera}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 ; (Optional) Kill process before uninstalling if it is running
-Filename: "{cmd}"; Parameters: "/C taskkill /F /IM NoraWallpaper.exe"; Flags: runhidden waituntilterminated
+Filename: "{cmd}"; Parameters: "/C taskkill /F /IM Nythera.exe"; Flags: runhidden waituntilterminated
 
 [Code]
 function InitializeSetup(): Boolean;
@@ -57,6 +57,6 @@ var
   ResultCode: Integer;
 begin
   // Kill the application silently before extracting files to prevent locking issues
-  Exec(ExpandConstant('{cmd}'), '/c taskkill /F /IM NoraWallpaper.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec(ExpandConstant('{cmd}'), '/c taskkill /F /IM Nythera.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Result := True;
 end;
