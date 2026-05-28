@@ -45,7 +45,12 @@ public static class LocalizationService
         { "PreviewAllMonitors", "Önizleme: Tüm Ekranlar (Ana Ekran baz alındı: {0}x{1})" },
         { "PreviewMonitor", "Önizleme: {0} ({1}x{2})" },
         { "MonitorText", "Monitör:" },
-        { "AllMonitors", "Tüm Ekranlar" }
+        { "AllMonitors", "Tüm Ekranlar" },
+        { "Applied", "Uygulandı" },
+        { "AllMonitorsShort", "Tümü" },
+        { "MonitorShort", "M{0}" },
+        { "VideoReady", "Video hazır" },
+        { "WallpaperApplied", "Duvar kağıdı uygulandı" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -89,7 +94,12 @@ public static class LocalizationService
         { "PreviewAllMonitors", "Preview: All Monitors (Based on Primary: {0}x{1})" },
         { "PreviewMonitor", "Preview: {0} ({1}x{2})" },
         { "MonitorText", "Monitor:" },
-        { "AllMonitors", "All Monitors" }
+        { "AllMonitors", "All Monitors" },
+        { "Applied", "Applied" },
+        { "AllMonitorsShort", "All" },
+        { "MonitorShort", "M{0}" },
+        { "VideoReady", "Video ready" },
+        { "WallpaperApplied", "Wallpaper applied" }
     };
 
     public static string GetString(string key)

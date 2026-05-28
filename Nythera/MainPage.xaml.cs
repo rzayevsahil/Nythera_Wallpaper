@@ -235,6 +235,13 @@ public sealed partial class MainPage : Page
         {
             UpdatePreviewBounds(selectedItem.Tag.ToString());
         }
+        
+        if (AppliedBadgeText != null)
+        {
+            AppliedBadgeText.Text = LocalizationService.GetString("Applied");
+        }
+        
+        UpdateVideoListBadges();
     }
 
     private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -506,7 +513,7 @@ public sealed partial class MainPage : Page
 
             if (appliedToAll && _monitors.Count > 0)
             {
-                video.AppliedMonitorsText = "Tümü";
+                video.AppliedMonitorsText = LocalizationService.GetString("AllMonitorsShort");
             }
             else
             {
@@ -514,7 +521,7 @@ public sealed partial class MainPage : Page
                 {
                     if (video.VideoPath.Equals(monitorPaths[mon.Id], StringComparison.OrdinalIgnoreCase))
                     {
-                        matchedMonitors.Add($"M{mon.Id}");
+                        matchedMonitors.Add(string.Format(LocalizationService.GetString("MonitorShort"), mon.Id));
                     }
                 }
                 
@@ -1015,7 +1022,7 @@ public sealed partial class MainPage : Page
 
             if (sender != null && _selectedFile != null)
             {
-                StatusText.Text = $"Wallpaper applied: {_selectedFile.Name}";
+                StatusText.Text = $"{LocalizationService.GetString("WallpaperApplied")}: {_selectedFile.Name}";
             }
             
             UpdateAppliedBadge();
