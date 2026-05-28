@@ -55,4 +55,14 @@ public class DesktopInterop
             WindowsApi.SetParent(hWnd, workerW);
         }
     }
+
+    public static void RestoreDesktop()
+    {
+        // Forcing a wallpaper refresh causes Windows to tear down the spawned WorkerW
+        WindowsApi.SystemParametersInfo(
+            WindowsApi.SPI_SETDESKWALLPAPER, 
+            0, 
+            null, 
+            WindowsApi.SPIF_UPDATEINIFILE | WindowsApi.SPIF_SENDWININICHANGE);
+    }
 }

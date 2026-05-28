@@ -124,6 +124,13 @@ public static class WindowsApi
     [DllImport("dwmapi.dll", PreserveSig = true)]
     public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+    public const int SPI_SETDESKWALLPAPER = 0x0014;
+    public const int SPIF_UPDATEINIFILE = 0x01;
+    public const int SPIF_SENDWININICHANGE = 0x02;
+
     public const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
     public const int DWMWCP_DONOTROUND = 1;
 }
