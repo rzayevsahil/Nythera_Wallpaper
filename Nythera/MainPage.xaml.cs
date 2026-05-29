@@ -493,6 +493,8 @@ public sealed partial class MainPage : Page
     private void InitializeMonitors()
     {
         _monitors.Clear();
+        TargetMonitorComboBox.Items.Clear();
+
         int monitorCount = 0;
         Native.WindowsApi.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref Native.WindowsApi.RECT lprcMonitor, IntPtr dwData)
         {
@@ -508,6 +510,12 @@ public sealed partial class MainPage : Page
             return true;
         }, IntPtr.Zero);
 
+        if (_monitors.Count > 1)
+        {
+            var allItem = new ComboBoxItem { Content = LocalizationService.GetString("AllMonitors"), Tag = "All" };
+            TargetMonitorComboBox.Items.Insert(0, allItem);
+        }
+
         string savedMonitor = SettingsService.GetTargetMonitor();
         foreach (ComboBoxItem item in TargetMonitorComboBox.Items)
         {
@@ -517,10 +525,17 @@ public sealed partial class MainPage : Page
                 break;
             }
         }
+        
         if (TargetMonitorComboBox.SelectedItem == null && TargetMonitorComboBox.Items.Count > 0)
+        {
             TargetMonitorComboBox.SelectedIndex = 0;
+            if (TargetMonitorComboBox.SelectedItem is ComboBoxItem cbItem && cbItem.Tag != null)
+            {
+                SettingsService.SaveTargetMonitor(cbItem.Tag.ToString());
+            }
+        }
             
-        UpdatePreviewBounds(TargetMonitorComboBox.SelectedItem is ComboBoxItem cbItem && cbItem.Tag != null ? cbItem.Tag.ToString() : "All");
+        UpdatePreviewBounds(TargetMonitorComboBox.SelectedItem is ComboBoxItem selectedCbItem && selectedCbItem.Tag != null ? selectedCbItem.Tag.ToString() : "All");
     }
 
     private void UpdatePreviewBounds(string targetMonitor)

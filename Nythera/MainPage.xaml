@@ -346,7 +346,6 @@
                                     <!-- Target Monitor -->
                                     <TextBlock x:Name="TargetMonitorText" Text="Monitor:" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" />
                                     <ComboBox x:Name="TargetMonitorComboBox" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="TargetMonitorComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="All Monitors (Tüm Ekranlar)" Tag="All" />
                                     </ComboBox>
                                 </Grid>
                                 
