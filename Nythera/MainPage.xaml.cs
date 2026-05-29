@@ -12,7 +12,7 @@ using Nythera.Services;
 
 namespace Nythera;
 
-public class DefaultVideo : System.ComponentModel.INotifyPropertyChanged
+public partial class DefaultVideo : System.ComponentModel.INotifyPropertyChanged
 {
     public string Title { get; set; }
     public string VideoPath { get; set; }
