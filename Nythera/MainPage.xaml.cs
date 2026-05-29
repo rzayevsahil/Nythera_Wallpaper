@@ -363,7 +363,7 @@ public sealed partial class MainPage : Page
             double targetScale = offset == 0 ? 1.0 : 0.8;
             double targetOpacity = offset == 0 ? 1.0 : 0.4;
             double contentOpacity = offset == 0 ? 1.0 : 0.05; // 5% opacity for unreadable text in background
-            double targetX = offset * 220;
+            double targetX = offset * 260;
             int zIndex = offset == 0 ? 2 : 1;
 
             AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex, contentOpacity);
@@ -583,7 +583,7 @@ public sealed partial class MainPage : Page
         
         if (targetWidth > 0)
         {
-            double fixedWidth = 432.0;
+            double fixedWidth = 512.0;
             PreviewBorder.Height = fixedWidth * ((double)targetHeight / targetWidth);
         }
         
@@ -1448,5 +1448,13 @@ public sealed partial class MainPage : Page
         PlaylistTimer_Tick(null, null);
         
         StatusText.Text = string.Format(LocalizationService.GetString("PlaylistApplied"), paths.Count);
+    }
+
+    private void DeveloperImage_ImageOpened(object sender, RoutedEventArgs e)
+    {
+        if (DeveloperFallback != null)
+        {
+            DeveloperFallback.Visibility = Visibility.Collapsed;
+        }
     }
 }
