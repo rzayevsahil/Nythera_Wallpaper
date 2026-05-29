@@ -445,7 +445,13 @@ public sealed partial class MainPage : Page
         // Check for updates asynchronously without blocking the UI
         _ = CheckForUpdatesAsync();
 
-        string savedPath = SettingsService.GetWallpaperPath();
+        string targetMonitor = SettingsService.GetTargetMonitor();
+        string savedPath = SettingsService.GetWallpaperPath(targetMonitor);
+        if (string.IsNullOrEmpty(savedPath))
+        {
+            savedPath = SettingsService.GetWallpaperPath("All");
+        }
+        
         if (!string.IsNullOrEmpty(savedPath))
         {
             try
