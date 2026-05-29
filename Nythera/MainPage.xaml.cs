@@ -1313,6 +1313,14 @@ public sealed partial class MainPage : Page
     {
         if (!_isSwiping) return;
 
+        // Eğer farenin sol tuşu basılı değilse ama buraya girdiysek, tıklama bırakılmış demektir.
+        // (Bazen Button veya ScrollViewer PointerReleased olayını yutar, bu yüzden manuel kontrol etmeliyiz)
+        if (!e.GetCurrentPoint(RootGrid).Properties.IsLeftButtonPressed)
+        {
+            _isSwiping = false;
+            return;
+        }
+
         double currentX = e.GetCurrentPoint(RootGrid).Position.X;
         double deltaX = currentX - _pointerStartX;
 

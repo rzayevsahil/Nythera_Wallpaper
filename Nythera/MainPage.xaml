@@ -15,7 +15,7 @@
           PointerCanceled="RootGrid_PointerCanceled"
           PointerCaptureLost="RootGrid_PointerCanceled">
           
-        <Viewbox Stretch="Uniform" StretchDirection="DownOnly">
+        <Viewbox Stretch="Uniform" StretchDirection="Both">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <!-- Header outside carousel -->
             <StackPanel Spacing="8" HorizontalAlignment="Center" Margin="0,0,0,24">
