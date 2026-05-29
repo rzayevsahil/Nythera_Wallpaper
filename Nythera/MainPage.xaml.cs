@@ -9,10 +9,11 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Windows.Storage.Pickers;
 using Nythera.Services;
+using System.ComponentModel;
 
 namespace Nythera;
 
-public partial class DefaultVideo : System.ComponentModel.INotifyPropertyChanged
+public partial class DefaultVideo : INotifyPropertyChanged
 {
     public string Title { get; set; }
     public string VideoPath { get; set; }
@@ -486,6 +487,7 @@ public sealed partial class MainPage : Page
         
         _isInitializing = false;
         UpdateAppliedBadge();
+        UpdateVideoListBadges();
     }
 
     private void InitializeMonitors()
