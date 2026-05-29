@@ -627,7 +627,7 @@ public sealed partial class MainPage : Page
                 }
             }
 
-            if (appliedToAll && _monitors.Count > 0)
+            if (appliedToAll && _monitors.Count > 1)
             {
                 video.AppliedMonitorsText = LocalizationService.GetString("AllMonitorsShort");
             }
