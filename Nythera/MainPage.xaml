@@ -20,7 +20,7 @@
                 <!-- Header outside carousel -->
             <StackPanel Spacing="8" HorizontalAlignment="Center" Margin="0,0,0,24">
                 <Border CornerRadius="16" HorizontalAlignment="Center">
-                    <Image x:Name="AppTitleLogo" Height="130" Stretch="Uniform" />
+                    <Image x:Name="AppTitleLogo" Height="140" Stretch="Uniform" />
                 </Border>
             </StackPanel>
 
