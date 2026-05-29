@@ -362,17 +362,17 @@ public sealed partial class MainPage : Page
 
             double targetScale = offset == 0 ? 1.0 : 0.8;
             double targetOpacity = offset == 0 ? 1.0 : 0.4;
-            double blurOpacity = offset == 0 ? 0.0 : 0.6;
+            double contentOpacity = offset == 0 ? 1.0 : 0.05; // 5% opacity for unreadable text in background
             double targetX = offset * 220;
             int zIndex = offset == 0 ? 2 : 1;
 
-            AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex, blurOpacity);
+            AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex, contentOpacity);
             
             pages[i].IsHitTestVisible = (offset == 0);
         }
     }
 
-    private void AnimateCoverFlow(UIElement element, double targetScale, double targetTranslateX, double targetOpacity, int zIndex, double blurOpacity = 0.0)
+    private void AnimateCoverFlow(UIElement element, double targetScale, double targetTranslateX, double targetOpacity, int zIndex, double contentOpacity = 1.0)
     {
         Canvas.SetZIndex(element, zIndex);
 
@@ -408,13 +408,13 @@ public sealed partial class MainPage : Page
         var fwElement = element as FrameworkElement;
         if (fwElement != null)
         {
-            var blurOverlay = (Border)fwElement.FindName(fwElement.Name + "BlurOverlay");
-            if (blurOverlay != null)
+            var contentInner = fwElement.FindName(fwElement.Name + "Content") as UIElement;
+            if (contentInner != null)
             {
-                var blurAnim = new DoubleAnimation { To = blurOpacity, Duration = duration, EasingFunction = easing };
-                Storyboard.SetTarget(blurAnim, blurOverlay);
-                Storyboard.SetTargetProperty(blurAnim, "Opacity");
-                storyboard.Children.Add(blurAnim);
+                var contentAnim = new DoubleAnimation { To = contentOpacity, Duration = duration, EasingFunction = easing };
+                Storyboard.SetTarget(contentAnim, contentInner);
+                Storyboard.SetTargetProperty(contentAnim, "Opacity");
+                storyboard.Children.Add(contentAnim);
             }
         }
         storyboard.Children.Add(opacityAnim);
