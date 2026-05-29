@@ -59,10 +59,47 @@ public class SettingsService
         }
     }
 
+    public static string ResolveFilePath(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return path;
+        if (File.Exists(path)) return path;
+
+        try
+        {
+            string fileName = Path.GetFileName(path);
+            
+            // 1. Try Assets/Videos directory
+            string basePath = AppContext.BaseDirectory;
+            string newPath = Path.Combine(basePath, "Assets", "Videos", fileName);
+            if (File.Exists(newPath)) return newPath;
+
+            // 2. Try Fallback Assets/Videos directory (if run from source)
+            string currentDirFallback = Path.Combine(Environment.CurrentDirectory, "Assets", "Videos", fileName);
+            if (File.Exists(currentDirFallback)) return currentDirFallback;
+
+            // 3. Try Assembly directory
+            string? assemblyDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            if (assemblyDir != null)
+            {
+                string assemblyFallback = Path.Combine(assemblyDir, "Assets", "Videos", fileName);
+                if (File.Exists(assemblyFallback)) return assemblyFallback;
+            }
+
+            // 4. Try CustomVideos directory
+            string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "CustomVideos");
+            string customPath = Path.Combine(appData, fileName);
+            if (File.Exists(customPath)) return customPath;
+        }
+        catch { }
+
+        return path;
+    }
+
     public static string GetWallpaperPath(string monitorId)
     {
         try
         {
+            string path = null;
             if (File.Exists(MonitorSettingsPath))
             {
                 var lines = File.ReadAllLines(MonitorSettingsPath);
@@ -70,14 +107,19 @@ public class SettingsService
                 {
                     var parts = line.Split('=', 2);
                     if (parts.Length == 2 && parts[0] == monitorId)
-                        return parts[1];
+                    {
+                        path = parts[1];
+                        break;
+                    }
                 }
             }
             // Fallback to legacy settings.txt
-            if (File.Exists(SettingsPath))
+            if (path == null && File.Exists(SettingsPath))
             {
-                return File.ReadAllText(SettingsPath).Trim();
+                path = File.ReadAllText(SettingsPath).Trim();
             }
+            
+            return ResolveFilePath(path);
         }
         catch (Exception ex)
         {
@@ -299,7 +341,10 @@ public class SettingsService
                 foreach (var line in lines)
                 {
                     if (!string.IsNullOrWhiteSpace(line))
-                        favorites.Add(line.Trim());
+                    {
+                        string resolved = ResolveFilePath(line.Trim());
+                        favorites.Add(resolved);
+                    }
                 }
             }
         }

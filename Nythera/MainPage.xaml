@@ -22,7 +22,7 @@
         <!-- Header outside carousel -->
         <StackPanel Grid.Row="0" Spacing="8" HorizontalAlignment="Center" Margin="0,24,0,12">
             <Border CornerRadius="16" HorizontalAlignment="Center" Margin="0,0,0,4">
-                <Image x:Name="AppTitleLogo" Height="120" Stretch="Uniform" />
+                <Image x:Name="AppTitleLogo" Height="140" Stretch="Uniform" />
             </Border>
         </StackPanel>
 

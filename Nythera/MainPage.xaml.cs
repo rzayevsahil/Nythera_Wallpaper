@@ -201,7 +201,7 @@ public sealed partial class MainPage : Page
             }
             else
             {
-                RootGrid.Background = null;
+                RootGrid.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
             }
         }
         

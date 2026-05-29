@@ -32,6 +32,14 @@ public static class PlaylistService
             {
                 var json = File.ReadAllText(PlaylistSettingsPath);
                 _playlists = JsonSerializer.Deserialize<Dictionary<string, PlaylistConfig>>(json) ?? new();
+                
+                foreach (var config in _playlists.Values)
+                {
+                    for (int i = 0; i < config.VideoPaths.Count; i++)
+                    {
+                        config.VideoPaths[i] = SettingsService.ResolveFilePath(config.VideoPaths[i]);
+                    }
+                }
             }
         }
         catch { }
