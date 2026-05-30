@@ -172,4 +172,73 @@ public static class LocalizationService
             
         return key;
     }
+
+    private static readonly Dictionary<string, string> _trVideos = new()
+    {
+        { "150883-799711528_medium.mp4", "Siberpunk Neon Oda" },
+        { "19188-299997283_medium.mp4", "Kozmik Yalnızlık" },
+        { "202600-918484146_medium.mp4", "Yağmurlu Gece Yürüyüşü" },
+        { "204056-923134012_medium.mp4", "Lofi Ders Çalışma" },
+        { "205733-927672950_medium.mp4", "Sonbahar Esintisi" },
+        { "210490_medium.mp4", "Mistik Kızıl Ormanı" },
+        { "229513_medium.mp4", "Gece Yarısı Düşünceleri" },
+        { "247183_medium.mp4", "Kış Temalı Lofi" },
+        { "247741_medium.mp4", "Gece Yıldızları" },
+        { "265906_medium.mp4", "Şehir Manzaralı Boş Oda" },
+        { "266892_medium.mp4", "Kızıl Gün Batımı" },
+        { "270562_medium.mp4", "Kütüphane Çocuğu" },
+        { "285205_medium.mp4", "Huzurlu Uyku Müziği" },
+        { "285242_medium.mp4", "Altın Saatte Yürüyüş" },
+        { "286234_medium.mp4", "Mistik Mavi Gözler" },
+        { "287542_medium.mp4", "Gece Sürüşü Havası" },
+        { "297863_medium.mp4", "Kedimle Kitap Keyfi" },
+        { "298371_medium.mp4", "Büyülü Işıldayan Orman" },
+        { "310025_medium.mp4", "Gece Ders Çalışması" },
+        { "318357_medium.mp4", "Gece Yarısı Yolculuğu" },
+        { "320449_medium.mp4", "Tren Penceresinden Manzara" },
+        { "330218_medium.mp4", "Yağmurlu Gün Melankolisi" },
+        { "335657_medium.mp4", "Gökyüzüne Bakış" },
+        { "91562-629172467_medium.mp4", "Kızıl Akşamüstü" }
+    };
+
+    private static readonly Dictionary<string, string> _enVideos = new()
+    {
+        { "150883-799711528_medium.mp4", "Cyberpunk Neon Room" },
+        { "19188-299997283_medium.mp4", "Cosmic Solitude" },
+        { "202600-918484146_medium.mp4", "Rainy Night Walk" },
+        { "204056-923134012_medium.mp4", "Lofi Study Session" },
+        { "205733-927672950_medium.mp4", "Autumn Breeze" },
+        { "210490_medium.mp4", "Mystical Crimson Forest" },
+        { "229513_medium.mp4", "Midnight Thoughts" },
+        { "247183_medium.mp4", "Winter Lofi" },
+        { "247741_medium.mp4", "Night Stars" },
+        { "265906_medium.mp4", "Empty Room with City View" },
+        { "266892_medium.mp4", "Crimson Sunset" },
+        { "270562_medium.mp4", "Library Boy" },
+        { "285205_medium.mp4", "Peaceful Sleep Music" },
+        { "285242_medium.mp4", "Golden Hour Walk" },
+        { "286234_medium.mp4", "Mystical Blue Eyes" },
+        { "287542_medium.mp4", "Midnight Drive Vibe" },
+        { "297863_medium.mp4", "Reading with My Cat" },
+        { "298371_medium.mp4", "Magic Glowing Forest" },
+        { "310025_medium.mp4", "Night Study" },
+        { "318357_medium.mp4", "Midnight Journey" },
+        { "320449_medium.mp4", "Train Window View" },
+        { "330218_medium.mp4", "Rainy Day Melancholy" },
+        { "335657_medium.mp4", "Looking at the Sky" },
+        { "91562-629172467_medium.mp4", "Red Sunset" }
+    };
+
+    public static string GetVideoTitle(string fileName)
+    {
+        string lang = SettingsService.GetLanguage();
+        var dict = lang == "tr" ? _trVideos : _enVideos;
+        
+        if (dict.TryGetValue(fileName, out string title))
+            return title;
+            
+        // Fallback: remove .mp4 and _medium for custom/unknown files
+        string raw = fileName.Replace(".mp4", "").Replace("_medium", "");
+        return raw;
+    }
 }

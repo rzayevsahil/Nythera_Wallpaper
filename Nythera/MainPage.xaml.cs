@@ -827,7 +827,7 @@ public sealed partial class MainPage : Page
 
                     var videoObj = new DefaultVideo
                     {
-                        Title = Path.GetFileNameWithoutExtension(file),
+                        Title = LocalizationService.GetVideoTitle(fileName),
                         VideoPath = file,
                         IsCustom = false,
                         IsFavorite = favorites.Contains(file)
