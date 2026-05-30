@@ -294,7 +294,7 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
                                     <Rectangle Grid.Column="0" Height="1" Fill="Gray" Opacity="0.3" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Column="1" Text="VEYA" Foreground="Gray" FontSize="11" Margin="12,0" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="OrDividerText" Grid.Column="1" Text="VEYA" Foreground="Gray" FontSize="11" Margin="12,0" VerticalAlignment="Center" />
                                     <Rectangle Grid.Column="2" Height="1" Fill="Gray" Opacity="0.3" VerticalAlignment="Center" />
                                 </Grid>
 

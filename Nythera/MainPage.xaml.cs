@@ -15,7 +15,19 @@ namespace Nythera;
 
 public partial class DefaultVideo : INotifyPropertyChanged
 {
-    public string Title { get; set; }
+    private string _title;
+    public string Title
+    {
+        get => _title;
+        set
+        {
+            if (_title != value)
+            {
+                _title = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Title)));
+            }
+        }
+    }
     public string VideoPath { get; set; }
     public bool IsCustom { get; set; }
 
@@ -269,7 +281,70 @@ public sealed partial class MainPage : Page
         ApplyButton.Content = LocalizationService.GetString("ApplyWallpaper");
         SettingsTitle.Text = LocalizationService.GetString("Settings");
         VolumeText.Text = LocalizationService.GetString("Volume");
+        
+        if (DefaultVideosTitle != null) DefaultVideosTitle.Text = LocalizationService.GetString("DefaultVideosTitle");
+        if (PlaylistModeTitle != null) PlaylistModeTitle.Text = LocalizationService.GetString("PlaylistMode");
+        if (PlaylistModeToggle != null) 
+        {
+            PlaylistModeToggle.OnContent = LocalizationService.GetString("On");
+            PlaylistModeToggle.OffContent = LocalizationService.GetString("Off");
+        }
+        if (OrDividerText != null) OrDividerText.Text = LocalizationService.GetString("OrDivider");
+
+        if (VideoFilterComboBox != null)
+        {
+            foreach (var item in VideoFilterComboBox.Items)
+            {
+                if (item is ComboBoxItem cbItem && cbItem.Tag != null)
+                {
+                    string tag = cbItem.Tag.ToString();
+                    if (tag == "All") cbItem.Content = LocalizationService.GetString("FilterAll");
+                    else if (tag == "Favorites") cbItem.Content = LocalizationService.GetString("FilterFavorites");
+                    else if (tag == "Custom") cbItem.Content = LocalizationService.GetString("FilterCustom");
+                }
+            }
+            
+            // Force WinUI to refresh the displayed selected item text
+            int selectedIndex = VideoFilterComboBox.SelectedIndex;
+            if (selectedIndex >= 0)
+            {
+                VideoFilterComboBox.SelectedIndex = -1;
+                VideoFilterComboBox.SelectedIndex = selectedIndex;
+            }
+        }
+        
+        // Translate all video titles dynamically
+        foreach (var video in _allVideos)
+        {
+            if (!video.IsCustom)
+            {
+                video.Title = LocalizationService.GetVideoTitle(System.IO.Path.GetFileName(video.VideoPath));
+            }
+        }
+        
         ChooseFitText.Text = LocalizationService.GetString("ChooseFit");
+        if (StretchModeComboBox != null)
+        {
+            foreach (var item in StretchModeComboBox.Items)
+            {
+                if (item is ComboBoxItem cbItem && cbItem.Tag != null)
+                {
+                    string tag = cbItem.Tag.ToString();
+                    if (tag == "UniformToFill") cbItem.Content = LocalizationService.GetString("FitFill");
+                    else if (tag == "Uniform") cbItem.Content = LocalizationService.GetString("FitUniform");
+                    else if (tag == "Fill") cbItem.Content = LocalizationService.GetString("FitStretch");
+                    else if (tag == "None") cbItem.Content = LocalizationService.GetString("FitCenter");
+                }
+            }
+            
+            int selectedIndex = StretchModeComboBox.SelectedIndex;
+            if (selectedIndex >= 0)
+            {
+                StretchModeComboBox.SelectedIndex = -1;
+                StretchModeComboBox.SelectedIndex = selectedIndex;
+            }
+        }
+        
         StartupToggle.Header = LocalizationService.GetString("LaunchStartup");
         StartupToggle.OnContent = LocalizationService.GetString("On");
         StartupToggle.OffContent = LocalizationService.GetString("Off");
@@ -290,7 +365,14 @@ public sealed partial class MainPage : Page
         DeveloperDescText.Text = LocalizationService.GetString("DeveloperDesc");
         
         if (_selectedFile == null)
+        {
             StatusText.Text = LocalizationService.GetString("NoVideoSelected");
+        }
+        else
+        {
+            // Update the status text with translated video name and "Video ready" label if it's already selected
+            StatusText.Text = $"{LocalizationService.GetString("VideoReady")}: {LocalizationService.GetVideoTitle(_selectedFile.Name)}";
+        }
         
         if (_updateInfo != null && _updateInfo.IsUpdateAvailable)
             UpdateStatusText.Text = LocalizationService.GetString("UpdateAvailable");
@@ -508,7 +590,7 @@ public sealed partial class MainPage : Page
                 if (file != null)
                 {
                     _selectedFile = file;
-                    StatusText.Text = $"{LocalizationService.GetString("Restored")} {_selectedFile.Name}";
+                    StatusText.Text = $"{LocalizationService.GetString("Restored")} {LocalizationService.GetVideoTitle(_selectedFile.Name)}";
                     ApplyButton.IsEnabled = true;
                     
                     // Auto-apply saved wallpaper

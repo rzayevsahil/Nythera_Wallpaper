@@ -80,7 +80,16 @@ public static class LocalizationService
         { "FilterWarm", "Sıcak (Sarı/Turuncu)" },
         { "FilterCool", "Soğuk (Mavi)" },
         { "FilterMatrix", "Matrix (Yeşil)" },
-        { "FilterCyberpunk", "Cyberpunk (Mor/Pembe)" }
+        { "FilterCyberpunk", "Cyberpunk (Mor/Pembe)" },
+        { "DefaultVideosTitle", "Videolar" },
+        { "FilterAll", "Tümü" },
+        { "FilterFavorites", "Favoriler" },
+        { "FilterCustom", "Eklenenler" },
+        { "OrDivider", "VEYA" },
+        { "FitFill", "Doldur" },
+        { "FitUniform", "Sığdır" },
+        { "FitStretch", "Genişlet" },
+        { "FitCenter", "Ortala" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -159,7 +168,16 @@ public static class LocalizationService
         { "FilterWarm", "Warm (Orange)" },
         { "FilterCool", "Cool (Blue)" },
         { "FilterMatrix", "Matrix (Green)" },
-        { "FilterCyberpunk", "Cyberpunk (Purple)" }
+        { "FilterCyberpunk", "Cyberpunk (Purple)" },
+        { "DefaultVideosTitle", "Videos" },
+        { "FilterAll", "All" },
+        { "FilterFavorites", "Favorites" },
+        { "FilterCustom", "Custom" },
+        { "OrDivider", "OR" },
+        { "FitFill", "Fill" },
+        { "FitUniform", "Fit" },
+        { "FitStretch", "Stretch" },
+        { "FitCenter", "Center" }
     };
 
     public static string GetString(string key)
