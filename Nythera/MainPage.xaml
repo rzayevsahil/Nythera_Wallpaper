@@ -191,9 +191,9 @@
                                                 <ToggleSwitch x:Name="PlaylistModeToggle" OffContent="Kapalı" OnContent="Açık" Toggled="PlaylistModeToggle_Toggled" VerticalAlignment="Center" Margin="0" MinWidth="0" />
                                             </StackPanel>
                                             <ComboBox x:Name="VideoFilterComboBox" SelectedIndex="0" SelectionChanged="VideoFilterComboBox_SelectionChanged" Width="120" VerticalAlignment="Center">
-                                                <ComboBoxItem Content="Tümü" Tag="All" />
-                                                <ComboBoxItem Content="Favoriler" Tag="Favorites" />
-                                                <ComboBoxItem Content="Eklenenler" Tag="Custom" />
+                                                <ComboBoxItem Content="All" Tag="All" />
+                                                <ComboBoxItem Content="Favorites" Tag="Favorites" />
+                                                <ComboBoxItem Content="Custom" Tag="Custom" />
                                             </ComboBox>
                                         </StackPanel>
                                     </Grid>
@@ -350,10 +350,10 @@
                                     <!-- Stretch Mode -->
                                     <TextBlock x:Name="ChooseFitText" Text="Choose a fit:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
                                     <ComboBox x:Name="StretchModeComboBox" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="StretchModeComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="Fill (Doldur)" Tag="UniformToFill" />
-                                        <ComboBoxItem Content="Fit (Sığdır)" Tag="Uniform" />
-                                        <ComboBoxItem Content="Stretch (Genişlet)" Tag="Fill" />
-                                        <ComboBoxItem Content="Center (Ortala)" Tag="None" />
+                                        <ComboBoxItem Content="Fill" Tag="UniformToFill" />
+                                        <ComboBoxItem Content="Fit" Tag="Uniform" />
+                                        <ComboBoxItem Content="Stretch" Tag="Fill" />
+                                        <ComboBoxItem Content="Center" Tag="None" />
                                     </ComboBox>
                                     
                                     <!-- Target Monitor -->
