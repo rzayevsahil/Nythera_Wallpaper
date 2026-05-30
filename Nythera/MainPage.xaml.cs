@@ -1155,6 +1155,7 @@ public sealed partial class MainPage : Page
             if (sender != null && _selectedFile != null)
             {
                 SettingsService.SaveWallpaperPath(targetMonitor, _selectedFile.Path);
+                PlaylistService.ClearPlaylist(targetMonitor);
                 
                 if (targetMonitor == "All")
                 {
@@ -1162,6 +1163,7 @@ public sealed partial class MainPage : Page
                     foreach (var mon in _monitors)
                     {
                         SettingsService.SaveWallpaperPath(mon.Id, "");
+                        PlaylistService.ClearPlaylist(mon.Id);
                     }
                 }
             }
