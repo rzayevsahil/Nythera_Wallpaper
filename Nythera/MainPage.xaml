@@ -198,6 +198,12 @@
                                         </StackPanel>
                                     </Grid>
                                     <GridView x:Name="DefaultVideosGrid" SelectionMode="Single" SelectionChanged="DefaultVideosGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="340" Padding="0,0,0,12" HorizontalAlignment="Stretch">
+                                        <GridView.Resources>
+                                            <!-- Hide the native WinUI 3 Selection Borders to make our custom blue line pop -->
+                                            <SolidColorBrush x:Key="GridViewItemSelectedBorderThemeBrush" Color="Transparent" />
+                                            <SolidColorBrush x:Key="GridViewItemSelectedPointerOverBorderThemeBrush" Color="Transparent" />
+                                            <SolidColorBrush x:Key="GridViewItemPointerOverBorderThemeBrush" Color="Transparent" />
+                                        </GridView.Resources>
                                         <GridView.ItemContainerStyle>
                                             <Style TargetType="GridViewItem">
                                                 <Setter Property="Margin" Value="0" />
@@ -210,6 +216,9 @@
                                             <DataTemplate x:DataType="local:DefaultVideo">
                                                 <Grid Width="156" Height="82" CornerRadius="6" Background="#1AFFFFFF">
                                                     <Image Source="{x:Bind Thumbnail, Mode=OneWay}" Stretch="UniformToFill" />
+                                                    
+                                                    <!-- Custom Single Selection Indicator (Vertical Blue Line) -->
+                                                    <Border Width="4" HorizontalAlignment="Left" VerticalAlignment="Stretch" CornerRadius="6,0,0,6" Background="{ThemeResource SystemAccentColor}" Visibility="{x:Bind SelectionIndicatorVisibility, Mode=OneWay}" />
                                                     
                                                     <!-- Custom Playlist Selection Checkbox -->
                                                     <Button Background="#66000000" Width="26" Height="26" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,4,34,0" CornerRadius="8" Click="PlaylistSelectButton_Click" Tag="{x:Bind VideoPath}" Visibility="{x:Bind PlaylistSelectionVisibility, Mode=OneWay}">

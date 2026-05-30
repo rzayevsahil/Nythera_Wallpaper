@@ -65,6 +65,23 @@ public partial class DefaultVideo : INotifyPropertyChanged
         }
     }
 
+    private bool _isSelected;
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected != value)
+            {
+                _isSelected = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsSelected)));
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(SelectionIndicatorVisibility)));
+            }
+        }
+    }
+
+    public Microsoft.UI.Xaml.Visibility SelectionIndicatorVisibility => IsSelected ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+
     public string FavoriteIcon => IsFavorite ? "\uEB52" : "\uEB51";
 
     private Microsoft.UI.Xaml.Media.ImageSource _thumbnail;
@@ -891,6 +908,12 @@ public sealed partial class MainPage : Page
                 return;
             }
 
+            // Sync single selection visual state (blue vertical line)
+            foreach (var video in _allVideos)
+            {
+                video.IsSelected = (video == selected);
+            }
+
             if (File.Exists(selected.VideoPath))
             {
                 try
@@ -1445,7 +1468,11 @@ public sealed partial class MainPage : Page
         {
             PlaylistSettingsPanel.Visibility = Visibility.Visible;
             ApplyButton.Visibility = Visibility.Collapsed;
-            foreach (var video in _allVideos) video.PlaylistSelectionVisibility = Visibility.Visible;
+            foreach (var video in _allVideos)
+            {
+                video.PlaylistSelectionVisibility = Visibility.Visible;
+                video.IsSelected = false; // Hide the blue line when entering slide mode
+            }
         }
         else
         {
