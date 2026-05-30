@@ -34,6 +34,37 @@ public partial class DefaultVideo : INotifyPropertyChanged
         }
     }
 
+    private bool _isPlaylistSelected;
+    public bool IsPlaylistSelected
+    {
+        get => _isPlaylistSelected;
+        set
+        {
+            if (_isPlaylistSelected != value)
+            {
+                _isPlaylistSelected = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsPlaylistSelected)));
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(PlaylistCheckVisibility)));
+            }
+        }
+    }
+
+    public Microsoft.UI.Xaml.Visibility PlaylistCheckVisibility => IsPlaylistSelected ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+    private Microsoft.UI.Xaml.Visibility _playlistSelectionVisibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Microsoft.UI.Xaml.Visibility PlaylistSelectionVisibility
+    {
+        get => _playlistSelectionVisibility;
+        set
+        {
+            if (_playlistSelectionVisibility != value)
+            {
+                _playlistSelectionVisibility = value;
+                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(PlaylistSelectionVisibility)));
+            }
+        }
+    }
+
     public string FavoriteIcon => IsFavorite ? "\uEB52" : "\uEB51";
 
     private Microsoft.UI.Xaml.Media.ImageSource _thumbnail;
@@ -853,6 +884,13 @@ public sealed partial class MainPage : Page
     {
         if (DefaultVideosGrid.SelectedItem is DefaultVideo selected)
         {
+            if (PlaylistModeToggle.IsOn)
+            {
+                selected.IsPlaylistSelected = !selected.IsPlaylistSelected;
+                DefaultVideosGrid.SelectedItem = null; // Clear highlight so it can be clicked again
+                return;
+            }
+
             if (File.Exists(selected.VideoPath))
             {
                 try
@@ -1405,28 +1443,31 @@ public sealed partial class MainPage : Page
     {
         if (PlaylistModeToggle.IsOn)
         {
-            DefaultVideosGrid.SelectionMode = ListViewSelectionMode.Multiple;
             PlaylistSettingsPanel.Visibility = Visibility.Visible;
             ApplyButton.Visibility = Visibility.Collapsed;
+            foreach (var video in _allVideos) video.PlaylistSelectionVisibility = Visibility.Visible;
         }
         else
         {
-            DefaultVideosGrid.SelectionMode = ListViewSelectionMode.Single;
             PlaylistSettingsPanel.Visibility = Visibility.Collapsed;
             ApplyButton.Visibility = Visibility.Visible;
+            foreach (var video in _allVideos)
+            {
+                video.PlaylistSelectionVisibility = Visibility.Collapsed;
+                video.IsPlaylistSelected = false; // Clear selection when exiting
+            }
         }
     }
 
     private void ApplyPlaylistButton_Click(object sender, RoutedEventArgs e)
     {
-        var selectedItems = DefaultVideosGrid.SelectedItems;
-        if (selectedItems.Count == 0) return;
-
         var paths = new List<string>();
-        foreach (var item in selectedItems)
+        foreach (var video in _allVideos)
         {
-            if (item is DefaultVideo dv) paths.Add(dv.VideoPath);
+            if (video.IsPlaylistSelected) paths.Add(video.VideoPath);
         }
+        
+        if (paths.Count == 0) return;
 
         string targetMonitor = TargetMonitorComboBox.SelectedItem is ComboBoxItem cbItem && cbItem.Tag != null ? cbItem.Tag.ToString() : "All";
         
@@ -1463,6 +1504,18 @@ public sealed partial class MainPage : Page
         if (DeveloperFallback != null)
         {
             DeveloperFallback.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void PlaylistSelectButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string path)
+        {
+            var video = _allVideos.FirstOrDefault(v => v.VideoPath == path);
+            if (video != null)
+            {
+                video.IsPlaylistSelected = !video.IsPlaylistSelected;
+            }
         }
     }
 }
