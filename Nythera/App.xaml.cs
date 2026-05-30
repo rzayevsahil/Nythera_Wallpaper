@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -66,9 +67,9 @@ public partial class App : Application
         }
         
         // Initialize tray icon in code-behind
-        var menuFlyout = new Microsoft.UI.Xaml.Controls.MenuFlyout();
+        var menuFlyout = new MenuFlyout();
         
-        var dashboardItem = new Microsoft.UI.Xaml.Controls.MenuFlyoutItem { Text = "Dashboard" };
+        var dashboardItem = new MenuFlyoutItem { Text = "Dashboard" };
         dashboardItem.Command = new RelayCommand(() =>
         {
             if (_window != null)
@@ -86,9 +87,9 @@ public partial class App : Application
         });
         menuFlyout.Items.Add(dashboardItem);
         
-        menuFlyout.Items.Add(new Microsoft.UI.Xaml.Controls.MenuFlyoutSeparator());
+        menuFlyout.Items.Add(new MenuFlyoutSeparator());
         
-        var quitItem = new Microsoft.UI.Xaml.Controls.MenuFlyoutItem { Text = "Quit" };
+        var quitItem = new MenuFlyoutItem { Text = "Quit" };
         quitItem.Command = new RelayCommand(() =>
         {
             _trayIcon?.Dispose();
@@ -100,7 +101,7 @@ public partial class App : Application
         _trayIcon = new H.NotifyIcon.TaskbarIcon
         {
             ToolTipText = "Nythera",
-            IconSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new System.Uri("ms-appx:///Assets/AppIcon.ico")),
+            IconSource = new BitmapImage(new System.Uri("ms-appx:///Assets/AppIcon.ico")),
             ContextFlyout = menuFlyout
         };
         _trayIcon.ForceCreate();

@@ -3,10 +3,14 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Storage.Pickers;
 using Nythera.Services;
 using System.ComponentModel;
@@ -24,7 +28,7 @@ public partial class DefaultVideo : INotifyPropertyChanged
             if (_title != value)
             {
                 _title = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Title)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Title)));
             }
         }
     }
@@ -40,8 +44,8 @@ public partial class DefaultVideo : INotifyPropertyChanged
             if (_isFavorite != value)
             {
                 _isFavorite = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsFavorite)));
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(FavoriteIcon)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFavorite)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FavoriteIcon)));
             }
         }
     }
@@ -55,16 +59,16 @@ public partial class DefaultVideo : INotifyPropertyChanged
             if (_isPlaylistSelected != value)
             {
                 _isPlaylistSelected = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsPlaylistSelected)));
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(PlaylistCheckVisibility)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsPlaylistSelected)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PlaylistCheckVisibility)));
             }
         }
     }
 
-    public Microsoft.UI.Xaml.Visibility PlaylistCheckVisibility => IsPlaylistSelected ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Visibility PlaylistCheckVisibility => IsPlaylistSelected ? Visibility.Visible : Visibility.Collapsed;
 
-    private Microsoft.UI.Xaml.Visibility _playlistSelectionVisibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-    public Microsoft.UI.Xaml.Visibility PlaylistSelectionVisibility
+    private Visibility _playlistSelectionVisibility = Visibility.Collapsed;
+    public Visibility PlaylistSelectionVisibility
     {
         get => _playlistSelectionVisibility;
         set
@@ -72,7 +76,7 @@ public partial class DefaultVideo : INotifyPropertyChanged
             if (_playlistSelectionVisibility != value)
             {
                 _playlistSelectionVisibility = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(PlaylistSelectionVisibility)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PlaylistSelectionVisibility)));
             }
         }
     }
@@ -86,24 +90,24 @@ public partial class DefaultVideo : INotifyPropertyChanged
             if (_isSelected != value)
             {
                 _isSelected = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsSelected)));
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(SelectionIndicatorVisibility)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectionIndicatorVisibility)));
             }
         }
     }
 
-    public Microsoft.UI.Xaml.Visibility SelectionIndicatorVisibility => IsSelected ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+    public Visibility SelectionIndicatorVisibility => IsSelected ? Visibility.Visible : Visibility.Collapsed;
 
     public string FavoriteIcon => IsFavorite ? "\uEB52" : "\uEB51";
 
-    private Microsoft.UI.Xaml.Media.ImageSource _thumbnail;
-    public Microsoft.UI.Xaml.Media.ImageSource Thumbnail
+    private ImageSource _thumbnail;
+    public ImageSource Thumbnail
     {
         get => _thumbnail;
         set
         {
             _thumbnail = value;
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(Thumbnail)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Thumbnail)));
         }
     }
 
@@ -116,15 +120,15 @@ public partial class DefaultVideo : INotifyPropertyChanged
             if (_appliedMonitorsText != value)
             {
                 _appliedMonitorsText = value;
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(AppliedMonitorsText)));
-                PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(nameof(IsApplied)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AppliedMonitorsText)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsApplied)));
             }
         }
     }
 
     public bool IsApplied => !string.IsNullOrEmpty(AppliedMonitorsText);
 
-    public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
 
 public sealed partial class MainPage : Page
@@ -258,17 +262,17 @@ public sealed partial class MainPage : Page
         {
             if (isDark)
             {
-                RootGrid.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Black);
+                RootGrid.Background = new SolidColorBrush(Colors.Black);
             }
             else
             {
-                RootGrid.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White);
+                RootGrid.Background = new SolidColorBrush(Colors.White);
             }
         }
         
         try
         {
-            var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(logoPath));
+            var bitmapImage = new BitmapImage(new Uri(logoPath));
             AppTitleLogo.Source = bitmapImage;
         }
         catch { }
@@ -303,14 +307,6 @@ public sealed partial class MainPage : Page
                     else if (tag == "Custom") cbItem.Content = LocalizationService.GetString("FilterCustom");
                 }
             }
-            
-            // Force WinUI to refresh the displayed selected item text
-            int selectedIndex = VideoFilterComboBox.SelectedIndex;
-            if (selectedIndex >= 0)
-            {
-                VideoFilterComboBox.SelectedIndex = -1;
-                VideoFilterComboBox.SelectedIndex = selectedIndex;
-            }
         }
         
         // Translate all video titles dynamically
@@ -335,13 +331,6 @@ public sealed partial class MainPage : Page
                     else if (tag == "Fill") cbItem.Content = LocalizationService.GetString("FitStretch");
                     else if (tag == "None") cbItem.Content = LocalizationService.GetString("FitCenter");
                 }
-            }
-            
-            int selectedIndex = StretchModeComboBox.SelectedIndex;
-            if (selectedIndex >= 0)
-            {
-                StretchModeComboBox.SelectedIndex = -1;
-                StretchModeComboBox.SelectedIndex = selectedIndex;
             }
         }
         
@@ -445,8 +434,17 @@ public sealed partial class MainPage : Page
         if (Interval12h != null) Interval12h.Content = LocalizationService.GetString("Hour12");
         if (Interval24h != null) Interval24h.Content = LocalizationService.GetString("Hour24");
         
-        if (OrderSequential != null) OrderSequential.Content = LocalizationService.GetString("OrderSeq");
-        if (OrderRandom != null) OrderRandom.Content = LocalizationService.GetString("OrderRnd");
+        if (OrderSequential != null) OrderSequential.Content = LocalizationService.GetString("Sequential");
+        if (OrderRandom != null) OrderRandom.Content = LocalizationService.GetString("Random");
+
+        // Force WinUI to refresh the displayed selected item text for all translated ComboBoxes
+        if (VideoFilterComboBox != null) { int idx = VideoFilterComboBox.SelectedIndex; if (idx >= 0) { VideoFilterComboBox.SelectedIndex = -1; VideoFilterComboBox.SelectedIndex = idx; } }
+        if (StretchModeComboBox != null) { int idx = StretchModeComboBox.SelectedIndex; if (idx >= 0) { StretchModeComboBox.SelectedIndex = -1; StretchModeComboBox.SelectedIndex = idx; } }
+        if (ColorOverlayComboBox != null) { int idx = ColorOverlayComboBox.SelectedIndex; if (idx >= 0) { ColorOverlayComboBox.SelectedIndex = -1; ColorOverlayComboBox.SelectedIndex = idx; } }
+        if (TargetMonitorComboBox != null) { int idx = TargetMonitorComboBox.SelectedIndex; if (idx >= 0) { TargetMonitorComboBox.SelectedIndex = -1; TargetMonitorComboBox.SelectedIndex = idx; } }
+        if (SpeedComboBox != null) { int idx = SpeedComboBox.SelectedIndex; if (idx >= 0) { SpeedComboBox.SelectedIndex = -1; SpeedComboBox.SelectedIndex = idx; } }
+        if (PlaylistIntervalComboBox != null) { int idx = PlaylistIntervalComboBox.SelectedIndex; if (idx >= 0) { PlaylistIntervalComboBox.SelectedIndex = -1; PlaylistIntervalComboBox.SelectedIndex = idx; } }
+        if (PlaylistOrderComboBox != null) { int idx = PlaylistOrderComboBox.SelectedIndex; if (idx >= 0) { PlaylistOrderComboBox.SelectedIndex = -1; PlaylistOrderComboBox.SelectedIndex = idx; } }
         
         UpdateVideoListBadges();
     }
@@ -896,7 +894,7 @@ public sealed partial class MainPage : Page
             }
             
             
-            var fallbackBitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/logo1.png"));
+            var fallbackBitmap = new BitmapImage(new Uri("ms-appx:///Assets/logo1.png"));
             
             if (Directory.Exists(videosDir))
             {
@@ -967,7 +965,7 @@ public sealed partial class MainPage : Page
             var thumb = await file.GetThumbnailAsync(Windows.Storage.FileProperties.ThumbnailMode.VideosView, 200, Windows.Storage.FileProperties.ThumbnailOptions.UseCurrentScale);
             if (thumb != null)
             {
-                var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                var bitmap = new BitmapImage();
                 // To avoid cross-thread UI updates issues if not on UI thread, we use DispatcherQueue
                 DispatcherQueue.TryEnqueue(async () =>
                 {
@@ -1226,7 +1224,7 @@ public sealed partial class MainPage : Page
                 // Apply saved stretch mode
                 if (StretchModeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
                 {
-                    if (Enum.TryParse(item.Tag.ToString(), out Microsoft.UI.Xaml.Media.Stretch stretchValue))
+                    if (Enum.TryParse(item.Tag.ToString(), out Stretch stretchValue))
                     {
                         wallpaperWindow.SetStretchMode(stretchValue);
                     }
@@ -1295,7 +1293,7 @@ public sealed partial class MainPage : Page
         catch { }
     }
 
-    private void VolumeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+    private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
         foreach (var win in _wallpaperWindows.Values)
         {
@@ -1332,7 +1330,7 @@ public sealed partial class MainPage : Page
         catch { }
     }
 
-    private void BrightnessSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+    private void BrightnessSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
         try
         {
@@ -1372,24 +1370,24 @@ public sealed partial class MainPage : Page
                     switch(filter)
                     {
                         case "Warm":
-                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
+                            PreviewColorOverlay.Fill = new SolidColorBrush(Colors.Orange);
                             PreviewColorOverlay.Opacity = 0.15;
                             break;
                         case "Cool":
-                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DeepSkyBlue);
+                            PreviewColorOverlay.Fill = new SolidColorBrush(Colors.DeepSkyBlue);
                             PreviewColorOverlay.Opacity = 0.15;
                             break;
                         case "Matrix":
-                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LimeGreen);
+                            PreviewColorOverlay.Fill = new SolidColorBrush(Colors.LimeGreen);
                             PreviewColorOverlay.Opacity = 0.15;
                             break;
                         case "Cyberpunk":
-                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Fuchsia);
+                            PreviewColorOverlay.Fill = new SolidColorBrush(Colors.Fuchsia);
                             PreviewColorOverlay.Opacity = 0.15;
                             break;
                         case "None":
                         default:
-                            PreviewColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                            PreviewColorOverlay.Fill = new SolidColorBrush(Colors.Transparent);
                             PreviewColorOverlay.Opacity = 0;
                             break;
                     }
@@ -1428,7 +1426,7 @@ public sealed partial class MainPage : Page
             string stretchTag = item.Tag.ToString();
             SettingsService.SaveStretchMode(stretchTag);
             
-            if (Enum.TryParse(stretchTag, out Microsoft.UI.Xaml.Media.Stretch stretchValue))
+            if (Enum.TryParse(stretchTag, out Stretch stretchValue))
             {
                 if (PreviewPlayer != null)
                 {
@@ -1446,13 +1444,13 @@ public sealed partial class MainPage : Page
     private double _pointerStartX;
     private bool _isSwiping;
 
-    private void RootGrid_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void RootGrid_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         _pointerStartX = e.GetCurrentPoint(RootGrid).Position.X;
         _isSwiping = true;
     }
 
-    private void RootGrid_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
         if (!_isSwiping) return;
 
@@ -1489,12 +1487,12 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private void RootGrid_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void RootGrid_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
         _isSwiping = false;
     }
 
-    private void RootGrid_PointerCanceled(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private void RootGrid_PointerCanceled(object sender, PointerRoutedEventArgs e)
     {
         _isSwiping = false;
     }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Nythera.Services;
 
@@ -28,7 +29,7 @@ public class SettingsService
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(MonitorSettingsPath));
-            var settings = new System.Collections.Generic.Dictionary<string, string>();
+            var settings = new Dictionary<string, string>();
             if (File.Exists(MonitorSettingsPath))
             {
                 var lines = File.ReadAllLines(MonitorSettingsPath);
@@ -40,7 +41,7 @@ public class SettingsService
                 }
             }
             settings[monitorId] = path;
-            var newLines = new System.Collections.Generic.List<string>();
+            var newLines = new List<string>();
             foreach (var kvp in settings)
             {
                 newLines.Add($"{kvp.Key}={kvp.Value}");
@@ -330,9 +331,9 @@ public class SettingsService
         "favorites.txt"
     );
 
-    public static System.Collections.Generic.HashSet<string> GetFavorites()
+    public static HashSet<string> GetFavorites()
     {
-        var favorites = new System.Collections.Generic.HashSet<string>();
+        var favorites = new HashSet<string>();
         try
         {
             if (File.Exists(FavoritesPath))
@@ -352,7 +353,7 @@ public class SettingsService
         return favorites;
     }
 
-    public static void SaveFavorites(System.Collections.Generic.HashSet<string> favorites)
+    public static void SaveFavorites(HashSet<string> favorites)
     {
         try
         {

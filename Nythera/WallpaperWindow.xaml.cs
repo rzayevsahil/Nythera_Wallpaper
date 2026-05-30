@@ -1,4 +1,6 @@
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using System;
@@ -108,24 +110,24 @@ public sealed partial class WallpaperWindow : Window
             switch(filterName)
             {
                 case "Warm":
-                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Orange);
+                    ColorOverlay.Fill = new SolidColorBrush(Colors.Orange);
                     ColorOverlay.Opacity = 0.15;
                     break;
                 case "Cool":
-                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DeepSkyBlue);
+                    ColorOverlay.Fill = new SolidColorBrush(Colors.DeepSkyBlue);
                     ColorOverlay.Opacity = 0.15;
                     break;
                 case "Matrix":
-                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.LimeGreen);
+                    ColorOverlay.Fill = new SolidColorBrush(Colors.LimeGreen);
                     ColorOverlay.Opacity = 0.15;
                     break;
                 case "Cyberpunk":
-                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Fuchsia);
+                    ColorOverlay.Fill = new SolidColorBrush(Colors.Fuchsia);
                     ColorOverlay.Opacity = 0.15;
                     break;
                 case "None":
                 default:
-                    ColorOverlay.Fill = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.Transparent);
+                    ColorOverlay.Fill = new SolidColorBrush(Colors.Transparent);
                     ColorOverlay.Opacity = 0;
                     break;
             }
@@ -190,7 +192,7 @@ public sealed partial class WallpaperWindow : Window
         catch { }
     }
 
-    public void SetStretchMode(Microsoft.UI.Xaml.Media.Stretch stretch)
+    public void SetStretchMode(Stretch stretch)
     {
         if (BackgroundPlayer != null)
         {
