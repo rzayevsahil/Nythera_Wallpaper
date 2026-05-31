@@ -1181,10 +1181,12 @@ public sealed partial class MainPage : Page
                 string monitorId = currentMonitorIndex.ToString();
                 unseenMonitors.Remove(monitorId);
 
+                bool isNewWindow = false;
                 if (!_wallpaperWindows.TryGetValue(monitorId, out WallpaperWindow wallpaperWindow))
                 {
                     wallpaperWindow = new WallpaperWindow();
                     _wallpaperWindows[monitorId] = wallpaperWindow;
+                    isNewWindow = true;
                 }
 
                 // Determine which video to play on this monitor
@@ -1217,11 +1219,15 @@ public sealed partial class MainPage : Page
                 int height = lprcMonitor.Bottom - lprcMonitor.Top;
 
                 wallpaperWindow.AttachToDesktop(x, y, width, height);
-                wallpaperWindow.ShowWindow();
+                
+                if (!isNewWindow)
+                {
+                    wallpaperWindow.ShowWindow();
+                }
                 
                 // We use async here, but EnumDisplayMonitors callback is synchronous.
                 // PlayVideo async execution inside synchronous callback is fine since it doesn't await here.
-                _ = PlayVideoOnWindowAsync(wallpaperWindow, pathToPlay);
+                _ = PlayVideoOnWindowAsync(wallpaperWindow, pathToPlay, isNewWindow);
                 
                 // Apply saved stretch mode
                 if (StretchModeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
@@ -1285,12 +1291,19 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async Task PlayVideoOnWindowAsync(WallpaperWindow wallpaperWindow, string pathToPlay)
+    private async Task PlayVideoOnWindowAsync(WallpaperWindow wallpaperWindow, string pathToPlay, bool isNewWindow = false)
     {
         try
         {
             var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(pathToPlay);
             wallpaperWindow.PlayVideo(file);
+            
+            if (isNewWindow)
+            {
+                // Wait for the video to start rendering before showing the window to prevent black/yellow flash on startup
+                await Task.Delay(350);
+                wallpaperWindow.ShowWindow();
+            }
         }
         catch { }
     }
