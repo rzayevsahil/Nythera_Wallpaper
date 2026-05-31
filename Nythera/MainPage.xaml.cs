@@ -100,6 +100,8 @@ public partial class DefaultVideo : INotifyPropertyChanged
 
     public string FavoriteIcon => IsFavorite ? "\uEB52" : "\uEB51";
 
+    public Visibility DeleteButtonVisibility => IsCustom ? Visibility.Visible : Visibility.Collapsed;
+
     private ImageSource _thumbnail;
     public ImageSource Thumbnail
     {
@@ -1090,6 +1092,48 @@ public sealed partial class MainPage : Page
         catch (Exception ex)
         {
             StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
+        }
+    }
+
+    private void DeleteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string videoPath)
+        {
+            var video = System.Linq.Enumerable.FirstOrDefault(_allVideos, v => v.VideoPath == videoPath);
+            if (video != null && video.IsCustom)
+            {
+                try
+                {
+                    if (System.IO.File.Exists(videoPath))
+                    {
+                        System.IO.File.Delete(videoPath);
+                    }
+                }
+                catch { }
+
+                if (video.IsFavorite)
+                {
+                    var favorites = SettingsService.GetFavorites();
+                    favorites.Remove(videoPath);
+                    SettingsService.SaveFavorites(favorites);
+                }
+
+                _allVideos.Remove(video);
+                if (_filteredVideos.Contains(video))
+                {
+                    _filteredVideos.Remove(video);
+                }
+
+                if (_selectedFile != null && _selectedFile.Path == videoPath)
+                {
+                    _selectedFile = null;
+                    StatusText.Text = LocalizationService.GetString("NoVideoSelected");
+                    ApplyButton.IsEnabled = false;
+                    PreviewPlayer.Source = null;
+                    PreviewPlaceholderIcon.Visibility = Visibility.Visible;
+                    AppliedBadge.Visibility = Visibility.Collapsed;
+                }
+            }
         }
     }
 

@@ -227,15 +227,22 @@
                                                         </Border.Background>
                                                     </Border>
                                                     
-                                                    <!-- Custom Playlist Selection Checkbox -->
-                                                    <Button Background="#66000000" Width="26" Height="26" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,4,34,0" CornerRadius="8" Click="PlaylistSelectButton_Click" Tag="{x:Bind VideoPath}" Visibility="{x:Bind PlaylistSelectionVisibility, Mode=OneWay}">
-                                                        <FontIcon Glyph="&#xE73E;" FontSize="12" Foreground="White" Visibility="{x:Bind PlaylistCheckVisibility, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
-                                                    </Button>
-                                                    
-                                                    <!-- Favorite Button (Static, never moves) -->
-                                                    <Button Background="#66000000" Width="26" Height="26" Padding="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="4" CornerRadius="13" Click="FavoriteButton_Click" Tag="{x:Bind VideoPath}">
-                                                        <FontIcon Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" FontSize="12" Foreground="White" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
-                                                    </Button>
+                                                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="4">
+                                                        <!-- Custom Playlist Selection Checkbox -->
+                                                        <Button Background="#66000000" Width="26" Height="26" Padding="0" CornerRadius="8" Click="PlaylistSelectButton_Click" Tag="{x:Bind VideoPath}" Visibility="{x:Bind PlaylistSelectionVisibility, Mode=OneWay}">
+                                                            <FontIcon Glyph="&#xE73E;" FontSize="12" Foreground="White" Visibility="{x:Bind PlaylistCheckVisibility, Mode=OneWay}" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                                                        </Button>
+
+                                                        <!-- Delete Button (Only for Custom) -->
+                                                        <Button Background="#66000000" Width="26" Height="26" Padding="0" CornerRadius="13" Click="DeleteButton_Click" Tag="{x:Bind VideoPath}" Visibility="{x:Bind DeleteButtonVisibility, Mode=OneWay}">
+                                                            <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="White" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                                                        </Button>
+
+                                                        <!-- Favorite Button (Static, never moves) -->
+                                                        <Button Background="#66000000" Width="26" Height="26" Padding="0" CornerRadius="13" Click="FavoriteButton_Click" Tag="{x:Bind VideoPath}">
+                                                            <FontIcon Glyph="{x:Bind FavoriteIcon, Mode=OneWay}" FontSize="12" Foreground="White" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                                                        </Button>
+                                                    </StackPanel>
 
                                                     <!-- Applied Indicator -->
                                                     <Border Background="{ThemeResource SystemAccentColor}" Visibility="{x:Bind IsApplied, Mode=OneWay}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="4" Padding="6,2" CornerRadius="4">
