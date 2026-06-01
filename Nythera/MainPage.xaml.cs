@@ -1558,7 +1558,7 @@ public sealed partial class MainPage : Page
                          EnableKenBurns = SettingsService.GetEnableKenBurns(monitorId),
                          EnableParallax = SettingsService.GetEnableParallax(monitorId)
                     };
-                    string stretch = SettingsService.GetStretchMode(monitorId);
+                    string stretch = SettingsService.GetImageStretchMode(monitorId);
                     imgSettings.LayoutMode = stretch;
                     
                     _ = wallpaperWindow.ApplyImageSettingsAsync(imgSettings);
@@ -2230,7 +2230,15 @@ public sealed partial class MainPage : Page
         
         if (ImageStretchComboBox.SelectedItem is ComboBoxItem stretchItem && stretchItem.Tag != null)
         {
-            Nythera.Services.SettingsService.SaveStretchMode(targetMonitor, stretchItem.Tag.ToString());
+            Nythera.Services.SettingsService.SaveImageStretchMode(targetMonitor, stretchItem.Tag.ToString());
+        }
+        else if (ImageStretchComboBox.Items.Count > 0)
+        {
+            ImageStretchComboBox.SelectedIndex = 0;
+            if (ImageStretchComboBox.SelectedItem is ComboBoxItem defaultItem && defaultItem.Tag != null)
+            {
+                Nythera.Services.SettingsService.SaveImageStretchMode(targetMonitor, defaultItem.Tag.ToString());
+            }
         }
 
         ApplyWallpaperToMonitor(targetMonitor, "Image", _selectedImagePath);
@@ -2262,6 +2270,17 @@ public sealed partial class MainPage : Page
     private void ImageStretchComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isInitializing) return;
+        
+        if (ImageStretchComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            string targetMonitor = "All";
+            if (ImageMonitorComboBox != null && ImageMonitorComboBox.SelectedItem is ComboBoxItem monitorItem && monitorItem.Tag != null)
+            {
+                targetMonitor = monitorItem.Tag.ToString();
+            }
+            Nythera.Services.SettingsService.SaveImageStretchMode(targetMonitor, item.Tag.ToString());
+        }
+        
         ImageProperties_ValueChanged(null, null);
     }
 
@@ -2281,7 +2300,7 @@ public sealed partial class MainPage : Page
             KenBurnsToggle.IsOn = Nythera.Services.SettingsService.GetEnableKenBurns(monitorId);
             ParallaxToggle.IsOn = Nythera.Services.SettingsService.GetEnableParallax(monitorId);
             
-            string savedStretchMode = Nythera.Services.SettingsService.GetStretchMode(monitorId);
+            string savedStretchMode = Nythera.Services.SettingsService.GetImageStretchMode(monitorId);
             foreach (ComboBoxItem cbItem in ImageStretchComboBox.Items)
             {
                 if (cbItem.Tag.ToString() == savedStretchMode)
@@ -2289,6 +2308,10 @@ public sealed partial class MainPage : Page
                     ImageStretchComboBox.SelectedItem = cbItem;
                     break;
                 }
+            }
+            if (ImageStretchComboBox.SelectedItem == null && ImageStretchComboBox.Items.Count > 0)
+            {
+                ImageStretchComboBox.SelectedIndex = 0;
             }
             
             _isInitializing = false;

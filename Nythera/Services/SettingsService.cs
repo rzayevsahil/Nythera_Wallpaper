@@ -144,6 +144,22 @@ public class SettingsService
         return GetPerMonitorSetting(StretchModePath, monitorId) ?? "UniformToFill";
     }
 
+    private static readonly string ImageStretchModePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "imagestretchmode.txt"
+    );
+
+    public static void SaveImageStretchMode(string monitorId, string stretchMode)
+    {
+        SavePerMonitorSetting(ImageStretchModePath, monitorId, stretchMode);
+    }
+
+    public static string GetImageStretchMode(string monitorId)
+    {
+        return GetPerMonitorSetting(ImageStretchModePath, monitorId) ?? "Fill";
+    }
+
     private static readonly string ThemePath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "Nythera",
