@@ -237,7 +237,12 @@ public sealed partial class MainPage : Page
             }
         }
         UpdateLanguageUI();
-        
+        // Initialize Battery & Gaming Toggles
+        if (BatterySaverToggle != null) BatterySaverToggle.IsOn = SettingsService.GetPauseOnBattery();
+        if (PauseFullscreenToggle != null) PauseFullscreenToggle.IsOn = SettingsService.GetPauseOnFullscreen();
+
+
+
         this.Loaded += MainPage_Loaded;
         MarketplaceGrid.ItemsSource = _marketItems;
         _downloadManager.DownloadCompleted += DownloadManager_DownloadCompleted;
@@ -293,6 +298,37 @@ public sealed partial class MainPage : Page
         BrowseVideoButton.Content = LocalizationService.GetString("BrowseVideo");
         ApplyButton.Content = LocalizationService.GetString("ApplyWallpaper");
         SettingsTitle.Text = LocalizationService.GetString("Settings");
+        
+        // Settings Headers & Labels
+        if (GeneralExpander != null) GeneralExpander.Header = LocalizationService.GetString("GeneralSettings");
+        if (PerformanceExpander != null) PerformanceExpander.Header = LocalizationService.GetString("PerformanceSettings");
+        if (GamingExpander != null) GamingExpander.Header = LocalizationService.GetString("GamingSettings");
+        if (BatterySaverToggle != null) 
+        {
+            BatterySaverToggle.Header = LocalizationService.GetString("BatterySaver");
+            BatterySaverToggle.OnContent = LocalizationService.GetString("ToggleOn");
+            BatterySaverToggle.OffContent = LocalizationService.GetString("ToggleOff");
+        }
+        if (BatterySaverDescText != null) BatterySaverDescText.Text = LocalizationService.GetString("BatterySaverDesc");
+        
+        if (PauseFullscreenToggle != null)
+        {
+            PauseFullscreenToggle.Header = LocalizationService.GetString("PauseFullscreen");
+            PauseFullscreenToggle.OnContent = LocalizationService.GetString("ToggleOn");
+            PauseFullscreenToggle.OffContent = LocalizationService.GetString("ToggleOff");
+        }
+        if (PauseFullscreenDescText != null) PauseFullscreenDescText.Text = LocalizationService.GetString("PauseFullscreenDesc");
+        
+        if (ThemeText != null) ThemeText.Text = LocalizationService.GetString("ThemeText");
+        if (LanguageText != null) LanguageText.Text = LocalizationService.GetString("LanguageText");
+        
+        if (StartupToggle != null)
+        {
+            StartupToggle.Header = LocalizationService.GetString("StartupToggle");
+            StartupToggle.OnContent = LocalizationService.GetString("ToggleOn");
+            StartupToggle.OffContent = LocalizationService.GetString("ToggleOff");
+        }
+
         VolumeText.Text = LocalizationService.GetString("Volume");
         
         if (MarketplaceTitleText != null) MarketplaceTitleText.Text = LocalizationService.GetString("MarketplaceTitle");
@@ -1561,6 +1597,20 @@ public sealed partial class MainPage : Page
             StatusText.Text = LocalizationService.GetString("StartupDisabled");
         }
     }
+
+    private void BatterySaverToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (BatterySaverToggle != null)
+            SettingsService.SavePauseOnBattery(BatterySaverToggle.IsOn);
+    }
+
+    private void PauseFullscreenToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (PauseFullscreenToggle != null)
+            SettingsService.SavePauseOnFullscreen(PauseFullscreenToggle.IsOn);
+    }
+
+
 
     private void StretchModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {

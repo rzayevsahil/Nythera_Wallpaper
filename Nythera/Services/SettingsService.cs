@@ -362,4 +362,99 @@ public class SettingsService
         }
         catch { }
     }
+
+    private static readonly string PauseOnBatteryPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "pauseonbattery.txt"
+    );
+
+    public static void SavePauseOnBattery(bool pause)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(PauseOnBatteryPath));
+            File.WriteAllText(PauseOnBatteryPath, pause.ToString());
+        }
+        catch { }
+    }
+
+    public static bool GetPauseOnBattery()
+    {
+        if (File.Exists(PauseOnBatteryPath))
+            if (bool.TryParse(File.ReadAllText(PauseOnBatteryPath).Trim(), out bool val))
+                return val;
+        return true; // Default
+    }
+
+    private static readonly string PauseOnFullscreenPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "pauseonfullscreen.txt"
+    );
+
+    public static void SavePauseOnFullscreen(bool pause)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(PauseOnFullscreenPath));
+            File.WriteAllText(PauseOnFullscreenPath, pause.ToString());
+        }
+        catch { }
+    }
+
+    public static bool GetPauseOnFullscreen()
+    {
+        if (File.Exists(PauseOnFullscreenPath))
+            if (bool.TryParse(File.ReadAllText(PauseOnFullscreenPath).Trim(), out bool val))
+                return val;
+        return true; // Default
+    }
+
+    private static readonly string QualityProfilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "qualityprofile.txt"
+    );
+
+    public static void SaveQualityProfile(string profile)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(QualityProfilePath));
+            File.WriteAllText(QualityProfilePath, profile);
+        }
+        catch { }
+    }
+
+    public static string GetQualityProfile()
+    {
+        if (File.Exists(QualityProfilePath))
+            return File.ReadAllText(QualityProfilePath).Trim();
+        return "High"; // Default
+    }
+
+    private static readonly string FpsLimitPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "fpslimit.txt"
+    );
+
+    public static void SaveFpsLimit(int fps)
+    {
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FpsLimitPath));
+            File.WriteAllText(FpsLimitPath, fps.ToString());
+        }
+        catch { }
+    }
+
+    public static int GetFpsLimit()
+    {
+        if (File.Exists(FpsLimitPath))
+            if (int.TryParse(File.ReadAllText(FpsLimitPath).Trim(), out int val))
+                return val;
+        return 60; // Default
+    }
 }

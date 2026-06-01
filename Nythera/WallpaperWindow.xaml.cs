@@ -109,7 +109,8 @@ public sealed partial class WallpaperWindow : Window
     {
         DispatcherQueue.TryEnqueue(() =>
         {
-            if (isFullScreen || App.PerformanceManager.CurrentMode == Nythera.Core.Shared.Models.PerformanceMode.Low)
+            bool pauseForFullScreen = isFullScreen && Nythera.Services.SettingsService.GetPauseOnFullscreen();
+            if (pauseForFullScreen || App.PerformanceManager.CurrentMode == Nythera.Core.Shared.Models.PerformanceMode.Low)
             {
                 PauseVideo();
             }
@@ -128,15 +129,10 @@ public sealed partial class WallpaperWindow : Window
             {
                 PauseVideo();
             }
-            else if (mode == Nythera.Core.Shared.Models.PerformanceMode.Medium)
-            {
-                SetPlaybackSpeed(0.5);
-                if (!_fullScreenDetector.IsFullScreen) ResumeVideo();
-            }
             else
             {
                 SetPlaybackSpeed(Nythera.Services.SettingsService.GetPlaybackSpeed());
-                if (!_fullScreenDetector.IsFullScreen) ResumeVideo();
+                if (!(_fullScreenDetector.IsFullScreen && Nythera.Services.SettingsService.GetPauseOnFullscreen())) ResumeVideo();
             }
         });
     }

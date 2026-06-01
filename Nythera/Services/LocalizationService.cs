@@ -93,7 +93,21 @@ public static class LocalizationService
         { "Download", "İndir" },
         { "DownloadingPercent", "İndiriliyor... %{0}" },
         { "Downloaded", "İndirildi" },
-        { "MarketplaceTitle", "Keşfet (Marketplace)" }
+        { "MarketplaceTitle", "Keşfet (Marketplace)" },
+        { "GeneralSettings", "Genel" },
+        { "PerformanceSettings", "Performans" },
+        { "GamingSettings", "Oyun Modu" },
+        { "QualityProfile", "Kalite Profili:" },
+        { "FpsLimit", "FPS Limiti:" },
+        { "BatterySaver", "Pildeyken duraklat" },
+        { "BatterySaverDesc", "Pil %20'nin altına düştüğünde sistemi rahatlatmak için duvar kağıdını otomatik duraklatır." },
+        { "PauseFullscreen", "Tam ekran uygulamalarda duraklat" },
+        { "PauseFullscreenDesc", "Tam ekran bir oyun veya uygulama açtığınızda performansı korumak için duvar kağıdını duraklatır." },
+        { "ThemeText", "Tema:" },
+        { "LanguageText", "Dil:" },
+        { "StartupToggle", "Windows ile başlat" },
+        { "ToggleOn", "Açık" },
+        { "ToggleOff", "Kapalı" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -185,7 +199,21 @@ public static class LocalizationService
         { "Download", "Download" },
         { "DownloadingPercent", "Downloading... %{0}" },
         { "Downloaded", "Downloaded" },
-        { "MarketplaceTitle", "Discover (Marketplace)" }
+        { "MarketplaceTitle", "Discover (Marketplace)" },
+        { "GeneralSettings", "General" },
+        { "PerformanceSettings", "Performance" },
+        { "GamingSettings", "Gaming" },
+        { "QualityProfile", "Quality Profile:" },
+        { "FpsLimit", "FPS Limit:" },
+        { "BatterySaver", "Pause on Battery" },
+        { "BatterySaverDesc", "Automatically pauses the wallpaper when the battery falls below 20% to save power." },
+        { "PauseFullscreen", "Pause when Fullscreen" },
+        { "PauseFullscreenDesc", "Pauses the wallpaper to conserve performance when a fullscreen game or application is running." },
+        { "ThemeText", "Theme:" },
+        { "LanguageText", "Language:" },
+        { "StartupToggle", "Start With Windows" },
+        { "ToggleOn", "On" },
+        { "ToggleOff", "Off" }
     };
 
     public static string GetString(string key)

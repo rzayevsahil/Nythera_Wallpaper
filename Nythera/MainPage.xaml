@@ -410,40 +410,60 @@
                 <ScrollViewer x:Name="Page2Content" VerticalScrollBarVisibility="Hidden" Opacity="0.15">
                     <StackPanel Spacing="24" Padding="24">
                         
-                        <!-- Settings Card -->
-                        <Border CornerRadius="8" Padding="0">
-                            <StackPanel Spacing="16">
-                                <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" />
-                                
-                                <Grid RowSpacing="12" ColumnSpacing="20">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
+                        <StackPanel Spacing="12">
+                            <TextBlock x:Name="SettingsTitle" Text="Settings" Style="{ThemeResource SubtitleTextBlockStyle}" FontWeight="SemiBold" Margin="0,0,0,8" />
+                            
+                            <!-- General -->
+                            <Expander x:Name="GeneralExpander" Header="Genel (General)" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" IsExpanded="True">
+                                <StackPanel Spacing="16">
+                                    <Grid RowSpacing="12" ColumnSpacing="20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" MinWidth="120" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                    <!-- Theme -->
-                                    <TextBlock x:Name="ThemeText" Text="Theme:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
-                                    <ComboBox x:Name="ThemeComboBox" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="Dark" Tag="Dark" />
-                                        <ComboBoxItem Content="Light" Tag="Light" />
-                                        <ComboBoxItem Content="System" Tag="Default" />
-                                    </ComboBox>
+                                        <TextBlock x:Name="ThemeText" Text="Tema:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+                                        <ComboBox x:Name="ThemeComboBox" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ThemeComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="Dark" Tag="Dark" />
+                                            <ComboBoxItem Content="Light" Tag="Light" />
+                                            <ComboBoxItem Content="System" Tag="Default" />
+                                        </ComboBox>
 
-                                    <!-- Language -->
-                                    <TextBlock x:Name="LanguageText" Text="Language:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
-                                    <ComboBox x:Name="LanguageComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="English" Tag="en" />
-                                        <ComboBoxItem Content="Türkçe" Tag="tr" />
-                                    </ComboBox>
-                                </Grid>
-                                
-                                <ToggleSwitch x:Name="StartupToggle" Header="Launch on Windows Startup" Toggled="StartupToggle_Toggled" />
-                            </StackPanel>
-                        </Border>
+                                        <TextBlock x:Name="LanguageText" Text="Dil:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                                        <ComboBox x:Name="LanguageComboBox" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="LanguageComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="English" Tag="en" />
+                                            <ComboBoxItem Content="Türkçe" Tag="tr" />
+                                        </ComboBox>
+                                    </Grid>
+                                    <ToggleSwitch x:Name="StartupToggle" Header="Windows ile başlat" Toggled="StartupToggle_Toggled" />
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Performance -->
+                            <Expander x:Name="PerformanceExpander" Header="Performans (Performance)" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                <StackPanel Spacing="16">
+
+                                    <StackPanel Spacing="2">
+                                        <ToggleSwitch x:Name="BatterySaverToggle" Header="Pildeyken duraklat (Battery Saver)" IsOn="True" Toggled="BatterySaverToggle_Toggled" />
+                                        <TextBlock x:Name="BatterySaverDescText" Text="Pil %20'nin altına düştüğünde sistemi rahatlatmak için duvar kağıdını otomatik duraklatır." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+
+                            <!-- Gaming -->
+                            <Expander x:Name="GamingExpander" Header="Oyun Modu (Gaming)" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                <StackPanel Spacing="16">
+                                    <StackPanel Spacing="2">
+                                        <ToggleSwitch x:Name="PauseFullscreenToggle" Header="Tam ekran uygulamalarda duraklat" IsOn="True" Toggled="PauseFullscreenToggle_Toggled" />
+                                        <TextBlock x:Name="PauseFullscreenDescText" Text="Tam ekran bir oyun veya uygulama açtığınızda performansı korumak için duvar kağıdını duraklatır." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+                        </StackPanel>
 
                     </StackPanel>
                 </ScrollViewer>

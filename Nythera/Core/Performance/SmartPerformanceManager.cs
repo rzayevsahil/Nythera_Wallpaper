@@ -45,16 +45,16 @@ public class SmartPerformanceManager
             return;
         }
 
+        bool pauseOnBattery = Nythera.Services.SettingsService.GetPauseOnBattery();
         int battery = _batteryMonitor.GetCurrentBatteryLevel();
         
-        if (battery > 50)
-            SetMode(PerformanceMode.Ultra);
-        else if (battery > 30)
-            SetMode(PerformanceMode.High);
-        else if (battery > 15)
-            SetMode(PerformanceMode.Medium);
-        else
-            SetMode(PerformanceMode.Low);
+        if (battery <= 20 && pauseOnBattery)
+        {
+            SetMode(PerformanceMode.Low); // Pause completely
+            return;
+        }
+
+        SetMode(PerformanceMode.Ultra);
     }
 
     private void SetMode(PerformanceMode newMode)
