@@ -10,6 +10,9 @@ Nythera, Windows işletim sistemi için geliştirilmiş, yüksek performanslı, 
 ## Özellikler (Features) 🚀
 - **Video Duvar Kağıdı:** `.mp4`, `.webm` ve `.mkv` formatındaki videoları doğrudan masaüstü arka planı olarak oynatır.
 - **Akıllı Performans Yönetimi (Auto-Pause):** Tam ekran bir oyuna veya uygulamaya girdiğinizde bunu otomatik olarak algılar ve videoyu duraklatır. Böylece CPU/GPU tüketimini sıfırlar ve FPS düşüşü yaşatmaz.
+- **Pil Tasarrufu (Battery Saver):** Dizüstü bilgisayarınız pildeyken ve şarj %20'nin altına düştüğünde sistemi rahatlatmak için duvar kağıdını otomatik duraklatır.
+- **Etkileşimli Masaüstü (Interactive):** Çalan sese duyarlı neon ışık efektleri (Audio Visualizer) ve farenizi takip eden interaktif masaüstü karakteri ile ekranınızı canlandırır.
+- **Gelişmiş Ayarlar Paneli:** Genel, Performans ve Oyun Modu gibi kategorilere ayrılmış temiz, kullanıcı dostu modern bir arayüz (Expander tabanlı) sunar.
 - **Çoklu Monitör Desteği:** Sistemdeki tüm monitörleri algılar ve seçtiğiniz videoyu her ekranın kendi çözünürlüğüne uygun şekilde ayrı ayrı konumlandırır.
 - **Windows Başlangıcında Çalışma:** İsteğe bağlı olarak Windows ile birlikte başlar ve son seçtiğiniz duvar kağıdını otomatik olarak yükler.
 - **Sistem Tepsisi (System Tray) Entegrasyonu:** Arka planda sessizce çalışır. Tepsiden yönetilebilir, arayüz (dashboard) kapatılsa bile video oynamaya devam eder.
@@ -27,6 +30,9 @@ Nythera is a high-performance, open-source **Video Wallpaper Engine** built spec
 ## Key Features 🚀
 - **Video Wallpapers:** Play `.mp4`, `.webm`, and `.mkv` videos directly as your desktop background.
 - **Smart Performance Management (Auto-Pause):** Automatically detects when you are running a full-screen game or application and pauses the wallpaper to free up CPU/GPU resources, ensuring zero FPS drops.
+- **Battery Saver:** Automatically pauses the wallpaper when the battery falls below 20% to save power on laptops.
+- **Interactive Audio & Desktop:** Features audio-reactive neon flash overlays and a desktop character that tracks your mouse movements.
+- **Advanced Settings Panel:** Modern Expander-based UI categorized cleanly into General, Performance, and Gaming settings.
 - **Multi-Monitor Support:** Automatically detects all connected monitors and accurately fits the wallpaper per display.
 - **Launch on Startup:** Optionally starts with Windows and auto-loads your last applied video wallpaper.
 - **System Tray Integration:** Runs silently in the background. Hiding the dashboard keeps the wallpaper running smoothly.
