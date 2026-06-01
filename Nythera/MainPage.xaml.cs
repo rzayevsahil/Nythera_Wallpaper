@@ -347,8 +347,63 @@ public sealed partial class MainPage : Page
         }
         if (PauseFullscreenDescText != null) PauseFullscreenDescText.Text = LocalizationService.GetString("PauseFullscreenDesc");
         
+        // Image UI Translations
+        if (ImagesDescription != null) ImagesDescription.Text = LocalizationService.GetString("ImageAppDescription");
+        if (DefaultImagesTitle != null) DefaultImagesTitle.Text = LocalizationService.GetString("DefaultImagesTitle");
+        if (ImagePlaylistModeTitle != null) ImagePlaylistModeTitle.Text = LocalizationService.GetString("PlaylistMode");
+        if (ImagePlaylistModeToggle != null) 
+        {
+            ImagePlaylistModeToggle.OffContent = LocalizationService.GetString("ToggleOff");
+            ImagePlaylistModeToggle.OnContent = LocalizationService.GetString("ToggleOn");
+        }
+        if (ImageOrText != null) ImageOrText.Text = LocalizationService.GetString("OrDivider");
+        if (BrowseImageButton != null) BrowseImageButton.Content = LocalizationService.GetString("BrowseImage");
+        if (ApplyImageButton != null) ApplyImageButton.Content = LocalizationService.GetString("ApplyWallpaper");
+        
+        if (ImageBlurTitle != null) ImageBlurTitle.Text = LocalizationService.GetString("Blur");
+        if (ImageBrightnessTitle != null) ImageBrightnessTitle.Text = LocalizationService.GetString("Brightness");
+        if (ImageContrastTitle != null) ImageContrastTitle.Text = LocalizationService.GetString("Contrast");
+        if (ImageStretchTitle != null) ImageStretchTitle.Text = LocalizationService.GetString("StretchMode");
+        if (ImageEffectsTitle != null) ImageEffectsTitle.Text = LocalizationService.GetString("Effects");
+        if (ImageMonitorTitle != null) ImageMonitorTitle.Text = LocalizationService.GetString("MonitorText");
+        
+        if (ImageFilterComboBox != null && ImageFilterComboBox.Items.Count >= 3)
+        {
+            var savedIndex = ImageFilterComboBox.SelectedIndex;
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageFilterComboBox.Items[0]).Content = LocalizationService.GetString("FilterAll");
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageFilterComboBox.Items[1]).Content = LocalizationService.GetString("FilterFavorites");
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageFilterComboBox.Items[2]).Content = LocalizationService.GetString("FilterCustom");
+            if (savedIndex >= 0)
+            {
+                ImageFilterComboBox.SelectedIndex = -1;
+                ImageFilterComboBox.SelectedIndex = savedIndex;
+            }
+        }
+        
+        if (ImageStretchComboBox != null && ImageStretchComboBox.Items.Count >= 5)
+        {
+            var savedIndex = ImageStretchComboBox.SelectedIndex;
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageStretchComboBox.Items[0]).Content = LocalizationService.GetString("FitFill");
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageStretchComboBox.Items[1]).Content = LocalizationService.GetString("FitUniform");
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageStretchComboBox.Items[2]).Content = LocalizationService.GetString("FitStretch");
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageStretchComboBox.Items[3]).Content = LocalizationService.GetString("FitCenter");
+            ((Microsoft.UI.Xaml.Controls.ComboBoxItem)ImageStretchComboBox.Items[4]).Content = LocalizationService.GetString("FitSpan");
+            if (savedIndex >= 0)
+            {
+                ImageStretchComboBox.SelectedIndex = -1;
+                ImageStretchComboBox.SelectedIndex = savedIndex;
+            }
+        }
+        
+        if (ImageStatusText != null && string.IsNullOrEmpty(_selectedImagePath))
+        {
+            ImageStatusText.Text = LocalizationService.GetString("NoImageSelected");
+        }
+        
         if (ThemeText != null) ThemeText.Text = LocalizationService.GetString("ThemeText");
         if (LanguageText != null) LanguageText.Text = LocalizationService.GetString("LanguageText");
+        
+        InitializeMonitors();
         
         if (StartupToggle != null)
         {
@@ -384,6 +439,7 @@ public sealed partial class MainPage : Page
 
         if (VideoFilterComboBox != null)
         {
+            var savedIndex = VideoFilterComboBox.SelectedIndex;
             foreach (var item in VideoFilterComboBox.Items)
             {
                 if (item is ComboBoxItem cbItem && cbItem.Tag != null)
@@ -393,6 +449,11 @@ public sealed partial class MainPage : Page
                     else if (tag == "Favorites") cbItem.Content = LocalizationService.GetString("FilterFavorites");
                     else if (tag == "Custom") cbItem.Content = LocalizationService.GetString("FilterCustom");
                 }
+            }
+            if (savedIndex >= 0)
+            {
+                VideoFilterComboBox.SelectedIndex = -1;
+                VideoFilterComboBox.SelectedIndex = savedIndex;
             }
         }
         
@@ -800,7 +861,7 @@ public sealed partial class MainPage : Page
             
             var item = new ComboBoxItem { Content = $"{monitorName} ({w}x{h})", Tag = monitorCount.ToString() };
             TargetMonitorComboBox.Items.Add(item);
-            if (ImageMonitorComboBox != null) { ImageMonitorComboBox.Items.Add(new ComboBoxItem { Content = "$monitorName ($w`x$h)", Tag = monitorCount.ToString() }); }
+            if (ImageMonitorComboBox != null) { ImageMonitorComboBox.Items.Add(new ComboBoxItem { Content = $"{monitorName} ({w}x{h})", Tag = monitorCount.ToString() }); }
             return true;
         }, IntPtr.Zero);
 
@@ -2097,7 +2158,7 @@ public sealed partial class MainPage : Page
                 
                 _selectedImagePath = copiedFile.Path;
                 _selectedImageName = copiedFile.Name;
-                ImageStatusText.Text = $"Selected: {copiedFile.Name}";
+                ImageStatusText.Text = string.Format(Nythera.Services.LocalizationService.GetString("ReadyFormat"), copiedFile.Name);
                 ApplyImageButton.IsEnabled = true;
                 System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] BrowseImage logic complete\n");
             }
@@ -2130,7 +2191,7 @@ public sealed partial class MainPage : Page
                 _selectedImageName = selected.Name;
                 System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Setting status text\n");
                 
-                ImageStatusText.Text = $"Ready: {selected.Name}";
+                ImageStatusText.Text = string.Format(Nythera.Services.LocalizationService.GetString("ReadyFormat"), selected.Name);
                 System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Enabling button\n");
                 
                 ApplyImageButton.IsEnabled = true;

@@ -109,7 +109,18 @@ public static class LocalizationService
         { "ToggleOn", "Açık" },
         { "ToggleOff", "Kapalı" },
         { "TrayDashboard", "Ana Ekran" },
-        { "TrayQuit", "Çıkış" }
+        { "TrayQuit", "Çıkış" },
+        { "ImageAppDescription", "Masaüstü arka planınız olarak ayarlamak için bir resim seçin." },
+        { "DefaultImagesTitle", "Resimler" },
+        { "BrowseImage", "Kendi Resmini Seç" },
+        { "NoImageSelected", "Henüz resim seçilmedi." },
+        { "Blur", "Bulanıklık:" },
+        { "Contrast", "Kontrast:" },
+        { "StretchMode", "Yerleşim:" },
+        { "Effects", "Efektler:" },
+        { "ReadyFormat", "Hazır: {0}" },
+        { "SelectedFormat", "Seçildi: {0}" },
+        { "FitSpan", "Yay (Çoklu Ekran)" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -217,7 +228,18 @@ public static class LocalizationService
         { "ToggleOn", "On" },
         { "ToggleOff", "Off" },
         { "TrayDashboard", "Dashboard" },
-        { "TrayQuit", "Quit" }
+        { "TrayQuit", "Quit" },
+        { "ImageAppDescription", "Select an image to set as your desktop background." },
+        { "DefaultImagesTitle", "Images" },
+        { "BrowseImage", "Browse Image" },
+        { "NoImageSelected", "No image selected." },
+        { "Blur", "Blur:" },
+        { "Contrast", "Contrast:" },
+        { "StretchMode", "Fit:" },
+        { "Effects", "Effects:" },
+        { "ReadyFormat", "Ready: {0}" },
+        { "SelectedFormat", "Selected: {0}" },
+        { "FitSpan", "Span (Multi-Monitor)" }
     };
 
     public static string GetString(string key)
