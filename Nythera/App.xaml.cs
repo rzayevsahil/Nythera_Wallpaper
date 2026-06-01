@@ -44,6 +44,8 @@ public partial class App : Application
     /// </summary>
     /// <param name="args">Details about the launch request and process.</param>
     private H.NotifyIcon.TaskbarIcon _trayIcon;
+    public MenuFlyoutItem _dashboardItem;
+    public MenuFlyoutItem _quitItem;
 
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
@@ -81,8 +83,8 @@ public partial class App : Application
         // Initialize tray icon in code-behind
         var menuFlyout = new MenuFlyout();
         
-        var dashboardItem = new MenuFlyoutItem { Text = "Dashboard" };
-        dashboardItem.Command = new RelayCommand(() =>
+        _dashboardItem = new MenuFlyoutItem { Text = Services.LocalizationService.GetString("TrayDashboard") };
+        _dashboardItem.Command = new RelayCommand(() =>
         {
             if (_window != null)
             {
@@ -97,18 +99,18 @@ public partial class App : Application
                 _window.Activate();
             }
         });
-        menuFlyout.Items.Add(dashboardItem);
+        menuFlyout.Items.Add(_dashboardItem);
         
         menuFlyout.Items.Add(new MenuFlyoutSeparator());
         
-        var quitItem = new MenuFlyoutItem { Text = "Quit" };
-        quitItem.Command = new RelayCommand(() =>
+        _quitItem = new MenuFlyoutItem { Text = Services.LocalizationService.GetString("TrayQuit") };
+        _quitItem.Command = new RelayCommand(() =>
         {
             _trayIcon?.Dispose();
             Core.WallpaperEngine.DesktopInterop.RestoreDesktop();
             Environment.Exit(0);
         });
-        menuFlyout.Items.Add(quitItem);
+        menuFlyout.Items.Add(_quitItem);
 
         _trayIcon = new H.NotifyIcon.TaskbarIcon
         {
@@ -153,6 +155,14 @@ public partial class App : Application
         AudioController?.Stop();
         Core.WallpaperEngine.DesktopInterop.RestoreDesktop();
         Environment.Exit(0);
+    }
+
+    public void UpdateTrayLanguage()
+    {
+        if (_dashboardItem != null)
+            _dashboardItem.Text = Services.LocalizationService.GetString("TrayDashboard");
+        if (_quitItem != null)
+            _quitItem.Text = Services.LocalizationService.GetString("TrayQuit");
     }
 
     private void CurrentDomain_ProcessExit(object? sender, System.EventArgs e)

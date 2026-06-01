@@ -107,7 +107,9 @@ public static class LocalizationService
         { "LanguageText", "Dil:" },
         { "StartupToggle", "Windows ile başlat" },
         { "ToggleOn", "Açık" },
-        { "ToggleOff", "Kapalı" }
+        { "ToggleOff", "Kapalı" },
+        { "TrayDashboard", "Ana Ekran" },
+        { "TrayQuit", "Çıkış" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -213,7 +215,9 @@ public static class LocalizationService
         { "LanguageText", "Language:" },
         { "StartupToggle", "Start With Windows" },
         { "ToggleOn", "On" },
-        { "ToggleOff", "Off" }
+        { "ToggleOff", "Off" },
+        { "TrayDashboard", "Dashboard" },
+        { "TrayQuit", "Quit" }
     };
 
     public static string GetString(string key)

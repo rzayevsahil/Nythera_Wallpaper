@@ -31,11 +31,6 @@ public sealed partial class WallpaperWindow : Window
 
         App.PerformanceManager.PerformanceModeChanged += PerformanceManager_StateChanged;
 
-        if (App.CharacterController != null)
-        {
-            App.CharacterController.ActionChanged += CharacterController_ActionChanged;
-            UpdateCharacterImage(App.CharacterController.CurrentAction);
-        }
 
         if (App.AudioController != null)
         {
@@ -43,11 +38,13 @@ public sealed partial class WallpaperWindow : Window
         }
     }
 
+    public string MonitorId { get; set; } = "All";
+
     private void AudioController_NeonFlashTriggered(object? sender, float bassIntensity)
     {
         DispatcherQueue.TryEnqueue(() =>
         {
-            string currentFilter = Nythera.Services.SettingsService.GetVideoFilter();
+            string currentFilter = Nythera.Services.SettingsService.GetVideoFilter(MonitorId);
             double baseOpacity = currentFilter == "None" ? 0.0 : 0.15;
             double flashOpacity = Math.Min(0.8, baseOpacity + bassIntensity);
             
@@ -81,30 +78,6 @@ public sealed partial class WallpaperWindow : Window
         });
     }
 
-    private void CharacterController_ActionChanged(object sender, Nythera.Core.Interactive.Models.CharacterAction action)
-    {
-        DispatcherQueue.TryEnqueue(() =>
-        {
-            UpdateCharacterImage(action);
-        });
-    }
-
-    private void UpdateCharacterImage(Nythera.Core.Interactive.Models.CharacterAction action)
-    {
-        if (action == Nythera.Core.Interactive.Models.CharacterAction.LookLeft)
-        {
-            CharacterPlaceholderText.Text = "( <_< )";
-        }
-        else if (action == Nythera.Core.Interactive.Models.CharacterAction.LookRight)
-        {
-            CharacterPlaceholderText.Text = "( >_> )";
-        }
-        else
-        {
-            CharacterPlaceholderText.Text = "( O_O )";
-        }
-    }
-
     private void FullScreenDetector_StateChanged(object sender, bool isFullScreen)
     {
         DispatcherQueue.TryEnqueue(() =>
@@ -131,7 +104,7 @@ public sealed partial class WallpaperWindow : Window
             }
             else
             {
-                SetPlaybackSpeed(Nythera.Services.SettingsService.GetPlaybackSpeed());
+                SetPlaybackSpeed(Nythera.Services.SettingsService.GetPlaybackSpeed(MonitorId));
                 if (!(_fullScreenDetector.IsFullScreen && Nythera.Services.SettingsService.GetPauseOnFullscreen())) ResumeVideo();
             }
         });
@@ -142,7 +115,7 @@ public sealed partial class WallpaperWindow : Window
         _mediaPlayer.Source = MediaSource.CreateFromStorageFile(file);
         if (_mediaPlayer.PlaybackSession != null)
         {
-            _mediaPlayer.PlaybackSession.PlaybackRate = Nythera.Services.SettingsService.GetPlaybackSpeed();
+            _mediaPlayer.PlaybackSession.PlaybackRate = Nythera.Services.SettingsService.GetPlaybackSpeed(MonitorId);
         }
         _mediaPlayer.Play();
     }
@@ -245,10 +218,7 @@ public sealed partial class WallpaperWindow : Window
         }
 
         App.PerformanceManager.PerformanceModeChanged -= PerformanceManager_StateChanged;
-        if (App.CharacterController != null)
-        {
-            App.CharacterController.ActionChanged -= CharacterController_ActionChanged;
-        }
+
         if (App.AudioController != null)
         {
             App.AudioController.NeonFlashTriggered -= AudioController_NeonFlashTriggered;

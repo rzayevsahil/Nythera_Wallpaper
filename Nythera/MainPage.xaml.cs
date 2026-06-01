@@ -165,8 +165,11 @@ public sealed partial class MainPage : Page
         // Initialize startup toggle state
         StartupToggle.IsOn = StartupService.IsStartupEnabled();
         
+        // Get current target monitor
+        string targetMonitor = SettingsService.GetTargetMonitor();
+
         // Initialize stretch mode combo box
-        string savedStretchMode = SettingsService.GetStretchMode();
+        string savedStretchMode = SettingsService.GetStretchMode(targetMonitor);
         foreach (ComboBoxItem item in StretchModeComboBox.Items)
         {
             if (item.Tag.ToString() == savedStretchMode)
@@ -179,7 +182,7 @@ public sealed partial class MainPage : Page
             StretchModeComboBox.SelectedIndex = 0;
             
         // Initialize Speed combo box
-        double savedSpeed = SettingsService.GetPlaybackSpeed();
+        double savedSpeed = SettingsService.GetPlaybackSpeed(targetMonitor);
         foreach (ComboBoxItem item in SpeedComboBox.Items)
         {
             if (item.Tag != null && double.TryParse(item.Tag.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double val) && Math.Abs(val - savedSpeed) < 0.01)
@@ -192,14 +195,14 @@ public sealed partial class MainPage : Page
             SpeedComboBox.SelectedIndex = 2; // Default to 1.0x
 
         // Initialize Brightness
-        double savedBrightness = SettingsService.GetBrightness();
+        double savedBrightness = SettingsService.GetBrightness(targetMonitor);
         if (BrightnessSlider != null)
         {
             BrightnessSlider.Value = savedBrightness;
         }
 
         // Initialize Video Filter
-        string savedFilter = SettingsService.GetVideoFilter();
+        string savedFilter = SettingsService.GetVideoFilter(targetMonitor);
         if (ColorOverlayComboBox != null)
         {
             foreach (ComboBoxItem item in ColorOverlayComboBox.Items)
@@ -677,6 +680,7 @@ public sealed partial class MainPage : Page
             string langTag = item.Tag.ToString();
             SettingsService.SaveLanguage(langTag);
             UpdateLanguageUI();
+            (Application.Current as App)?.UpdateTrayLanguage();
         }
     }
 
@@ -932,6 +936,45 @@ public sealed partial class MainPage : Page
             string tag = item.Tag.ToString();
             SettingsService.SaveTargetMonitor(tag);
             UpdatePreviewBounds(tag);
+            
+            _isInitializing = true;
+            
+            double savedSpeed = SettingsService.GetPlaybackSpeed(tag);
+            foreach (ComboBoxItem speedItem in SpeedComboBox.Items)
+            {
+                if (double.TryParse(speedItem.Tag.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double s) && s == savedSpeed)
+                {
+                    SpeedComboBox.SelectedItem = speedItem;
+                    break;
+                }
+            }
+
+            if (BrightnessSlider != null)
+            {
+                BrightnessSlider.Value = SettingsService.GetBrightness(tag);
+            }
+
+            string savedFilter = SettingsService.GetVideoFilter(tag);
+            foreach (ComboBoxItem filterItem in ColorOverlayComboBox.Items)
+            {
+                if (filterItem.Tag != null && filterItem.Tag.ToString() == savedFilter)
+                {
+                    ColorOverlayComboBox.SelectedItem = filterItem;
+                    break;
+                }
+            }
+            
+            string savedStretchMode = SettingsService.GetStretchMode(tag);
+            foreach (ComboBoxItem stretchItem in StretchModeComboBox.Items)
+            {
+                if (stretchItem.Tag != null && stretchItem.Tag.ToString() == savedStretchMode)
+                {
+                    StretchModeComboBox.SelectedItem = stretchItem;
+                    break;
+                }
+            }
+
+            _isInitializing = false;
             
             if (!_isInitializing)
             {
@@ -1394,28 +1437,25 @@ public sealed partial class MainPage : Page
                 _ = PlayVideoOnWindowAsync(wallpaperWindow, pathToPlay, isNewWindow);
                 
                 // Apply saved stretch mode
-                if (StretchModeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+                string stretchStr = SettingsService.GetStretchMode(monitorId);
+                if (Enum.TryParse(stretchStr, out Stretch stretchValue))
                 {
-                    if (Enum.TryParse(item.Tag.ToString(), out Stretch stretchValue))
-                    {
-                        wallpaperWindow.SetStretchMode(stretchValue);
-                    }
+                    wallpaperWindow.SetStretchMode(stretchValue);
                 }
 
                 // Apply volume
-                wallpaperWindow.SetVolume(VolumeSlider.Value / 100.0);
+                if (VolumeSlider != null)
+                {
+                    wallpaperWindow.SetVolume(VolumeSlider.Value / 100.0);
+                }
 
                 // Apply Brightness
-                if (BrightnessSlider != null)
-                {
-                    wallpaperWindow.SetBrightness(BrightnessSlider.Value);
-                }
+                double brightness = SettingsService.GetBrightness(monitorId);
+                wallpaperWindow.SetBrightness(brightness);
                 
                 // Apply Video Filter
-                if (ColorOverlayComboBox != null && ColorOverlayComboBox.SelectedItem is ComboBoxItem filterItem && filterItem.Tag != null)
-                {
-                    wallpaperWindow.SetVideoFilter(filterItem.Tag.ToString());
-                }
+                string filterStr = SettingsService.GetVideoFilter(monitorId);
+                wallpaperWindow.SetVideoFilter(filterStr);
 
                 return true;
             }, IntPtr.Zero);
@@ -1489,16 +1529,24 @@ public sealed partial class MainPage : Page
             {
                 if (double.TryParse(item.Tag.ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double speed))
                 {
-                    SettingsService.SavePlaybackSpeed(speed);
+                    string targetMonitor = SettingsService.GetTargetMonitor();
+                    SettingsService.SavePlaybackSpeed(targetMonitor, speed);
                     
                     if (PreviewPlayer != null && PreviewPlayer.MediaPlayer != null && PreviewPlayer.MediaPlayer.PlaybackSession != null)
                     {
                         PreviewPlayer.MediaPlayer.PlaybackSession.PlaybackRate = speed;
                     }
                     
-                    if (_wallpaperWindows != null)
+                    if (_wallpaperWindows != null && !_isInitializing)
                     {
-                        foreach (var win in _wallpaperWindows.Values)
+                        if (targetMonitor == "All")
+                        {
+                            foreach (var win in _wallpaperWindows.Values)
+                            {
+                                win.SetPlaybackSpeed(speed);
+                            }
+                        }
+                        else if (_wallpaperWindows.TryGetValue(targetMonitor, out var win))
                         {
                             win.SetPlaybackSpeed(speed);
                         }
@@ -1514,7 +1562,11 @@ public sealed partial class MainPage : Page
         try
         {
             double brightness = e.NewValue;
-            SettingsService.SaveBrightness(brightness);
+            string targetMonitor = SettingsService.GetTargetMonitor();
+            if (!_isInitializing)
+            {
+                SettingsService.SaveBrightness(targetMonitor, brightness);
+            }
             
             double opacity = 1.0 - (brightness / 100.0);
             opacity = Math.Max(0.0, Math.Min(1.0, opacity));
@@ -1524,9 +1576,16 @@ public sealed partial class MainPage : Page
                 PreviewBrightnessOverlay.Opacity = opacity;
             }
             
-            if (_wallpaperWindows != null)
+            if (_wallpaperWindows != null && !_isInitializing)
             {
-                foreach (var win in _wallpaperWindows.Values)
+                if (targetMonitor == "All")
+                {
+                    foreach (var win in _wallpaperWindows.Values)
+                    {
+                        win.SetBrightness(brightness);
+                    }
+                }
+                else if (_wallpaperWindows.TryGetValue(targetMonitor, out var win))
                 {
                     win.SetBrightness(brightness);
                 }
@@ -1542,7 +1601,11 @@ public sealed partial class MainPage : Page
             if (ColorOverlayComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
             {
                 string filter = item.Tag.ToString();
-                SettingsService.SaveVideoFilter(filter);
+                string targetMonitor = SettingsService.GetTargetMonitor();
+                if (!_isInitializing)
+                {
+                    SettingsService.SaveVideoFilter(targetMonitor, filter);
+                }
                 
                 if (PreviewColorOverlay != null)
                 {
@@ -1572,9 +1635,16 @@ public sealed partial class MainPage : Page
                     }
                 }
                 
-                if (_wallpaperWindows != null)
+                if (_wallpaperWindows != null && !_isInitializing)
                 {
-                    foreach (var win in _wallpaperWindows.Values)
+                    if (targetMonitor == "All")
+                    {
+                        foreach (var win in _wallpaperWindows.Values)
+                        {
+                            win.SetVideoFilter(filter);
+                        }
+                    }
+                    else if (_wallpaperWindows.TryGetValue(targetMonitor, out var win))
                     {
                         win.SetVideoFilter(filter);
                     }
@@ -1617,7 +1687,11 @@ public sealed partial class MainPage : Page
         if (StretchModeComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
         {
             string stretchTag = item.Tag.ToString();
-            SettingsService.SaveStretchMode(stretchTag);
+            string targetMonitor = SettingsService.GetTargetMonitor();
+            if (!_isInitializing)
+            {
+                SettingsService.SaveStretchMode(targetMonitor, stretchTag);
+            }
             
             if (Enum.TryParse(stretchTag, out Stretch stretchValue))
             {
@@ -1626,9 +1700,19 @@ public sealed partial class MainPage : Page
                     PreviewPlayer.Stretch = stretchValue;
                 }
                 
-                foreach (var win in _wallpaperWindows.Values)
+                if (_wallpaperWindows != null && !_isInitializing)
                 {
-                    win.SetStretchMode(stretchValue);
+                    if (targetMonitor == "All")
+                    {
+                        foreach (var win in _wallpaperWindows.Values)
+                        {
+                            win.SetStretchMode(stretchValue);
+                        }
+                    }
+                    else if (_wallpaperWindows.TryGetValue(targetMonitor, out var win))
+                    {
+                        win.SetStretchMode(stretchValue);
+                    }
                 }
             }
         }
@@ -1720,7 +1804,7 @@ public sealed partial class MainPage : Page
                 
                 SettingsService.SaveWallpaperPath(kvp.Key, nextVideoPath);
                 
-                string stretchMode = SettingsService.GetStretchMode() ?? "UniformToFill";
+
                 
                 // Set the flag to indicate we updated something
                 hasChanges = true;

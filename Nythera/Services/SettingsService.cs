@@ -134,33 +134,14 @@ public class SettingsService
         return GetWallpaperPath("All");
     }
 
-    public static void SaveStretchMode(string stretchMode)
+    public static void SaveStretchMode(string monitorId, string stretchMode)
     {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(StretchModePath));
-            File.WriteAllText(StretchModePath, stretchMode);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to save stretch mode: {ex.Message}");
-        }
+        SavePerMonitorSetting(StretchModePath, monitorId, stretchMode);
     }
 
-    public static string GetStretchMode()
+    public static string GetStretchMode(string monitorId)
     {
-        try
-        {
-            if (File.Exists(StretchModePath))
-            {
-                return File.ReadAllText(StretchModePath).Trim();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to load stretch mode: {ex.Message}");
-        }
-        return "UniformToFill"; // Default
+        return GetPerMonitorSetting(StretchModePath, monitorId) ?? "UniformToFill";
     }
 
     private static readonly string ThemePath = Path.Combine(
@@ -192,29 +173,18 @@ public class SettingsService
         "speed.txt"
     );
 
-    public static void SavePlaybackSpeed(double speed)
+    public static void SavePlaybackSpeed(string monitorId, double speed)
     {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(PlaybackSpeedPath));
-            File.WriteAllText(PlaybackSpeedPath, speed.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        }
-        catch { }
+        SavePerMonitorSetting(PlaybackSpeedPath, monitorId, speed.ToString(System.Globalization.CultureInfo.InvariantCulture));
     }
 
-    public static double GetPlaybackSpeed()
+    public static double GetPlaybackSpeed(string monitorId)
     {
-        try
+        string val = GetPerMonitorSetting(PlaybackSpeedPath, monitorId);
+        if (val != null && double.TryParse(val, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double speed))
         {
-            if (File.Exists(PlaybackSpeedPath))
-            {
-                if (double.TryParse(File.ReadAllText(PlaybackSpeedPath).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double speed))
-                {
-                    return speed;
-                }
-            }
+            return speed;
         }
-        catch { }
         return 1.0; // Default
     }
 
@@ -224,30 +194,19 @@ public class SettingsService
         "brightness.txt"
     );
 
-    public static void SaveBrightness(double brightness)
+    public static void SaveBrightness(string monitorId, double brightness)
     {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(BrightnessPath));
-            File.WriteAllText(BrightnessPath, brightness.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        }
-        catch { }
+        SavePerMonitorSetting(BrightnessPath, monitorId, brightness.ToString(System.Globalization.CultureInfo.InvariantCulture));
     }
 
-    public static double GetBrightness()
+    public static double GetBrightness(string monitorId)
     {
-        try
+        string val = GetPerMonitorSetting(BrightnessPath, monitorId);
+        if (val != null && double.TryParse(val, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double brightness))
         {
-            if (File.Exists(BrightnessPath))
-            {
-                if (double.TryParse(File.ReadAllText(BrightnessPath).Trim(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double brightness))
-                {
-                    return brightness;
-                }
-            }
+            return brightness;
         }
-        catch { }
-        return 100.0; // Default is full brightness (no dimming)
+        return 100.0; // Default is full brightness
     }
 
     private static readonly string VideoFilterPath = Path.Combine(
@@ -256,27 +215,97 @@ public class SettingsService
         "videofilter.txt"
     );
 
-    public static void SaveVideoFilter(string filter)
+    public static void SaveVideoFilter(string monitorId, string filter)
+    {
+        SavePerMonitorSetting(VideoFilterPath, monitorId, filter);
+    }
+
+    public static string GetVideoFilter(string monitorId)
+    {
+        return GetPerMonitorSetting(VideoFilterPath, monitorId) ?? "None";
+    }
+
+    private static void SavePerMonitorSetting(string path, string monitorId, string value)
     {
         try
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(VideoFilterPath));
-            File.WriteAllText(VideoFilterPath, filter);
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            var settings = new Dictionary<string, string>();
+            if (File.Exists(path))
+            {
+                var lines = File.ReadAllLines(path);
+                foreach (var line in lines)
+                {
+                    var parts = line.Split('=', 2);
+                    if (parts.Length == 2)
+                        settings[parts[0]] = parts[1];
+                }
+            }
+            settings[monitorId] = value;
+            var newLines = new List<string>();
+            foreach (var kvp in settings)
+            {
+                newLines.Add($"{kvp.Key}={kvp.Value}");
+            }
+            File.WriteAllLines(path, newLines);
+            
+            // For backward compatibility / global fallback
+            if (monitorId == "All")
+            {
+                string globalPath = path + ".global";
+                File.WriteAllText(globalPath, value);
+            }
         }
         catch { }
     }
 
-    public static string GetVideoFilter()
+    private static string GetPerMonitorSetting(string path, string monitorId)
     {
         try
         {
-            if (File.Exists(VideoFilterPath))
+            if (File.Exists(path))
             {
-                return File.ReadAllText(VideoFilterPath).Trim();
+                var lines = File.ReadAllLines(path);
+                foreach (var line in lines)
+                {
+                    var parts = line.Split('=', 2);
+                    if (parts.Length == 2 && parts[0] == monitorId)
+                    {
+                        return parts[1];
+                    }
+                }
+            }
+            
+            // Fallback to "All" setting
+            if (monitorId != "All" && File.Exists(path))
+            {
+                var lines = File.ReadAllLines(path);
+                foreach (var line in lines)
+                {
+                    var parts = line.Split('=', 2);
+                    if (parts.Length == 2 && parts[0] == "All")
+                    {
+                        return parts[1];
+                    }
+                }
+            }
+
+            // Fallback to legacy global setting
+            string globalPath = path + ".global";
+            if (File.Exists(globalPath))
+            {
+                return File.ReadAllText(globalPath).Trim();
+            }
+            // Super legacy fallback (direct file read for files that were previously not dictionary-based)
+            if (File.Exists(path))
+            {
+                string text = File.ReadAllText(path).Trim();
+                if (!text.Contains("=")) // Avoid reading dictionary format as a single value
+                    return text;
             }
         }
         catch { }
-        return "None"; // Default
+        return null;
     }
 
     private static readonly string LanguagePath = Path.Combine(

@@ -16,10 +16,5 @@
         <Rectangle x:Name="ColorOverlay" Fill="Transparent" IsHitTestVisible="False" />
         <Rectangle x:Name="BrightnessOverlay" Fill="Black" Opacity="0" IsHitTestVisible="False" />
 
-        <!-- Interactive Character MVP Overlay -->
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,100,50" IsHitTestVisible="False">
-            <Image x:Name="CharacterImage" Width="300" Height="400" Stretch="Uniform" />
-            <TextBlock x:Name="CharacterPlaceholderText" Text="( O_O )" FontSize="72" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
-        </Grid>
     </Grid>
 </Window>
