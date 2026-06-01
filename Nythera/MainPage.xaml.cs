@@ -247,9 +247,24 @@ public sealed partial class MainPage : Page
 
 
         this.Loaded += MainPage_Loaded;
+        this.Unloaded += MainPage_Unloaded;
         MarketplaceGrid.ItemsSource = _marketItems;
         _downloadManager.DownloadCompleted += DownloadManager_DownloadCompleted;
         _downloadManager.DownloadProgressChanged += DownloadManager_DownloadProgressChanged;
+    }
+
+    private void MainPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (MainWindow.Instance != null)
+        {
+            MainWindow.Instance.DisplayChanged -= MainWindow_DisplayChanged;
+        }
+    }
+
+    private void MainWindow_DisplayChanged(object sender, EventArgs e)
+    {
+        InitializeMonitors();
+        UpdateVideoListBadges();
     }
 
     private void ApplyTheme(string themeStr)
@@ -744,6 +759,11 @@ public sealed partial class MainPage : Page
         PlaylistTimer_Tick(null, null);
 
         InitializeMonitors();
+        
+        if (MainWindow.Instance != null)
+        {
+            MainWindow.Instance.DisplayChanged += MainWindow_DisplayChanged;
+        }
         
         _isInitializing = false;
         UpdateAppliedBadge();
