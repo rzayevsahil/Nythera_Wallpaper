@@ -2261,9 +2261,27 @@ public sealed partial class MainPage : Page
         Nythera.Services.SettingsService.SaveEnableKenBurns(targetMonitor, KenBurnsToggle.IsOn);
         Nythera.Services.SettingsService.SaveEnableParallax(targetMonitor, ParallaxToggle.IsOn);
         
-        if (MainWindow.Instance != null)
+        if (MainWindow.Instance != null && _wallpaperWindows != null)
         {
-            ApplyWallpaperToMonitor(targetMonitor, "Image", Nythera.Services.SettingsService.GetImagePath(targetMonitor));
+            foreach (var kvp in _wallpaperWindows)
+            {
+                if (targetMonitor == "All" || kvp.Key == targetMonitor)
+                {
+                    if (Nythera.Services.SettingsService.GetWallpaperType(kvp.Key) == "Image")
+                    {
+                        var imgSettings = new Core.WallpaperImage {
+                             ImagePath = Nythera.Services.SettingsService.GetImagePath(kvp.Key),
+                             Blur = Nythera.Services.SettingsService.GetBlur(kvp.Key),
+                             Brightness = Nythera.Services.SettingsService.GetBrightness(kvp.Key),
+                             Contrast = Nythera.Services.SettingsService.GetContrast(kvp.Key),
+                             EnableKenBurns = Nythera.Services.SettingsService.GetEnableKenBurns(kvp.Key),
+                             EnableParallax = Nythera.Services.SettingsService.GetEnableParallax(kvp.Key),
+                             LayoutMode = Nythera.Services.SettingsService.GetImageStretchMode(kvp.Key)
+                        };
+                        _ = kvp.Value.ApplyImageSettingsAsync(imgSettings);
+                    }
+                }
+            }
         }
     }
 
