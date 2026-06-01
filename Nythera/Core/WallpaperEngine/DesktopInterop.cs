@@ -65,7 +65,7 @@ public class DesktopInterop
         WindowsApi.SystemParametersInfo(
             WindowsApi.SPI_SETDESKWALLPAPER, 
             0, 
-            null, 
+            null!, 
             WindowsApi.SPIF_UPDATEINIFILE | WindowsApi.SPIF_SENDWININICHANGE);
     }
 }

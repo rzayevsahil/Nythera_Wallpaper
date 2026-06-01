@@ -89,7 +89,11 @@ public static class LocalizationService
         { "FitFill", "Doldur" },
         { "FitUniform", "Sığdır" },
         { "FitStretch", "Genişlet" },
-        { "FitCenter", "Ortala" }
+        { "FitCenter", "Ortala" },
+        { "Download", "İndir" },
+        { "DownloadingPercent", "İndiriliyor... %{0}" },
+        { "Downloaded", "İndirildi" },
+        { "MarketplaceTitle", "Keşfet (Marketplace)" }
     };
 
     private static readonly Dictionary<string, string> _en = new()
@@ -177,7 +181,11 @@ public static class LocalizationService
         { "FitFill", "Fill" },
         { "FitUniform", "Fit" },
         { "FitStretch", "Stretch" },
-        { "FitCenter", "Center" }
+        { "FitCenter", "Center" },
+        { "Download", "Download" },
+        { "DownloadingPercent", "Downloading... %{0}" },
+        { "Downloaded", "Downloaded" },
+        { "MarketplaceTitle", "Discover (Marketplace)" }
     };
 
     public static string GetString(string key)

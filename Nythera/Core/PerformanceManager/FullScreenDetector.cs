@@ -9,6 +9,7 @@ public class FullScreenDetector
 {
     private Timer _timer;
     private bool _isFullScreenAppRunning = false;
+    public bool IsFullScreen => _isFullScreenAppRunning;
     
     public event EventHandler<bool> FullScreenStateChanged;
 
@@ -23,7 +24,7 @@ public class FullScreenDetector
         _timer?.Dispose();
     }
 
-    private void CheckFullScreen(object state)
+    private void CheckFullScreen(object? state)
     {
         bool isFullScreen = IsFullScreenAppRunning();
         

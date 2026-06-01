@@ -23,6 +23,12 @@ namespace Nythera;
 public partial class App : Application
 {
     private Window? _window;
+    public static Core.Performance.SmartPerformanceManager PerformanceManager { get; } = new();
+    public static Core.Interactive.MouseTrackerService MouseTracker { get; } = new();
+    public static Core.Interactive.CharacterController CharacterController { get; private set; }
+    public static Core.Audio.AudioCaptureService AudioCapture { get; } = new();
+    public static Core.Audio.AudioAnalyzer AudioAnalyzer { get; private set; }
+    public static Core.Audio.AudioReactiveController AudioController { get; private set; }
     
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -41,6 +47,12 @@ public partial class App : Application
 
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+        PerformanceManager.Start();
+        CharacterController = new Core.Interactive.CharacterController(MouseTracker);
+        MouseTracker.Start();
+        AudioAnalyzer = new Core.Audio.AudioAnalyzer(AudioCapture);
+        AudioController = new Core.Audio.AudioReactiveController(AudioAnalyzer);
+        AudioController.Start();
         _window = new MainWindow();
         
         bool isHidden = System.Linq.Enumerable.Contains(System.Environment.GetCommandLineArgs(), "--hidden");
@@ -136,12 +148,18 @@ public partial class App : Application
     private void TrayQuit_Click(object sender, RoutedEventArgs e)
     {
         _trayIcon?.Dispose();
+        PerformanceManager?.Stop();
+        MouseTracker?.Stop();
+        AudioController?.Stop();
         Core.WallpaperEngine.DesktopInterop.RestoreDesktop();
         Environment.Exit(0);
     }
 
     private void CurrentDomain_ProcessExit(object? sender, System.EventArgs e)
     {
+        PerformanceManager?.Stop();
+        MouseTracker?.Stop();
+        AudioController?.Stop();
         Core.WallpaperEngine.DesktopInterop.RestoreDesktop();
     }
 }

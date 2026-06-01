@@ -28,22 +28,115 @@ public sealed partial class WallpaperWindow : Window
         _fullScreenDetector = new Core.PerformanceManager.FullScreenDetector();
         _fullScreenDetector.FullScreenStateChanged += FullScreenDetector_StateChanged;
         _fullScreenDetector.Start();
+
+        App.PerformanceManager.PerformanceModeChanged += PerformanceManager_StateChanged;
+
+        if (App.CharacterController != null)
+        {
+            App.CharacterController.ActionChanged += CharacterController_ActionChanged;
+            UpdateCharacterImage(App.CharacterController.CurrentAction);
+        }
+
+        if (App.AudioController != null)
+        {
+            App.AudioController.NeonFlashTriggered += AudioController_NeonFlashTriggered;
+        }
+    }
+
+    private void AudioController_NeonFlashTriggered(object? sender, float bassIntensity)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            string currentFilter = Nythera.Services.SettingsService.GetVideoFilter();
+            double baseOpacity = currentFilter == "None" ? 0.0 : 0.15;
+            double flashOpacity = Math.Min(0.8, baseOpacity + bassIntensity);
+            
+            if (ColorOverlay.Opacity < flashOpacity - 0.05)
+            {
+                ColorOverlay.Opacity = flashOpacity;
+                if (ColorOverlay.Fill is SolidColorBrush brush && brush.Color == Colors.Transparent)
+                {
+                    ColorOverlay.Fill = new SolidColorBrush(Colors.Fuchsia); // Default neon flash color if no filter
+                }
+
+                var storyboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
+                var anim = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
+                {
+                    To = baseOpacity,
+                    Duration = new Microsoft.UI.Xaml.Duration(TimeSpan.FromMilliseconds(300)),
+                    EasingFunction = new Microsoft.UI.Xaml.Media.Animation.ExponentialEase { EasingMode = Microsoft.UI.Xaml.Media.Animation.EasingMode.EaseOut }
+                };
+                Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(anim, ColorOverlay);
+                Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(anim, "Opacity");
+                
+                storyboard.Completed += (s, e) => {
+                    if (currentFilter == "None") {
+                        ColorOverlay.Fill = new SolidColorBrush(Colors.Transparent);
+                    }
+                };
+                
+                storyboard.Children.Add(anim);
+                storyboard.Begin();
+            }
+        });
+    }
+
+    private void CharacterController_ActionChanged(object sender, Nythera.Core.Interactive.Models.CharacterAction action)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            UpdateCharacterImage(action);
+        });
+    }
+
+    private void UpdateCharacterImage(Nythera.Core.Interactive.Models.CharacterAction action)
+    {
+        if (action == Nythera.Core.Interactive.Models.CharacterAction.LookLeft)
+        {
+            CharacterPlaceholderText.Text = "( <_< )";
+        }
+        else if (action == Nythera.Core.Interactive.Models.CharacterAction.LookRight)
+        {
+            CharacterPlaceholderText.Text = "( >_> )";
+        }
+        else
+        {
+            CharacterPlaceholderText.Text = "( O_O )";
+        }
     }
 
     private void FullScreenDetector_StateChanged(object sender, bool isFullScreen)
     {
-        // Must be marshalled to the UI thread if changing UI elements, 
-        // but MediaPlayer controls can generally be called from background threads.
-        // However, it's safer to use DispatcherQueue.
         DispatcherQueue.TryEnqueue(() =>
         {
-            if (isFullScreen)
+            if (isFullScreen || App.PerformanceManager.CurrentMode == Nythera.Core.Shared.Models.PerformanceMode.Low)
             {
                 PauseVideo();
             }
             else
             {
                 ResumeVideo();
+            }
+        });
+    }
+
+    private void PerformanceManager_StateChanged(object sender, Nythera.Core.Shared.Models.PerformanceMode mode)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (mode == Nythera.Core.Shared.Models.PerformanceMode.Low)
+            {
+                PauseVideo();
+            }
+            else if (mode == Nythera.Core.Shared.Models.PerformanceMode.Medium)
+            {
+                SetPlaybackSpeed(0.5);
+                if (!_fullScreenDetector.IsFullScreen) ResumeVideo();
+            }
+            else
+            {
+                SetPlaybackSpeed(Nythera.Services.SettingsService.GetPlaybackSpeed());
+                if (!_fullScreenDetector.IsFullScreen) ResumeVideo();
             }
         });
     }
@@ -153,6 +246,16 @@ public sealed partial class WallpaperWindow : Window
             _fullScreenDetector.Stop();
             _fullScreenDetector.FullScreenStateChanged -= FullScreenDetector_StateChanged;
             _fullScreenDetector = null;
+        }
+
+        App.PerformanceManager.PerformanceModeChanged -= PerformanceManager_StateChanged;
+        if (App.CharacterController != null)
+        {
+            App.CharacterController.ActionChanged -= CharacterController_ActionChanged;
+        }
+        if (App.AudioController != null)
+        {
+            App.AudioController.NeonFlashTriggered -= AudioController_NeonFlashTriggered;
         }
 
         if (_mediaPlayer != null)

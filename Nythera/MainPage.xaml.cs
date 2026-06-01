@@ -153,6 +153,10 @@ public sealed partial class MainPage : Page
     private System.Collections.ObjectModel.ObservableCollection<DefaultVideo> _allVideos = new();
     private System.Collections.ObjectModel.ObservableCollection<DefaultVideo> _filteredVideos = new();
     private string _currentFilter = "All";
+    
+    private Core.Marketplace.IMarketplaceApi _marketplaceApi = new Core.Marketplace.MockMarketplaceApi();
+    private Core.Marketplace.DownloadManager _downloadManager = new Core.Marketplace.DownloadManager();
+    private System.Collections.ObjectModel.ObservableCollection<Core.Marketplace.Models.MarketplaceItem> _marketItems = new();
 
     public MainPage()
     {
@@ -235,6 +239,9 @@ public sealed partial class MainPage : Page
         UpdateLanguageUI();
         
         this.Loaded += MainPage_Loaded;
+        MarketplaceGrid.ItemsSource = _marketItems;
+        _downloadManager.DownloadCompleted += DownloadManager_DownloadCompleted;
+        _downloadManager.DownloadProgressChanged += DownloadManager_DownloadProgressChanged;
     }
 
     private void ApplyTheme(string themeStr)
@@ -287,6 +294,20 @@ public sealed partial class MainPage : Page
         ApplyButton.Content = LocalizationService.GetString("ApplyWallpaper");
         SettingsTitle.Text = LocalizationService.GetString("Settings");
         VolumeText.Text = LocalizationService.GetString("Volume");
+        
+        if (MarketplaceTitleText != null) MarketplaceTitleText.Text = LocalizationService.GetString("MarketplaceTitle");
+        
+        foreach (var item in _marketItems)
+        {
+            if (item.IsDownloaded)
+            {
+                item.DownloadStateText = LocalizationService.GetString("Downloaded");
+            }
+            else if (!item.IsDownloading)
+            {
+                item.DownloadStateText = LocalizationService.GetString("Download");
+            }
+        }
         
         if (DefaultVideosTitle != null) DefaultVideosTitle.Text = LocalizationService.GetString("DefaultVideosTitle");
         if (PlaylistModeTitle != null) PlaylistModeTitle.Text = LocalizationService.GetString("PlaylistMode");
@@ -551,6 +572,68 @@ public sealed partial class MainPage : Page
         
         storyboard.Begin();
     }
+    private async Task LoadMarketplaceItemsAsync()
+    {
+        try
+        {
+            var items = await _marketplaceApi.GetFeaturedWallpapersAsync();
+            string downloadFolder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "CustomVideos");
+            
+            foreach(var item in items) {
+                string expectedPath = System.IO.Path.Combine(downloadFolder, $"{item.Title}_{item.Id}.mp4");
+                if (System.IO.File.Exists(expectedPath))
+                {
+                    item.IsDownloaded = true;
+                    item.DownloadStateText = Nythera.Services.LocalizationService.GetString("Downloaded");
+                }
+                _marketItems.Add(item);
+            }
+            MarketplaceLoadingRing.IsActive = false;
+        }
+        catch { }
+    }
+
+    private void MarketplaceDownload_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string itemId)
+        {
+            var item = System.Linq.Enumerable.FirstOrDefault(_marketItems, i => i.Id == itemId);
+            if (item != null && !item.IsDownloading)
+            {
+                item.IsDownloading = true;
+                item.DownloadStateText = string.Format(Nythera.Services.LocalizationService.GetString("DownloadingPercent"), 0);
+                _ = _downloadManager.DownloadVideoAsync(item.Id, item.VideoUrl, $"{item.Title}_{item.Id}.mp4");
+            }
+        }
+    }
+
+    private void DownloadManager_DownloadProgressChanged(object sender, (string itemId, int progress) e)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            var item = System.Linq.Enumerable.FirstOrDefault(_marketItems, i => i.Id == e.itemId);
+            if (item != null)
+            {
+                item.DownloadStateText = string.Format(Nythera.Services.LocalizationService.GetString("DownloadingPercent"), e.progress);
+            }
+        });
+    }
+
+    private void DownloadManager_DownloadCompleted(object sender, (string itemId, string localPath) e)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            var item = System.Linq.Enumerable.FirstOrDefault(_marketItems, i => i.Id == e.itemId);
+            if (item != null)
+            {
+                item.IsDownloading = false;
+                item.IsDownloaded = true;
+                item.DownloadStateText = Nythera.Services.LocalizationService.GetString("Downloaded");
+            }
+            LoadDefaultVideos(); // Refresh custom videos to show newly downloaded item
+        });
+    }
+
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (LanguageComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
@@ -574,6 +657,7 @@ public sealed partial class MainPage : Page
         // We will set the preview size in UpdatePreviewBounds() instead of here.
         // Check for updates asynchronously without blocking the UI
         _ = CheckForUpdatesAsync();
+        _ = LoadMarketplaceItemsAsync();
 
         string targetMonitor = SettingsService.GetTargetMonitor();
         string savedPath = SettingsService.GetWallpaperPath(targetMonitor);
