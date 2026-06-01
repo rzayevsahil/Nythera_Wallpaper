@@ -225,16 +225,13 @@
                                     </Grid.RowDefinitions>
 
                                     <!-- Blur -->
-                                    <TextBlock x:Name="ImageBlurTitle" Text="Blur:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
-                                    <Slider x:Name="ImageBlurSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="20" Value="0" ValueChanged="ImageProperties_ValueChanged" />
+                                    <TextBlock x:Name="ImageBlurTitle" Text="Bulanıklık (Yakında):" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+                                    <Slider x:Name="ImageBlurSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="20" Value="0" IsEnabled="False" />
 
                                     <!-- Brightness -->
                                     <TextBlock x:Name="ImageBrightnessTitle" Text="Parlaklık:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
                                     <Slider x:Name="ImageBrightnessSlider" Grid.Row="1" Grid.Column="1" Minimum="10" Maximum="150" Value="100" ValueChanged="ImageProperties_ValueChanged" />
 
-                                    <!-- Contrast -->
-                                    <TextBlock x:Name="ImageContrastTitle" Text="Kontrast:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                                    <Slider x:Name="ImageContrastSlider" Grid.Row="2" Grid.Column="1" Minimum="10" Maximum="200" Value="100" ValueChanged="ImageProperties_ValueChanged" />
 
                                     <!-- Stretch Mode -->
                                     <TextBlock x:Name="ImageStretchTitle" Text="Yerleşim:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
@@ -250,7 +247,6 @@
                                     <TextBlock x:Name="ImageEffectsTitle" Text="Efektler:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
                                     <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="16">
                                         <ToggleSwitch x:Name="KenBurnsToggle" OffContent="Ken Burns" OnContent="Ken Burns" Toggled="ImageProperties_ValueChanged" />
-                                        <ToggleSwitch x:Name="ParallaxToggle" OffContent="Parallax" OnContent="Parallax" Toggled="ImageProperties_ValueChanged" />
                                     </StackPanel>
                                     
                                     <!-- Target Monitor -->

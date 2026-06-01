@@ -362,7 +362,6 @@ public sealed partial class MainPage : Page
         
         if (ImageBlurTitle != null) ImageBlurTitle.Text = LocalizationService.GetString("Blur");
         if (ImageBrightnessTitle != null) ImageBrightnessTitle.Text = LocalizationService.GetString("Brightness");
-        if (ImageContrastTitle != null) ImageContrastTitle.Text = LocalizationService.GetString("Contrast");
         if (ImageStretchTitle != null) ImageStretchTitle.Text = LocalizationService.GetString("StretchMode");
         if (ImageEffectsTitle != null) ImageEffectsTitle.Text = LocalizationService.GetString("Effects");
         if (ImageMonitorTitle != null) ImageMonitorTitle.Text = LocalizationService.GetString("MonitorText");
@@ -2224,9 +2223,7 @@ public sealed partial class MainPage : Page
         Nythera.Services.SettingsService.SaveImagePath(targetMonitor, _selectedImagePath);
         Nythera.Services.SettingsService.SaveBlur(targetMonitor, ImageBlurSlider.Value);
         Nythera.Services.SettingsService.SaveBrightness(targetMonitor, ImageBrightnessSlider.Value);
-        Nythera.Services.SettingsService.SaveContrast(targetMonitor, ImageContrastSlider.Value);
         Nythera.Services.SettingsService.SaveEnableKenBurns(targetMonitor, KenBurnsToggle.IsOn);
-        Nythera.Services.SettingsService.SaveEnableParallax(targetMonitor, ParallaxToggle.IsOn);
         
         if (ImageStretchComboBox.SelectedItem is ComboBoxItem stretchItem && stretchItem.Tag != null)
         {
@@ -2257,9 +2254,7 @@ public sealed partial class MainPage : Page
         
         Nythera.Services.SettingsService.SaveBlur(targetMonitor, ImageBlurSlider.Value);
         Nythera.Services.SettingsService.SaveBrightness(targetMonitor, ImageBrightnessSlider.Value);
-        Nythera.Services.SettingsService.SaveContrast(targetMonitor, ImageContrastSlider.Value);
         Nythera.Services.SettingsService.SaveEnableKenBurns(targetMonitor, KenBurnsToggle.IsOn);
-        Nythera.Services.SettingsService.SaveEnableParallax(targetMonitor, ParallaxToggle.IsOn);
         
         if (MainWindow.Instance != null && _wallpaperWindows != null)
         {
@@ -2314,9 +2309,7 @@ public sealed partial class MainPage : Page
             
             ImageBlurSlider.Value = Nythera.Services.SettingsService.GetBlur(monitorId);
             ImageBrightnessSlider.Value = Nythera.Services.SettingsService.GetBrightness(monitorId);
-            ImageContrastSlider.Value = Nythera.Services.SettingsService.GetContrast(monitorId);
             KenBurnsToggle.IsOn = Nythera.Services.SettingsService.GetEnableKenBurns(monitorId);
-            ParallaxToggle.IsOn = Nythera.Services.SettingsService.GetEnableParallax(monitorId);
             
             string savedStretchMode = Nythera.Services.SettingsService.GetImageStretchMode(monitorId);
             foreach (ComboBoxItem cbItem in ImageStretchComboBox.Items)
