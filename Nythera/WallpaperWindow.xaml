@@ -5,16 +5,23 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Nythera"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d"
     Title="Nythera Background">
-    <Grid Background="Black">
+    <Grid x:Name="RootGrid" Background="Black">
         <MediaPlayerElement x:Name="BackgroundPlayer" 
                             AutoPlay="True" 
                             AreTransportControlsEnabled="False"
                             Stretch="UniformToFill" />
+                            
+        <Image x:Name="StaticWallpaperImage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="UniformToFill" Visibility="Collapsed">
+            <Image.RenderTransform>
+                <CompositeTransform x:Name="StaticWallpaperTransform" ScaleX="1.0" ScaleY="1.0" />
+            </Image.RenderTransform>
+        </Image>
+        
         <!-- Video Effects Overlays -->
         <Rectangle x:Name="ColorOverlay" Fill="Transparent" IsHitTestVisible="False" />
         <Rectangle x:Name="BrightnessOverlay" Fill="Black" Opacity="0" IsHitTestVisible="False" />
-
     </Grid>
 </Window>

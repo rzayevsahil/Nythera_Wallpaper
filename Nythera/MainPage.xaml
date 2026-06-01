@@ -26,14 +26,14 @@
 
             <Grid Width="1080" Height="680" HorizontalAlignment="Center" VerticalAlignment="Center">
                 
-                <!-- PAGE 3: About (Starts in background left) -->
-            <Grid x:Name="Page3" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                <!-- PAGE 4: About -->
+            <Grid x:Name="PageAbout" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
-                  Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                  Opacity="0.4" Canvas.ZIndex="4" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
                     <CompositeTransform TranslateX="-260" ScaleX="0.8" ScaleY="0.8" />
                 </Grid.RenderTransform>
-                <Border x:Name="Page3Content" CornerRadius="8" Padding="24" Opacity="0.15">
+                <Border x:Name="PageAboutContent" CornerRadius="8" Padding="24" Opacity="0.05">
                     <ScrollViewer VerticalScrollBarVisibility="Hidden">
                         <StackPanel Spacing="16">
                                 <TextBlock x:Name="AboutTitleText" Text="Hakkında" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="18" />
@@ -125,14 +125,151 @@
                 </Border>
             </Grid>
 
-            <!-- PAGE 1: Video Selection (Starts active center) -->
-            <Grid x:Name="Page1" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <!-- PAGE 0: Image Selection -->
+            <Grid x:Name="PageImages" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
-                  Opacity="1.0" Canvas.ZIndex="2" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
+                  Opacity="1.0" Canvas.ZIndex="5" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="True">
                 <Grid.RenderTransform>
                     <CompositeTransform TranslateX="0" ScaleX="1.0" ScaleY="1.0" />
                 </Grid.RenderTransform>
-                <ScrollViewer x:Name="Page1Content" VerticalScrollBarVisibility="Hidden" Opacity="1.0">
+                <ScrollViewer x:Name="PageImagesContent" VerticalScrollBarVisibility="Hidden" Opacity="1.0">
+                    <StackPanel Spacing="24" Padding="24">
+                        <TextBlock x:Name="ImagesDescription" Text="Select an image to set as your desktop background." Style="{ThemeResource BodyTextBlockStyle}" Foreground="Gray" HorizontalAlignment="Center" Margin="0,8,0,0" />
+                        
+                        <Border CornerRadius="8" Padding="0">
+                            <StackPanel Spacing="16">
+                                <StackPanel Spacing="8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" x:Name="DefaultImagesTitle" Text="Resimler" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" Margin="0,0,8,0" TextTrimming="CharacterEllipsis" />
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Right">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <TextBlock x:Name="ImagePlaylistModeTitle" Text="Slayt Modu:" FontSize="12" VerticalAlignment="Center" Foreground="Gray" />
+                                                <ToggleSwitch x:Name="ImagePlaylistModeToggle" OffContent="Kapalı" OnContent="Açık" Toggled="ImagePlaylistModeToggle_Toggled" VerticalAlignment="Center" Margin="0" MinWidth="0" />
+                                            </StackPanel>
+                                            <ComboBox x:Name="ImageFilterComboBox" SelectedIndex="0" SelectionChanged="ImageFilterComboBox_SelectionChanged" Width="120" VerticalAlignment="Center">
+                                                <ComboBoxItem Content="All" Tag="All" />
+                                                <ComboBoxItem Content="Favorites" Tag="Favorites" />
+                                                <ComboBoxItem Content="Custom" Tag="Custom" />
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </Grid>
+                                    <GridView x:Name="DefaultImagesGrid" SelectionMode="Single" SelectionChanged="DefaultImagesGrid_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled" MaxHeight="340" Padding="0,0,0,12" HorizontalAlignment="Stretch">
+                                        <GridView.Resources>
+                                            <SolidColorBrush x:Key="GridViewItemSelectedBorderThemeBrush" Color="Transparent" />
+                                            <SolidColorBrush x:Key="GridViewItemSelectedPointerOverBorderThemeBrush" Color="Transparent" />
+                                            <SolidColorBrush x:Key="GridViewItemPointerOverBorderThemeBrush" Color="Transparent" />
+                                        </GridView.Resources>
+                                        <GridView.ItemContainerStyle>
+                                            <Style TargetType="GridViewItem">
+                                                <Setter Property="Margin" Value="0" />
+                                                <Setter Property="Padding" Value="0,0,8,8" />
+                                                <Setter Property="MinHeight" Value="0" />
+                                                <Setter Property="MinWidth" Value="0" />
+                                            </Style>
+                                        </GridView.ItemContainerStyle>
+                                        <GridView.ItemTemplate>
+                                            <DataTemplate x:DataType="local:Core.WallpaperImage">
+                                                <Grid Width="156" Height="82" CornerRadius="6" Background="#1AFFFFFF">
+                                                    <Image Source="{x:Bind Thumbnail}" Stretch="UniformToFill" />
+                                                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="4">
+                                                        <!-- Fake Playlist button for UI consistency MVP -->
+                                                        <Button Background="#66000000" Width="26" Height="26" Padding="0" CornerRadius="8" Click="ImagePlaylistSelectButton_Click" Tag="{x:Bind ImagePath}">
+                                                            <FontIcon Glyph="&#xE73E;" FontSize="12" Foreground="White" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                                                        </Button>
+                                                        <Button Background="#66000000" Width="26" Height="26" Padding="0" CornerRadius="13" Click="ImageFavoriteButton_Click" Tag="{x:Bind ImagePath}">
+                                                            <FontIcon Glyph="&#xE734;" FontSize="12" Foreground="White" FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                    <Border Background="#99000000" VerticalAlignment="Bottom">
+                                                        <TextBlock Text="{x:Bind Name}" Foreground="White" FontSize="11" Margin="6,4" TextTrimming="CharacterEllipsis" />
+                                                    </Border>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </GridView.ItemTemplate>
+                                    </GridView>
+                                </StackPanel>
+                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Rectangle Grid.Column="0" Height="1" Fill="Gray" Opacity="0.3" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="1" Text="VEYA" Foreground="Gray" FontSize="11" Margin="12,0" VerticalAlignment="Center" />
+                                    <Rectangle Grid.Column="2" Height="1" Fill="Gray" Opacity="0.3" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                    <Button x:Name="BrowseImageButton" Content="Kendi Resmini Seç" Click="BrowseImage_Click" Width="160" />
+                                    <Button x:Name="ApplyImageButton" Content="Apply Wallpaper" Click="ApplyImage_Click" Style="{ThemeResource AccentButtonStyle}" Width="160" IsEnabled="False" />
+                                </StackPanel>
+                                <TextBlock x:Name="ImageStatusText" Text="No image selected." Foreground="Gray" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+                                
+                                <Grid RowSpacing="12" ColumnSpacing="20" Margin="0,8,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Blur -->
+                                    <TextBlock Text="Blur:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
+                                    <Slider x:Name="ImageBlurSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="20" Value="0" ValueChanged="ImageProperties_ValueChanged" />
+
+                                    <!-- Brightness -->
+                                    <TextBlock Text="Parlaklık:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                                    <Slider x:Name="ImageBrightnessSlider" Grid.Row="1" Grid.Column="1" Minimum="10" Maximum="150" Value="100" ValueChanged="ImageProperties_ValueChanged" />
+
+                                    <!-- Contrast -->
+                                    <TextBlock Text="Kontrast:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                                    <Slider x:Name="ImageContrastSlider" Grid.Row="2" Grid.Column="1" Minimum="10" Maximum="200" Value="100" ValueChanged="ImageProperties_ValueChanged" />
+
+                                    <!-- Stretch Mode -->
+                                    <TextBlock Text="Yerleşim:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                                    <ComboBox x:Name="ImageStretchComboBox" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ImageStretchComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Fill" Tag="Fill" />
+                                        <ComboBoxItem Content="Fit" Tag="Fit" />
+                                        <ComboBoxItem Content="Stretch" Tag="Stretch" />
+                                        <ComboBoxItem Content="Center" Tag="Center" />
+                                        <ComboBoxItem Content="Span (Çoklu Ekran)" Tag="Span" />
+                                    </ComboBox>
+                                    
+                                    <!-- Effects Toggles -->
+                                    <TextBlock Text="Efektler:" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
+                                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                                        <ToggleSwitch x:Name="KenBurnsToggle" OffContent="Ken Burns" OnContent="Ken Burns" Toggled="ImageProperties_ValueChanged" />
+                                        <ToggleSwitch x:Name="ParallaxToggle" OffContent="Parallax" OnContent="Parallax" Toggled="ImageProperties_ValueChanged" />
+                                    </StackPanel>
+                                    
+                                    <!-- Target Monitor -->
+                                    <TextBlock Text="Monitor:" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" />
+                                    <ComboBox x:Name="ImageMonitorComboBox" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" SelectionChanged="ImageMonitorComboBox_SelectionChanged" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+            <!-- PAGE 1: Video Selection (Starts active center) -->
+            <Grid x:Name="PageVideos" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                  Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
+                  Opacity="0.4" Canvas.ZIndex="4" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                <Grid.RenderTransform>
+                    <CompositeTransform TranslateX="260" ScaleX="0.8" ScaleY="0.8" />
+                </Grid.RenderTransform>
+                <ScrollViewer x:Name="PageVideosContent" VerticalScrollBarVisibility="Hidden" Opacity="0.05">
                     <StackPanel Spacing="24" Padding="24">
                         <!-- Update Banner (top of page, visible immediately) -->
                         <Border x:Name="UpdateContainer" Visibility="Collapsed" CornerRadius="8"
@@ -400,14 +537,14 @@
                 </ScrollViewer>
             </Grid>
 
-            <!-- PAGE 2: Settings (Starts in background right) -->
-            <Grid x:Name="Page2" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <!-- PAGE 3: Settings -->
+            <Grid x:Name="PageSettings" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
-                  Opacity="0.4" Canvas.ZIndex="1" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
+                  Opacity="0.0" Canvas.ZIndex="3" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False">
                 <Grid.RenderTransform>
-                    <CompositeTransform TranslateX="260" ScaleX="0.8" ScaleY="0.8" />
+                    <CompositeTransform TranslateX="-520" ScaleX="0.6" ScaleY="0.6" />
                 </Grid.RenderTransform>
-                <ScrollViewer x:Name="Page2Content" VerticalScrollBarVisibility="Hidden" Opacity="0.15">
+                <ScrollViewer x:Name="PageSettingsContent" VerticalScrollBarVisibility="Hidden" Opacity="0.05">
                     <StackPanel Spacing="24" Padding="24">
                         
                         <StackPanel Spacing="12">
@@ -459,7 +596,7 @@
                                 <StackPanel Spacing="16">
                                     <StackPanel Spacing="2">
                                         <ToggleSwitch x:Name="PauseFullscreenToggle" Header="Tam ekran uygulamalarda duraklat" IsOn="True" Toggled="PauseFullscreenToggle_Toggled" />
-                                        <TextBlock x:Name="PauseFullscreenDescText" Text="Tam ekran bir oyun veya uygulama açtığınızda performansı korumak için duvar kağıdını duraklatır." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4" />
+                                        <TextBlock x:Name="PauseFullscreenDescText" Text="Tam ekran bir oyun veya uygulama açtığınızda performansınızı korumak için duvar kağıdını duraklatır." Foreground="{ThemeResource TextFillColorSecondaryBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4" />
                                     </StackPanel>
                                 </StackPanel>
                             </Expander>
@@ -469,14 +606,14 @@
                 </ScrollViewer>
             </Grid>
 
-            <!-- PAGE 4: Marketplace (Hidden for now) -->
-            <Grid x:Name="Page4" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
+            <!-- PAGE 2: Marketplace -->
+            <Grid x:Name="PageMarketplace" Width="560" Height="680" VerticalAlignment="Center" HorizontalAlignment="Center" 
                   Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="12"
-                  Opacity="0.0" Canvas.ZIndex="0" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False" Visibility="Collapsed">
+                  Opacity="0.0" Canvas.ZIndex="3" RenderTransformOrigin="0.5,0.5" IsHitTestVisible="False" Visibility="Visible">
                 <Grid.RenderTransform>
                     <CompositeTransform TranslateX="520" ScaleX="0.6" ScaleY="0.6" />
                 </Grid.RenderTransform>
-                <Border x:Name="Page4Content" CornerRadius="8" Padding="24" Opacity="0.15">
+                <Border x:Name="PageMarketplaceContent" CornerRadius="8" Padding="24" Opacity="0.05">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -509,10 +646,12 @@
             
         </Grid>
         
-        <PipsPager x:Name="CarouselPager" NumberOfPages="3" SelectedPageIndex="0" WrapMode="Wrap"
+        <PipsPager x:Name="CarouselPager" NumberOfPages="5" SelectedPageIndex="0" WrapMode="Wrap"
                    HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,32,0,0"
                    SelectedIndexChanged="CarouselPager_SelectedIndexChanged" />
             </StackPanel>
         </Viewbox>
     </Grid>
 </Page>
+
+

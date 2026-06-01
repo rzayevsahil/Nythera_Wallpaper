@@ -486,4 +486,112 @@ public class SettingsService
                 return val;
         return 60; // Default
     }
+
+    private static readonly string WallpaperTypePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "wallpapertype.txt"
+    );
+
+    public static void SaveWallpaperType(string monitorId, string type)
+    {
+        SavePerMonitorSetting(WallpaperTypePath, monitorId, type);
+    }
+
+    public static string GetWallpaperType(string monitorId)
+    {
+        return GetPerMonitorSetting(WallpaperTypePath, monitorId) ?? "Video";
+    }
+
+    private static readonly string ImagePathPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "imagepath.txt"
+    );
+
+    public static void SaveImagePath(string monitorId, string path)
+    {
+        SavePerMonitorSetting(ImagePathPath, monitorId, path);
+    }
+
+    public static string GetImagePath(string monitorId)
+    {
+        return ResolveFilePath(GetPerMonitorSetting(ImagePathPath, monitorId));
+    }
+
+    private static readonly string BlurPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "blur.txt"
+    );
+
+    public static void SaveBlur(string monitorId, double blur)
+    {
+        SavePerMonitorSetting(BlurPath, monitorId, blur.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    }
+
+    public static double GetBlur(string monitorId)
+    {
+        string val = GetPerMonitorSetting(BlurPath, monitorId);
+        if (val != null && double.TryParse(val, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double b))
+            return b;
+        return 0; // Default
+    }
+
+    private static readonly string ContrastPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "contrast.txt"
+    );
+
+    public static void SaveContrast(string monitorId, double contrast)
+    {
+        SavePerMonitorSetting(ContrastPath, monitorId, contrast.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    }
+
+    public static double GetContrast(string monitorId)
+    {
+        string val = GetPerMonitorSetting(ContrastPath, monitorId);
+        if (val != null && double.TryParse(val, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double c))
+            return c;
+        return 100; // Default
+    }
+
+    private static readonly string KenBurnsPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "kenburns.txt"
+    );
+
+    public static void SaveEnableKenBurns(string monitorId, bool enable)
+    {
+        SavePerMonitorSetting(KenBurnsPath, monitorId, enable.ToString());
+    }
+
+    public static bool GetEnableKenBurns(string monitorId)
+    {
+        string val = GetPerMonitorSetting(KenBurnsPath, monitorId);
+        if (val != null && bool.TryParse(val, out bool e))
+            return e;
+        return false; // Default
+    }
+
+    private static readonly string ParallaxPath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Nythera",
+        "parallax.txt"
+    );
+
+    public static void SaveEnableParallax(string monitorId, bool enable)
+    {
+        SavePerMonitorSetting(ParallaxPath, monitorId, enable.ToString());
+    }
+
+    public static bool GetEnableParallax(string monitorId)
+    {
+        string val = GetPerMonitorSetting(ParallaxPath, monitorId);
+        if (val != null && bool.TryParse(val, out bool e))
+            return e;
+        return false; // Default
+    }
 }

@@ -49,15 +49,23 @@ public partial class App : Application
 
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
-        PerformanceManager.Start();
-        CharacterController = new Core.Interactive.CharacterController(MouseTracker);
-        MouseTracker.Start();
-        AudioAnalyzer = new Core.Audio.AudioAnalyzer(AudioCapture);
-        AudioController = new Core.Audio.AudioReactiveController(AudioAnalyzer);
-        AudioController.Start();
-        _window = new MainWindow();
-        
-        bool isHidden = System.Linq.Enumerable.Contains(System.Environment.GetCommandLineArgs(), "--hidden");
+        try
+        {
+            // Set safe WebView2 User Data Folder (UDF) for unpackaged WinUI 3 app
+            string localAppData = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
+            string udfPath = System.IO.Path.Combine(localAppData, "Nythera", "WebView2UserData");
+            System.IO.Directory.CreateDirectory(udfPath);
+            System.Environment.SetEnvironmentVariable("WEBVIEW2_USER_DATA_FOLDER", udfPath);
+
+            PerformanceManager.Start();
+            CharacterController = new Core.Interactive.CharacterController(MouseTracker);
+            MouseTracker.Start();
+            AudioAnalyzer = new Core.Audio.AudioAnalyzer(AudioCapture);
+            AudioController = new Core.Audio.AudioReactiveController(AudioAnalyzer);
+            AudioController.Start();
+            _window = new MainWindow();
+            
+            bool isHidden = System.Linq.Enumerable.Contains(System.Environment.GetCommandLineArgs(), "--hidden");
         if (isHidden)
         {
             // WinUI 3 requires the window to be activated at least once to initialize XamlRoot.
@@ -136,6 +144,12 @@ public partial class App : Application
         };
         
         System.AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+        }
+        catch (Exception ex)
+        {
+            System.IO.File.WriteAllText("app_crash.txt", ex.ToString());
+            throw;
+        }
     }
 
     private void TrayDashboard_Click(object sender, RoutedEventArgs e)

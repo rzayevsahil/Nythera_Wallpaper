@@ -158,9 +158,19 @@ public sealed partial class MainPage : Page
     private Core.Marketplace.DownloadManager _downloadManager = new Core.Marketplace.DownloadManager();
     private System.Collections.ObjectModel.ObservableCollection<Core.Marketplace.Models.MarketplaceItem> _marketItems = new();
 
+    private System.Collections.ObjectModel.ObservableCollection<Core.WallpaperImage> _allImages = new();
+    private System.Collections.ObjectModel.ObservableCollection<Core.WallpaperImage> _filteredImages = new();
+    private string _currentImageFilter = "All";
+    private string _selectedImagePath;
+    private string _selectedImageName;
+    private DispatcherTimer _imagePlaylistTimer;
+
     public MainPage()
     {
         InitializeComponent();
+
+        // Apply background immediately based on selected theme
+        UpdateBackgroundLogo(ElementTheme.Default);
         
         // Initialize startup toggle state
         StartupToggle.IsOn = StartupService.IsStartupEnabled();
@@ -555,21 +565,21 @@ public sealed partial class MainPage : Page
 
         _currentPageIndex = newIndex;
 
-        UIElement[] pages = { Page1, Page2, Page3 };
+        UIElement[] pages = { PageImages, PageVideos, PageMarketplace, PageSettings, PageAbout };
         int numPages = pages.Length;
 
         for (int i = 0; i < numPages; i++)
         {
             int offset = i - newIndex;
-            // Wrap the offset so it is always -1, 0, or 1 for 3 pages
-            if (offset > 1) offset -= numPages;
-            if (offset < -1) offset += numPages;
+            // Wrap the offset for 5 pages
+            if (offset > numPages / 2) offset -= numPages;
+            if (offset < -numPages / 2) offset += numPages;
 
-            double targetScale = offset == 0 ? 1.0 : 0.8;
-            double targetOpacity = offset == 0 ? 1.0 : 0.4;
+            double targetScale = offset == 0 ? 1.0 : (Math.Abs(offset) == 1 ? 0.8 : 0.6);
+            double targetOpacity = offset == 0 ? 1.0 : (Math.Abs(offset) == 1 ? 0.4 : 0.0);
             double contentOpacity = offset == 0 ? 1.0 : 0.05; // 5% opacity for unreadable text in background
             double targetX = offset * 260;
-            int zIndex = offset == 0 ? 2 : 1;
+            int zIndex = 5 - Math.Abs(offset);
 
             AnimateCoverFlow(pages[i], targetScale, targetX, targetOpacity, zIndex, contentOpacity);
             
@@ -684,7 +694,8 @@ public sealed partial class MainPage : Page
                 item.IsDownloaded = true;
                 item.DownloadStateText = Nythera.Services.LocalizationService.GetString("Downloaded");
             }
-            LoadDefaultVideos(); // Refresh custom videos to show newly downloaded item
+            LoadDefaultVideos();
+        LoadDefaultImages(); // Refresh custom videos to show newly downloaded item
         });
     }
 
@@ -708,6 +719,7 @@ public sealed partial class MainPage : Page
         }
         
         LoadDefaultVideos();
+        LoadDefaultImages();
         
         // We will set the preview size in UpdatePreviewBounds() instead of here.
         // Check for updates asynchronously without blocking the UI
@@ -774,6 +786,7 @@ public sealed partial class MainPage : Page
     {
         _monitors.Clear();
         TargetMonitorComboBox.Items.Clear();
+        if (ImageMonitorComboBox != null) ImageMonitorComboBox.Items.Clear();
 
         int monitorCount = 0;
         Native.WindowsApi.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref Native.WindowsApi.RECT lprcMonitor, IntPtr dwData)
@@ -787,6 +800,7 @@ public sealed partial class MainPage : Page
             
             var item = new ComboBoxItem { Content = $"{monitorName} ({w}x{h})", Tag = monitorCount.ToString() };
             TargetMonitorComboBox.Items.Add(item);
+            if (ImageMonitorComboBox != null) { ImageMonitorComboBox.Items.Add(new ComboBoxItem { Content = "$monitorName ($w`x$h)", Tag = monitorCount.ToString() }); }
             return true;
         }, IntPtr.Zero);
 
@@ -794,6 +808,7 @@ public sealed partial class MainPage : Page
         {
             var allItem = new ComboBoxItem { Content = LocalizationService.GetString("AllMonitors"), Tag = "All" };
             TargetMonitorComboBox.Items.Insert(0, allItem);
+            if (ImageMonitorComboBox != null) { ImageMonitorComboBox.Items.Insert(0, new ComboBoxItem { Content = LocalizationService.GetString("AllMonitors"), Tag = "All" }); }
         }
 
         string savedMonitor = SettingsService.GetTargetMonitor();
@@ -806,6 +821,7 @@ public sealed partial class MainPage : Page
             }
         }
         
+        if (ImageMonitorComboBox != null && ImageMonitorComboBox.SelectedItem == null && ImageMonitorComboBox.Items.Count > 0) ImageMonitorComboBox.SelectedIndex = 0;
         if (TargetMonitorComboBox.SelectedItem == null && TargetMonitorComboBox.Items.Count > 0)
         {
             TargetMonitorComboBox.SelectedIndex = 0;
@@ -1201,7 +1217,7 @@ public sealed partial class MainPage : Page
             }
             else
             {
-                StatusText.Text = "Video dosyası bulunamadı. Lütfen Assets/Videos içine gerekli MP4'leri ekleyin.";
+                StatusText.Text = "Video dosyasÄ± bulunamadÄ±. LÃ¼tfen Assets/Videos iÃ§ine gerekli MP4'leri ekleyin.";
             }
         }
     }
@@ -1367,120 +1383,143 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async void ApplyWallpaper_Click(object sender, RoutedEventArgs e)
+        private async void ApplyWallpaper_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            // We will invalidate WorkerW at the end of the method after all windows are repositioned
-            
-            // Mark all existing windows as 'unseen' this pass so we can clean up disconnected ones
             var unseenMonitors = new HashSet<string>(_wallpaperWindows.Keys);
-
             string targetMonitor = SettingsService.GetTargetMonitor();
             
-            // If user explicitly clicked Apply, save the selected video to the target monitor(s)
             if (sender != null && _selectedFile != null)
             {
+                SettingsService.SaveWallpaperType(targetMonitor, "Video");
                 SettingsService.SaveWallpaperPath(targetMonitor, _selectedFile.Path);
                 PlaylistService.ClearPlaylist(targetMonitor);
                 
                 if (targetMonitor == "All")
                 {
-                    // Clear individual monitor settings so "All" takes full precedence
                     foreach (var mon in _monitors)
                     {
+                        SettingsService.SaveWallpaperType(mon.Id, "Video");
                         SettingsService.SaveWallpaperPath(mon.Id, "");
                         PlaylistService.ClearPlaylist(mon.Id);
                     }
                 }
             }
 
-            int currentMonitorIndex = 0;
-            string debugFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "monitor_debug.txt");
-            System.IO.File.AppendAllText(debugFile, $"\n--- ApplyWallpaper_Click called. TargetMonitor: {targetMonitor} ---\n");
+            ApplyWallpaperToMonitor(targetMonitor, "Video", _selectedFile != null ? _selectedFile.Path : "None");
+        }
+        catch (Exception ex)
+        {
+            StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
+        }
+    }
 
-            // Enumerate monitors and create a window for each
+    public struct MonitorLayout
+    {
+        public string MonitorId;
+        public int X, Y, Width, Height;
+    }
+
+    public async void ApplyWallpaperToMonitor(string triggerMonitorId, string type, string triggerPath)
+    {
+        try
+        {
+            var unseenMonitors = new HashSet<string>(_wallpaperWindows.Keys);
+            int currentMonitorIndex = 0;
+            
+            var monitorLayouts = new List<MonitorLayout>();
+
             Native.WindowsApi.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref Native.WindowsApi.RECT lprcMonitor, IntPtr dwData)
             {
                 currentMonitorIndex++;
-                System.IO.File.AppendAllText(debugFile, $"Found Monitor {currentMonitorIndex} at ({lprcMonitor.Left}, {lprcMonitor.Top}) with size {lprcMonitor.Right - lprcMonitor.Left}x{lprcMonitor.Bottom - lprcMonitor.Top}\n");
-
                 string monitorId = currentMonitorIndex.ToString();
                 unseenMonitors.Remove(monitorId);
 
-                bool isNewWindow = false;
-                if (!_wallpaperWindows.TryGetValue(monitorId, out WallpaperWindow wallpaperWindow))
-                {
-                    wallpaperWindow = new WallpaperWindow();
-                    _wallpaperWindows[monitorId] = wallpaperWindow;
-                    isNewWindow = true;
-                }
-
-                // Determine which video to play on this monitor
-                string pathToPlay = null;
-                if (targetMonitor == "All")
-                {
-                    pathToPlay = SettingsService.GetWallpaperPath("All");
-                }
-                else
-                {
-                    pathToPlay = SettingsService.GetWallpaperPath(monitorId);
-                    if (string.IsNullOrEmpty(pathToPlay))
-                    {
-                        // Fallback to "All" if no specific wallpaper is set for this monitor
-                        pathToPlay = SettingsService.GetWallpaperPath("All");
-                    }
-                }
-
-                if (string.IsNullOrEmpty(pathToPlay) || !System.IO.File.Exists(pathToPlay))
-                {
-                    System.IO.File.AppendAllText(debugFile, $" -> Hiding Monitor {currentMonitorIndex} because no valid wallpaper path was found.\n");
-                    wallpaperWindow.HideWindow();
-                    return true;
-                }
-                
-                System.IO.File.AppendAllText(debugFile, $" -> Applying {pathToPlay} to Monitor {currentMonitorIndex}!\n");
                 int x = lprcMonitor.Left;
                 int y = lprcMonitor.Top;
                 int width = lprcMonitor.Right - lprcMonitor.Left;
                 int height = lprcMonitor.Bottom - lprcMonitor.Top;
+                
+                monitorLayouts.Add(new MonitorLayout { MonitorId = monitorId, X = x, Y = y, Width = width, Height = height });
 
-                wallpaperWindow.AttachToDesktop(x, y, width, height);
+                return true;
+            }, IntPtr.Zero);
+
+            foreach (var layout in monitorLayouts)
+            {
+                string monitorId = layout.MonitorId;
+                
+                bool isNewWindow = false;
+                if (!_wallpaperWindows.TryGetValue(monitorId, out WallpaperWindow wallpaperWindow))
+                {
+                    wallpaperWindow = new WallpaperWindow();
+                    wallpaperWindow.MonitorId = monitorId;
+                    _wallpaperWindows[monitorId] = wallpaperWindow;
+                    isNewWindow = true;
+                }
+
+                string wallType = SettingsService.GetWallpaperType(monitorId);
+                if (wallType != "Image" && wallType != "Video") wallType = "Video";
+                
+                string pathToPlay = null;
+                if (wallType == "Image") {
+                    pathToPlay = SettingsService.GetImagePath(monitorId);
+                    if (string.IsNullOrEmpty(pathToPlay)) pathToPlay = SettingsService.GetImagePath("All");
+                } else {
+                    pathToPlay = SettingsService.GetWallpaperPath(monitorId);
+                    if (string.IsNullOrEmpty(pathToPlay)) pathToPlay = SettingsService.GetWallpaperPath("All");
+                }
+
+                if (string.IsNullOrEmpty(pathToPlay) || !System.IO.File.Exists(pathToPlay))
+                {
+                    wallpaperWindow.HideWindow();
+                    continue;
+                }
+                
+                // Initialize WebView2 BEFORE reparenting to WorkerW
+                await wallpaperWindow.SetWallpaperTypeAsync(wallType);
+                
+                wallpaperWindow.AttachToDesktop(layout.X, layout.Y, layout.Width, layout.Height);
                 
                 if (!isNewWindow)
                 {
                     wallpaperWindow.ShowWindow();
                 }
-                
-                // We use async here, but EnumDisplayMonitors callback is synchronous.
-                // PlayVideo async execution inside synchronous callback is fine since it doesn't await here.
-                _ = PlayVideoOnWindowAsync(wallpaperWindow, pathToPlay, isNewWindow);
-                
-                // Apply saved stretch mode
-                string stretchStr = SettingsService.GetStretchMode(monitorId);
-                if (Enum.TryParse(stretchStr, out Stretch stretchValue))
+
+                if (wallType == "Image")
                 {
-                    wallpaperWindow.SetStretchMode(stretchValue);
+                    var imgSettings = new Core.WallpaperImage {
+                         ImagePath = pathToPlay,
+                         Blur = SettingsService.GetBlur(monitorId),
+                         Brightness = SettingsService.GetBrightness(monitorId),
+                         Contrast = SettingsService.GetContrast(monitorId),
+                         EnableKenBurns = SettingsService.GetEnableKenBurns(monitorId),
+                         EnableParallax = SettingsService.GetEnableParallax(monitorId)
+                    };
+                    string stretch = SettingsService.GetStretchMode(monitorId);
+                    imgSettings.LayoutMode = stretch;
+                    
+                    _ = wallpaperWindow.ApplyImageSettingsAsync(imgSettings);
                 }
-
-                // Apply volume
-                if (VolumeSlider != null)
+                else
                 {
-                    wallpaperWindow.SetVolume(VolumeSlider.Value / 100.0);
+                    _ = PlayVideoOnWindowAsync(wallpaperWindow, pathToPlay, isNewWindow);
+                    string stretchStr = SettingsService.GetStretchMode(monitorId);
+                    if (Enum.TryParse(stretchStr, out Stretch stretchValue))
+                    {
+                        wallpaperWindow.SetStretchMode(stretchValue);
+                    }
+                    else
+                    {
+                        wallpaperWindow.SetStretchMode(Stretch.UniformToFill);
+                    }
+                    if (VolumeSlider != null) wallpaperWindow.SetVolume(VolumeSlider.Value / 100.0);
+                    wallpaperWindow.SetBrightness(SettingsService.GetBrightness(monitorId));
+                    wallpaperWindow.SetVideoFilter(SettingsService.GetVideoFilter(monitorId));
                 }
+            }
 
-                // Apply Brightness
-                double brightness = SettingsService.GetBrightness(monitorId);
-                wallpaperWindow.SetBrightness(brightness);
-                
-                // Apply Video Filter
-                string filterStr = SettingsService.GetVideoFilter(monitorId);
-                wallpaperWindow.SetVideoFilter(filterStr);
-
-                return true;
-            }, IntPtr.Zero);
-
-            // Cleanup windows for monitors that no longer exist
             foreach (var id in unseenMonitors)
             {
                 try
@@ -1492,27 +1531,17 @@ public sealed partial class MainPage : Page
                 _wallpaperWindows.Remove(id);
             }
 
-            // Force WorkerW to redraw its background (clear ghost frames) AFTER all windows are adjusted
             IntPtr workerW = Native.WindowsApi.FindWindowEx(IntPtr.Zero, IntPtr.Zero, "WorkerW", null);
             if (workerW != IntPtr.Zero)
             {
-                // Force a full redraw of the desktop background behind the windows
                 Native.WindowsApi.InvalidateRect(workerW, IntPtr.Zero, true);
                 Native.WindowsApi.UpdateWindow(workerW);
             }
 
-            if (sender != null && _selectedFile != null)
-            {
-                StatusText.Text = $"{LocalizationService.GetString("WallpaperApplied")}: {_selectedFile.Name}";
-            }
-            
             UpdateAppliedBadge();
             UpdateVideoListBadges();
         }
-        catch (Exception ex)
-        {
-            StatusText.Text = $"{LocalizationService.GetString("ErrorApplying")} {ex.Message}";
-        }
+        catch { }
     }
 
     private async Task PlayVideoOnWindowAsync(WallpaperWindow wallpaperWindow, string pathToPlay, bool isNewWindow = false)
@@ -1751,8 +1780,8 @@ public sealed partial class MainPage : Page
     {
         if (!_isSwiping) return;
 
-        // Eğer farenin sol tuşu basılı değilse ama buraya girdiysek, tıklama bırakılmış demektir.
-        // (Bazen Button veya ScrollViewer PointerReleased olayını yutar, bu yüzden manuel kontrol etmeliyiz)
+        // EÄŸer farenin sol tuÅŸu basÄ±lÄ± deÄŸilse ama buraya girdiysek, tÄ±klama bÄ±rakÄ±lmÄ±ÅŸ demektir.
+        // (Bazen Button veya ScrollViewer PointerReleased olayÄ±nÄ± yutar, bu yÃ¼zden manuel kontrol etmeliyiz)
         if (!e.GetCurrentPoint(RootGrid).Properties.IsLeftButtonPressed)
         {
             _isSwiping = false;
@@ -1922,4 +1951,306 @@ public sealed partial class MainPage : Page
             }
         }
     }
+
+    private async void LoadDefaultImages()
+    {
+        _allImages.Clear();
+        _filteredImages.Clear();
+        
+        // 1. App bundled images (Assets/Images)
+        try
+        {
+            var folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
+            var imagesFolder = await folder.GetFolderAsync("Images");
+            var files = await imagesFolder.GetFilesAsync();
+            foreach (var file in files)
+            {
+                if (file.FileType == ".jpg" || file.FileType == ".png" || file.FileType == ".webp" || file.FileType == ".jpeg")
+                {
+                    await AddImageToList(file, false);
+                }
+            }
+        }
+        catch { }
+
+        // 2. Custom images
+        try
+        {
+            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string customFolderPath = System.IO.Path.Combine(localAppData, "Nythera", "CustomImages");
+            System.IO.Directory.CreateDirectory(customFolderPath);
+            var customFolder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(customFolderPath);
+            var files = await customFolder.GetFilesAsync();
+            foreach (var file in files)
+            {
+                if (file.FileType == ".jpg" || file.FileType == ".png" || file.FileType == ".webp" || file.FileType == ".jpeg")
+                {
+                    await AddImageToList(file, true);
+                }
+            }
+        }
+        catch { }
+        
+        FilterImages();
+    }
+
+    private async Task AddImageToList(Windows.Storage.StorageFile file, bool isCustom)
+    {
+        var img = new Core.WallpaperImage
+        {
+            Name = Nythera.Services.LocalizationService.GetVideoTitle(file.Name), // Reuse logic for now
+            ImagePath = file.Path,
+            IsCustom = isCustom,
+            IsFavorite = Nythera.Services.SettingsService.GetFavorites().Contains(file.Path)
+        };
+
+        try
+        {
+            using (var fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+            {
+                var memStream = new Windows.Storage.Streams.InMemoryRandomAccessStream();
+                await Windows.Storage.Streams.RandomAccessStream.CopyAsync(fileStream, memStream);
+                memStream.Seek(0);
+                
+                var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                bitmap.DecodePixelWidth = 300; // Optimize memory
+                await bitmap.SetSourceAsync(memStream);
+                img.Thumbnail = bitmap;
+            }
+        }
+        catch { }
+        
+        _allImages.Add(img);
+    }
+
+    private void FilterImages()
+    {
+        _filteredImages.Clear();
+        var favorites = Nythera.Services.SettingsService.GetFavorites();
+        
+        foreach (var img in _allImages)
+        {
+            img.IsFavorite = favorites.Contains(img.ImagePath);
+            
+            bool matchesFilter = _currentImageFilter switch
+            {
+                "Favorites" => img.IsFavorite,
+                "Custom" => img.IsCustom,
+                _ => true
+            };
+            
+            if (matchesFilter)
+            {
+                _filteredImages.Add(img);
+            }
+        }
+        DefaultImagesGrid.ItemsSource = _filteredImages;
+    }
+
+    private void ImageFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializing) return;
+        if (ImageFilterComboBox.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+        {
+            _currentImageFilter = tag;
+            FilterImages();
+        }
+    }
+
+    private void ImagePlaylistModeToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        // Setup playlist mode
+    }
+
+    private async void BrowseImage_Click(object sender, RoutedEventArgs e)
+    {
+        string logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "nythera_debug_log.txt");
+        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] BrowseImage_Click started\n");
+        try
+        {
+            var window = MainWindow.Instance;
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".webp");
+
+            var file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] File picked: {file.Name}\n");
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string customFolderPath = System.IO.Path.Combine(localAppData, "Nythera", "CustomImages");
+                System.IO.Directory.CreateDirectory(customFolderPath);
+                var customFolder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(customFolderPath);
+                var copiedFile = await file.CopyAsync(customFolder, file.Name, Windows.Storage.NameCollisionOption.GenerateUniqueName);
+                
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] File copied, calling AddImageToList\n");
+                await AddImageToList(copiedFile, true);
+                
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Calling FilterImages\n");
+                FilterImages();
+                
+                _selectedImagePath = copiedFile.Path;
+                _selectedImageName = copiedFile.Name;
+                ImageStatusText.Text = $"Selected: {copiedFile.Name}";
+                ApplyImageButton.IsEnabled = true;
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] BrowseImage logic complete\n");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception in BrowseImage_Click: {ex.Message}\n{ex.StackTrace}\n");
+        }
+    }
+
+    private void DefaultImagesGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        string logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "nythera_debug_log.txt");
+        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] DefaultImagesGrid_SelectionChanged started\n");
+        try
+        {
+            if (DefaultImagesGrid.SelectedItem is Core.WallpaperImage selected)
+            {
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Selected item: {selected.Name}\n");
+                
+                // Clear other selections visually
+                foreach (var img in _allImages)
+                {
+                    // We'd have IsSelected if implemented in INotifyPropertyChanged.
+                }
+                
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Foreach complete\n");
+                
+                _selectedImagePath = selected.ImagePath;
+                _selectedImageName = selected.Name;
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Setting status text\n");
+                
+                ImageStatusText.Text = $"Ready: {selected.Name}";
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Enabling button\n");
+                
+                ApplyImageButton.IsEnabled = true;
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Selection logic complete\n");
+            }
+            else
+            {
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Selected item is null or not WallpaperImage\n");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception in SelectionChanged: {ex.Message}\n{ex.StackTrace}\n");
+        }
+        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] DefaultImagesGrid_SelectionChanged ended\n");
+    }
+
+    private void ApplyImage_Click(object sender, RoutedEventArgs e)
+    {
+        if (string.IsNullOrEmpty(_selectedImagePath)) return;
+        
+        string targetMonitor = "All";
+        if (ImageMonitorComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            targetMonitor = item.Tag.ToString();
+        }
+
+        // Save settings
+        Nythera.Services.SettingsService.SaveWallpaperType(targetMonitor, "Image");
+        Nythera.Services.SettingsService.SaveImagePath(targetMonitor, _selectedImagePath);
+        Nythera.Services.SettingsService.SaveBlur(targetMonitor, ImageBlurSlider.Value);
+        Nythera.Services.SettingsService.SaveBrightness(targetMonitor, ImageBrightnessSlider.Value);
+        Nythera.Services.SettingsService.SaveContrast(targetMonitor, ImageContrastSlider.Value);
+        Nythera.Services.SettingsService.SaveEnableKenBurns(targetMonitor, KenBurnsToggle.IsOn);
+        Nythera.Services.SettingsService.SaveEnableParallax(targetMonitor, ParallaxToggle.IsOn);
+        
+        if (ImageStretchComboBox.SelectedItem is ComboBoxItem stretchItem && stretchItem.Tag != null)
+        {
+            Nythera.Services.SettingsService.SaveStretchMode(targetMonitor, stretchItem.Tag.ToString());
+        }
+
+        ApplyWallpaperToMonitor(targetMonitor, "Image", _selectedImagePath);
+    }
+
+    
+
+    private void ImageProperties_ValueChanged(object sender, object e)
+    {
+        if (_isInitializing) return;
+        string targetMonitor = "All";
+        if (ImageMonitorComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            targetMonitor = item.Tag.ToString();
+        }
+        
+        Nythera.Services.SettingsService.SaveBlur(targetMonitor, ImageBlurSlider.Value);
+        Nythera.Services.SettingsService.SaveBrightness(targetMonitor, ImageBrightnessSlider.Value);
+        Nythera.Services.SettingsService.SaveContrast(targetMonitor, ImageContrastSlider.Value);
+        Nythera.Services.SettingsService.SaveEnableKenBurns(targetMonitor, KenBurnsToggle.IsOn);
+        Nythera.Services.SettingsService.SaveEnableParallax(targetMonitor, ParallaxToggle.IsOn);
+        
+        if (MainWindow.Instance != null)
+        {
+            ApplyWallpaperToMonitor(targetMonitor, "Image", Nythera.Services.SettingsService.GetImagePath(targetMonitor));
+        }
+    }
+
+    private void ImageStretchComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializing) return;
+        ImageProperties_ValueChanged(null, null);
+    }
+
+    private void ImageMonitorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializing) return;
+        if (ImageMonitorComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            string monitorId = item.Tag.ToString();
+            
+            // Load settings for this monitor
+            _isInitializing = true;
+            
+            ImageBlurSlider.Value = Nythera.Services.SettingsService.GetBlur(monitorId);
+            ImageBrightnessSlider.Value = Nythera.Services.SettingsService.GetBrightness(monitorId);
+            ImageContrastSlider.Value = Nythera.Services.SettingsService.GetContrast(monitorId);
+            KenBurnsToggle.IsOn = Nythera.Services.SettingsService.GetEnableKenBurns(monitorId);
+            ParallaxToggle.IsOn = Nythera.Services.SettingsService.GetEnableParallax(monitorId);
+            
+            string savedStretchMode = Nythera.Services.SettingsService.GetStretchMode(monitorId);
+            foreach (ComboBoxItem cbItem in ImageStretchComboBox.Items)
+            {
+                if (cbItem.Tag.ToString() == savedStretchMode)
+                {
+                    ImageStretchComboBox.SelectedItem = cbItem;
+                    break;
+                }
+            }
+            
+            _isInitializing = false;
+        }
+    }
+
+    private void ImagePlaylistSelectButton_Click(object sender, RoutedEventArgs e)
+    {
+    }
+
+    private void ImageFavoriteButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string path)
+        {
+            var favorites = Nythera.Services.SettingsService.GetFavorites();
+            if (favorites.Contains(path)) favorites.Remove(path);
+            else favorites.Add(path);
+            Nythera.Services.SettingsService.SaveFavorites(favorites);
+            FilterImages();
+        }
+    }
+
 }
+
+
+

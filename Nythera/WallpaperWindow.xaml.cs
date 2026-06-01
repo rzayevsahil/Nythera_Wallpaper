@@ -304,4 +304,102 @@ public sealed partial class WallpaperWindow : Window
         // Force Win32 position again just in case WorkerW forces a relative offset
         WindowsApi.SetWindowPos(hwnd, IntPtr.Zero, x, y, width, height, 0x0200 | 0x0010); // SWP_NOOWNERZORDER | SWP_NOACTIVATE
     }
+
+    private Microsoft.UI.Xaml.Media.Animation.Storyboard _kenBurnsStoryboard;
+
+    public async Task SetWallpaperTypeAsync(string type)
+    {
+        if (type == "Image")
+        {
+            BackgroundPlayer.Visibility = Visibility.Collapsed;
+            StaticWallpaperImage.Visibility = Visibility.Visible;
+            PauseVideo();
+        }
+        else
+        {
+            StaticWallpaperImage.Visibility = Visibility.Collapsed;
+            BackgroundPlayer.Visibility = Visibility.Visible;
+        }
+    }
+
+    public async Task ApplyImageSettingsAsync(Nythera.Core.WallpaperImage imageSettings)
+    {
+        try
+        {
+            // Set image source safely
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(imageSettings.ImagePath);
+            using (var fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
+            {
+                var memStream = new Windows.Storage.Streams.InMemoryRandomAccessStream();
+                await Windows.Storage.Streams.RandomAccessStream.CopyAsync(fileStream, memStream);
+                memStream.Seek(0);
+                
+                var bitmap = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                await bitmap.SetSourceAsync(memStream);
+                StaticWallpaperImage.Source = bitmap;
+            }
+
+            // Apply layout
+            StaticWallpaperImage.Stretch = imageSettings.LayoutMode switch
+            {
+                "Fill" => Stretch.UniformToFill,
+                "Fit" => Stretch.Uniform,
+                "Stretch" => Stretch.Fill,
+                "Center" => Stretch.None,
+                _ => Stretch.UniformToFill
+            };
+
+            // Apply filters
+            SetBrightness(imageSettings.Brightness);
+            // Blur and Contrast require composition/Win2D in native WinUI, so we use brightness as primary filter natively
+
+            // Apply Ken Burns
+            if (_kenBurnsStoryboard != null)
+            {
+                _kenBurnsStoryboard.Stop();
+                _kenBurnsStoryboard = null;
+            }
+
+            if (imageSettings.EnableKenBurns)
+            {
+                _kenBurnsStoryboard = new Microsoft.UI.Xaml.Media.Animation.Storyboard();
+                _kenBurnsStoryboard.RepeatBehavior = Microsoft.UI.Xaml.Media.Animation.RepeatBehavior.Forever;
+                _kenBurnsStoryboard.AutoReverse = true;
+
+                var scaleXAnim = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
+                {
+                    From = 1.0,
+                    To = 1.1,
+                    Duration = new Duration(TimeSpan.FromSeconds(20)),
+                    EasingFunction = new Microsoft.UI.Xaml.Media.Animation.QuadraticEase()
+                };
+                Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(scaleXAnim, StaticWallpaperTransform);
+                Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(scaleXAnim, "ScaleX");
+
+                var scaleYAnim = new Microsoft.UI.Xaml.Media.Animation.DoubleAnimation
+                {
+                    From = 1.0,
+                    To = 1.1,
+                    Duration = new Duration(TimeSpan.FromSeconds(20)),
+                    EasingFunction = new Microsoft.UI.Xaml.Media.Animation.QuadraticEase()
+                };
+                Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTarget(scaleYAnim, StaticWallpaperTransform);
+                Microsoft.UI.Xaml.Media.Animation.Storyboard.SetTargetProperty(scaleYAnim, "ScaleY");
+
+                _kenBurnsStoryboard.Children.Add(scaleXAnim);
+                _kenBurnsStoryboard.Children.Add(scaleYAnim);
+                
+                // Ensure transform origin is center
+                StaticWallpaperImage.RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5);
+                
+                _kenBurnsStoryboard.Begin();
+            }
+            else
+            {
+                StaticWallpaperTransform.ScaleX = 1.0;
+                StaticWallpaperTransform.ScaleY = 1.0;
+            }
+        }
+        catch { }
+    }
 }

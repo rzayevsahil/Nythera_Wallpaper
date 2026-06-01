@@ -1,0 +1,28 @@
+[2.06.2026 00:04:26] BrowseImage_Click started
+[2.06.2026 00:04:29] File picked: wxLLJB_5cNFNbOqmeWkChF4saIwCpW4ag4znAAUTegxP6-ukgAo6D9AVngHWgh0zI8pHoNk4P5Etm-uwrb9CYjsbhWQWGkvPBuECFaYJpKKstGVRZaFVdJq1sdwvvvU4NqWxYEnd_7utJ9-pp7RzI7Bt1HhRqdyHGN7mc31i2r_Gaprwof5B5Bo9ZwORc_h2.jpg
+[2.06.2026 00:04:29] Exception in BrowseImage_Click: Operation is not valid due to the current state of the object.
+   at WinRT.ExceptionHelpers.<ThrowExceptionForHR>g__Throw|38_0(Int32 hr)
+   at ABI.Windows.Storage.IApplicationDataStaticsMethods.get_Current(IObjectReference _obj)
+   at Windows.Storage.ApplicationData.get_Current()
+   at Nythera.MainPage.BrowseImage_Click(Object sender, RoutedEventArgs e) in C:\Users\sahil\source\cursor-ai\walpaper-for-pc\Nythera\MainPage.xaml.cs:line 2085
+[2.06.2026 00:04:36] BrowseImage_Click started
+[2.06.2026 00:04:42] File picked: karanlık gecede manzara seyreden kız anime.jpg
+[2.06.2026 00:04:42] Exception in BrowseImage_Click: Operation is not valid due to the current state of the object.
+   at WinRT.ExceptionHelpers.<ThrowExceptionForHR>g__Throw|38_0(Int32 hr)
+   at ABI.Windows.Storage.IApplicationDataStaticsMethods.get_Current(IObjectReference _obj)
+   at Windows.Storage.ApplicationData.get_Current()
+   at Nythera.MainPage.BrowseImage_Click(Object sender, RoutedEventArgs e) in C:\Users\sahil\source\cursor-ai\walpaper-for-pc\Nythera\MainPage.xaml.cs:line 2085
+[2.06.2026 00:04:48] BrowseImage_Click started
+[2.06.2026 00:04:51] File picked: wxLLJB_5cNFNbOqmeWkChF4saIwCpW4ag4znAAUTegxP6-ukgAo6D9AVngHWgh0zI8pHoNk4P5Etm-uwrb9CYjsbhWQWGkvPBuECFaYJpKKstGVRZaFVdJq1sdwvvvU4NqWxYEnd_7utJ9-pp7RzI7Bt1HhRqdyHGN7mc31i2r_Gaprwof5B5Bo9ZwORc_h2.jpg
+[2.06.2026 00:04:51] Exception in BrowseImage_Click: Operation is not valid due to the current state of the object.
+   at WinRT.ExceptionHelpers.<ThrowExceptionForHR>g__Throw|38_0(Int32 hr)
+   at ABI.Windows.Storage.IApplicationDataStaticsMethods.get_Current(IObjectReference _obj)
+   at Windows.Storage.ApplicationData.get_Current()
+   at Nythera.MainPage.BrowseImage_Click(Object sender, RoutedEventArgs e) in C:\Users\sahil\source\cursor-ai\walpaper-for-pc\Nythera\MainPage.xaml.cs:line 2085
+[2.06.2026 00:05:29] BrowseImage_Click started
+[2.06.2026 00:05:35] File picked: Gemini_Generated_Image_kq16d9kq16d9kq16.png
+[2.06.2026 00:05:35] Exception in BrowseImage_Click: Operation is not valid due to the current state of the object.
+   at WinRT.ExceptionHelpers.<ThrowExceptionForHR>g__Throw|38_0(Int32 hr)
+   at ABI.Windows.Storage.IApplicationDataStaticsMethods.get_Current(IObjectReference _obj)
+   at Windows.Storage.ApplicationData.get_Current()
+   at Nythera.MainPage.BrowseImage_Click(Object sender, RoutedEventArgs e) in C:\Users\sahil\source\cursor-ai\walpaper-for-pc\Nythera\MainPage.xaml.cs:line 2085
