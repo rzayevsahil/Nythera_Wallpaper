@@ -40,6 +40,10 @@ public class SettingsService
                         settings[parts[0]] = parts[1];
                 }
             }
+            if (monitorId == "All")
+            {
+                settings.Clear();
+            }
             settings[monitorId] = path;
             var newLines = new List<string>();
             foreach (var kvp in settings)
@@ -256,6 +260,10 @@ public class SettingsService
                     if (parts.Length == 2)
                         settings[parts[0]] = parts[1];
                 }
+            }
+            if (monitorId == "All")
+            {
+                settings.Clear();
             }
             settings[monitorId] = value;
             var newLines = new List<string>();
