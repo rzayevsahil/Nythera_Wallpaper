@@ -2022,15 +2022,10 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private async void LoadDefaultImages()
+    private void LoadDefaultImages()
     {
         _allImages.Clear();
         _filteredImages.Clear();
-
-        string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
-        Directory.CreateDirectory(appData);
-        string logPath = Path.Combine(appData, "debug_images_log.txt");
-        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] LoadDefaultImages started.\n");
 
         // 1. App bundled images (Assets/Images)
         try
@@ -2038,45 +2033,31 @@ public sealed partial class MainPage : Page
             string basePath = System.AppContext.BaseDirectory;
             string imagesDir = System.IO.Path.Combine(basePath, "Assets", "Images");
             
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Base path: {basePath}\n");
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Images dir: {imagesDir} (Exists: {System.IO.Directory.Exists(imagesDir)})\n");
-
             // Fallback for dotnet run context where Assets might be in the project root
             if (!System.IO.Directory.Exists(imagesDir))
             {
                 imagesDir = System.IO.Path.Combine(Environment.CurrentDirectory, "Assets", "Images");
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Fallback 1: {imagesDir} (Exists: {System.IO.Directory.Exists(imagesDir)})\n");
             }
             // Fallback for Assembly location
             if (!System.IO.Directory.Exists(imagesDir))
             {
                 imagesDir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "", "Assets", "Images");
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Fallback 2: {imagesDir} (Exists: {System.IO.Directory.Exists(imagesDir)})\n");
             }
 
             if (System.IO.Directory.Exists(imagesDir))
             {
                 var files = System.IO.Directory.GetFiles(imagesDir);
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Found {files.Length} files in {imagesDir}\n");
                 foreach (var file in files)
                 {
                     string ext = System.IO.Path.GetExtension(file).ToLower();
                     if (ext == ".jpg" || ext == ".png" || ext == ".webp" || ext == ".jpeg")
                     {
-                        var storageFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(file);
-                        await AddImageToList(storageFile, false);
+                        AddImageToListSync(file, false);
                     }
                 }
             }
-            else
-            {
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Images dir still not found.\n");
-            }
         }
-        catch (Exception ex)
-        {
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception 1: {ex.Message}\n");
-        }
+        catch { }
 
         // 2. Custom images
         try
@@ -2084,38 +2065,44 @@ public sealed partial class MainPage : Page
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string customFolderPath = System.IO.Path.Combine(localAppData, "Nythera", "CustomImages");
             System.IO.Directory.CreateDirectory(customFolderPath);
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Custom folder: {customFolderPath}\n");
-            var customFolder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(customFolderPath);
-            var files = await customFolder.GetFilesAsync();
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Found {files.Count} custom files\n");
-            foreach (var file in files)
+            
+            if (System.IO.Directory.Exists(customFolderPath))
             {
-                if (file.FileType == ".jpg" || file.FileType == ".png" || file.FileType == ".webp" || file.FileType == ".jpeg")
+                var files = System.IO.Directory.GetFiles(customFolderPath);
+                foreach (var file in files)
                 {
-                    await AddImageToList(file, true);
+                    string ext = System.IO.Path.GetExtension(file).ToLower();
+                    if (ext == ".jpg" || ext == ".png" || ext == ".webp" || ext == ".jpeg")
+                    {
+                        AddImageToListSync(file, true);
+                    }
                 }
             }
         }
-        catch (Exception ex)
-        {
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception 2: {ex.Message}\n");
-        }
+        catch { }
         
         FilterImages();
     }
 
-    private async Task AddImageToList(Windows.Storage.StorageFile file, bool isCustom)
+    private void AddImageToListSync(string filePath, bool isCustom)
     {
         var img = new Core.WallpaperImage
         {
-            Name = Nythera.Services.LocalizationService.GetVideoTitle(file.Name), // Reuse logic for now
-            ImagePath = file.Path,
+            Name = Nythera.Services.LocalizationService.GetVideoTitle(System.IO.Path.GetFileName(filePath)),
+            ImagePath = filePath,
             IsCustom = isCustom,
-            IsFavorite = Nythera.Services.SettingsService.GetFavorites().Contains(file.Path)
+            IsFavorite = Nythera.Services.SettingsService.GetFavorites().Contains(filePath)
         };
 
+        _allImages.Add(img);
+        LoadImageThumbnailAsync(img, filePath);
+    }
+
+    private async void LoadImageThumbnailAsync(Core.WallpaperImage img, string filePath)
+    {
         try
         {
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(filePath);
             using (var fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read))
             {
                 var memStream = new Windows.Storage.Streams.InMemoryRandomAccessStream();
@@ -2129,8 +2116,6 @@ public sealed partial class MainPage : Page
             }
         }
         catch { }
-        
-        _allImages.Add(img);
     }
 
     private void FilterImages()
@@ -2154,11 +2139,6 @@ public sealed partial class MainPage : Page
                 _filteredImages.Add(img);
             }
         }
-        
-        string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
-        string logPath = Path.Combine(appData, "debug_images_log.txt");
-        try { System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] FilterImages finished. _allImages.Count: {_allImages.Count}, _filteredImages.Count: {_filteredImages.Count}\n"); } catch {}
-        
         DefaultImagesGrid.ItemsSource = _filteredImages;
     }
 
@@ -2223,8 +2203,8 @@ public sealed partial class MainPage : Page
                 var customFolder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(customFolderPath);
                 var copiedFile = await file.CopyAsync(customFolder, file.Name, Windows.Storage.NameCollisionOption.GenerateUniqueName);
                 
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] File copied, calling AddImageToList\n");
-                await AddImageToList(copiedFile, true);
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] File copied, calling AddImageToListSync\n");
+                AddImageToListSync(copiedFile.Path, true);
                 
                 System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Calling FilterImages\n");
                 FilterImages();
