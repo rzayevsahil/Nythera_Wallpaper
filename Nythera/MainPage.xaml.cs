@@ -466,6 +466,15 @@ public sealed partial class MainPage : Page
             }
         }
         
+        // Translate all image titles dynamically
+        foreach (var img in _allImages)
+        {
+            if (!img.IsCustom)
+            {
+                img.Name = LocalizationService.GetMediaTitle(System.IO.Path.GetFileName(img.ImagePath));
+            }
+        }
+        
         ChooseFitText.Text = LocalizationService.GetString("ChooseFit");
         if (StretchModeComboBox != null)
         {

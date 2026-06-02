@@ -309,16 +309,56 @@ public static class LocalizationService
         { "91562-629172467_medium.mp4", "Red Sunset" }
     };
 
-    public static string GetVideoTitle(string fileName)
+    private static readonly Dictionary<string, string> _trImages = new()
+    {
+        { "Nick and Judy🫶🏻 (1).jpg", "Nick ve Judy (Alternatif)" },
+        { "Nick and Judy🫶🏻.jpg", "Nick ve Judy" },
+        { "indir (2).jpg", "Dişsiz(Gece Öfkesi)" },
+        { "indir (3).jpg", "Beyaz Öfke" },
+        { "indir (4).jpg", "Samuray Çiçek Tarlasında" },
+        { "indir (6).jpg", "Joker" },
+        { "indir (7).jpg", "Özgürlük Kanatlarda" },
+        { "indir (8).jpg", "McQueen ve Tow Mater" },
+        { "indir (9).jpg", "McQueen" },
+        { "zootopia.jpg", "Zootropolis Şehri" }
+    };
+
+    private static readonly Dictionary<string, string> _enImages = new()
+    {
+        { "Nick and Judy🫶🏻 (1).jpg", "Nick and Judy (Alt)" },
+        { "Nick and Judy🫶🏻.jpg", "Nick and Judy" },
+        { "indir (2).jpg", "Toothless(Night Fury)" },
+        { "indir (3).jpg", "Light Fury" },
+        { "indir (4).jpg", "Samurai in Field of Flowers" },
+        { "indir (6).jpg", "Joker" },
+        { "indir (7).jpg", "Freedom on Wings" },
+        { "indir (8).jpg", "McQueen and Tow Mater" },
+        { "indir (9).jpg", "McQueen" },
+        { "zootopia.jpg", "Zootopia City" }
+    };
+
+    public static string GetMediaTitle(string fileName)
     {
         string lang = SettingsService.GetLanguage();
-        var dict = lang == "tr" ? _trVideos : _enVideos;
+        var videoDict = lang == "tr" ? _trVideos : _enVideos;
+        var imageDict = lang == "tr" ? _trImages : _enImages;
         
-        if (dict.TryGetValue(fileName, out string title))
-            return title;
+        if (videoDict.TryGetValue(fileName, out string videoTitle))
+            return videoTitle;
             
-        // Fallback: remove .mp4 and _medium for custom/unknown files
-        string raw = fileName.Replace(".mp4", "").Replace("_medium", "");
+        if (imageDict.TryGetValue(fileName, out string imageTitle))
+            return imageTitle;
+            
+        // Fallback: remove extensions and metadata for custom/unknown files
+        string raw = fileName.Replace(".mp4", "")
+                             .Replace(".jpg", "")
+                             .Replace(".jpeg", "")
+                             .Replace(".png", "")
+                             .Replace(".webp", "")
+                             .Replace("_medium", "");
         return raw;
     }
+    
+    // Kept for backward compatibility if needed in other places, though we should transition to GetMediaTitle
+    public static string GetVideoTitle(string fileName) => GetMediaTitle(fileName);
 }
