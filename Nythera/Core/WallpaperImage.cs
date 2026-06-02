@@ -37,7 +37,75 @@ namespace Nythera.Core
         public bool IsFavorite 
         { 
             get => _isFavorite; 
-            set { _isFavorite = value; OnPropertyChanged(); }
+            set 
+            { 
+                _isFavorite = value; 
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FavoriteIcon));
+            }
+        }
+
+        public string FavoriteIcon => IsFavorite ? "\uEB52" : "\uEB51";
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectionIndicatorVisibility));
+                }
+            }
+        }
+
+        public Microsoft.UI.Xaml.Visibility SelectionIndicatorVisibility => IsSelected ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+        private Microsoft.UI.Xaml.Visibility _playlistSelectionVisibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        public Microsoft.UI.Xaml.Visibility PlaylistSelectionVisibility
+        {
+            get => _playlistSelectionVisibility;
+            set
+            {
+                if (_playlistSelectionVisibility != value)
+                {
+                    _playlistSelectionVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public Microsoft.UI.Xaml.Visibility DeleteButtonVisibility => IsCustom ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+        private bool _isApplied;
+        public bool IsApplied
+        {
+            get => _isApplied;
+            set
+            {
+                if (_isApplied != value)
+                {
+                    _isApplied = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _appliedMonitorsText = "";
+        public string AppliedMonitorsText
+        {
+            get => _appliedMonitorsText;
+            set
+            {
+                if (_appliedMonitorsText != value)
+                {
+                    _appliedMonitorsText = value;
+                    OnPropertyChanged();
+                }
+            }
         }
         
         private bool _isCustom = false;
@@ -78,6 +146,21 @@ namespace Nythera.Core
         public string LayoutMode { get; set; } = "Fill";
         
         // Playlist selection
-        public bool IsSelectedForPlaylist { get; set; } = false;
+        private bool _isSelectedForPlaylist = false;
+        public bool IsSelectedForPlaylist
+        {
+            get => _isSelectedForPlaylist;
+            set
+            {
+                if (_isSelectedForPlaylist != value)
+                {
+                    _isSelectedForPlaylist = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(PlaylistCheckVisibility));
+                }
+            }
+        }
+        
+        public Microsoft.UI.Xaml.Visibility PlaylistCheckVisibility => IsSelectedForPlaylist ? Microsoft.UI.Xaml.Visibility.Visible : Microsoft.UI.Xaml.Visibility.Collapsed;
     }
 }

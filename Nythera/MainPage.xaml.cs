@@ -2026,22 +2026,57 @@ public sealed partial class MainPage : Page
     {
         _allImages.Clear();
         _filteredImages.Clear();
-        
+
+        string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
+        Directory.CreateDirectory(appData);
+        string logPath = Path.Combine(appData, "debug_images_log.txt");
+        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] LoadDefaultImages started.\n");
+
         // 1. App bundled images (Assets/Images)
         try
         {
-            var folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-            var imagesFolder = await folder.GetFolderAsync("Images");
-            var files = await imagesFolder.GetFilesAsync();
-            foreach (var file in files)
+            string basePath = System.AppContext.BaseDirectory;
+            string imagesDir = System.IO.Path.Combine(basePath, "Assets", "Images");
+            
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Base path: {basePath}\n");
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Images dir: {imagesDir} (Exists: {System.IO.Directory.Exists(imagesDir)})\n");
+
+            // Fallback for dotnet run context where Assets might be in the project root
+            if (!System.IO.Directory.Exists(imagesDir))
             {
-                if (file.FileType == ".jpg" || file.FileType == ".png" || file.FileType == ".webp" || file.FileType == ".jpeg")
+                imagesDir = System.IO.Path.Combine(Environment.CurrentDirectory, "Assets", "Images");
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Fallback 1: {imagesDir} (Exists: {System.IO.Directory.Exists(imagesDir)})\n");
+            }
+            // Fallback for Assembly location
+            if (!System.IO.Directory.Exists(imagesDir))
+            {
+                imagesDir = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "", "Assets", "Images");
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Fallback 2: {imagesDir} (Exists: {System.IO.Directory.Exists(imagesDir)})\n");
+            }
+
+            if (System.IO.Directory.Exists(imagesDir))
+            {
+                var files = System.IO.Directory.GetFiles(imagesDir);
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Found {files.Length} files in {imagesDir}\n");
+                foreach (var file in files)
                 {
-                    await AddImageToList(file, false);
+                    string ext = System.IO.Path.GetExtension(file).ToLower();
+                    if (ext == ".jpg" || ext == ".png" || ext == ".webp" || ext == ".jpeg")
+                    {
+                        var storageFile = await Windows.Storage.StorageFile.GetFileFromPathAsync(file);
+                        await AddImageToList(storageFile, false);
+                    }
                 }
             }
+            else
+            {
+                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Images dir still not found.\n");
+            }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception 1: {ex.Message}\n");
+        }
 
         // 2. Custom images
         try
@@ -2049,8 +2084,10 @@ public sealed partial class MainPage : Page
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string customFolderPath = System.IO.Path.Combine(localAppData, "Nythera", "CustomImages");
             System.IO.Directory.CreateDirectory(customFolderPath);
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Custom folder: {customFolderPath}\n");
             var customFolder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(customFolderPath);
             var files = await customFolder.GetFilesAsync();
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Found {files.Count} custom files\n");
             foreach (var file in files)
             {
                 if (file.FileType == ".jpg" || file.FileType == ".png" || file.FileType == ".webp" || file.FileType == ".jpeg")
@@ -2059,7 +2096,10 @@ public sealed partial class MainPage : Page
                 }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception 2: {ex.Message}\n");
+        }
         
         FilterImages();
     }
@@ -2114,6 +2154,11 @@ public sealed partial class MainPage : Page
                 _filteredImages.Add(img);
             }
         }
+        
+        string appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera");
+        string logPath = Path.Combine(appData, "debug_images_log.txt");
+        try { System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] FilterImages finished. _allImages.Count: {_allImages.Count}, _filteredImages.Count: {_filteredImages.Count}\n"); } catch {}
+        
         DefaultImagesGrid.ItemsSource = _filteredImages;
     }
 
@@ -2129,7 +2174,26 @@ public sealed partial class MainPage : Page
 
     private void ImagePlaylistModeToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        // Setup playlist mode
+        if (ImagePlaylistModeToggle.IsOn)
+        {
+            ImagePlaylistSettingsPanel.Visibility = Visibility.Visible;
+            ApplyImageButton.Visibility = Visibility.Collapsed;
+            foreach (var img in _allImages)
+            {
+                img.PlaylistSelectionVisibility = Visibility.Visible;
+                img.IsSelected = false; // Hide single selection border
+            }
+        }
+        else
+        {
+            ImagePlaylistSettingsPanel.Visibility = Visibility.Collapsed;
+            ApplyImageButton.Visibility = Visibility.Visible;
+            foreach (var img in _allImages)
+            {
+                img.PlaylistSelectionVisibility = Visibility.Collapsed;
+                img.IsSelectedForPlaylist = false; // Clear selection
+            }
+        }
     }
 
     private async void BrowseImage_Click(object sender, RoutedEventArgs e)
@@ -2180,42 +2244,56 @@ public sealed partial class MainPage : Page
 
     private void DefaultImagesGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        string logPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "nythera_debug_log.txt");
-        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] DefaultImagesGrid_SelectionChanged started\n");
         try
         {
             if (DefaultImagesGrid.SelectedItem is Core.WallpaperImage selected)
             {
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Selected item: {selected.Name}\n");
-                
-                // Clear other selections visually
-                foreach (var img in _allImages)
+                if (ImagePlaylistModeToggle.IsOn)
                 {
-                    // We'd have IsSelected if implemented in INotifyPropertyChanged.
+                    selected.IsSelectedForPlaylist = !selected.IsSelectedForPlaylist;
+                    DefaultImagesGrid.SelectedItem = null; // Clear highlight so it can be clicked again
+                    return;
                 }
                 
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Foreach complete\n");
+                // Sync single selection visual state (blue vertical line)
+                foreach (var img in _allImages)
+                {
+                    img.IsSelected = (img == selected);
+                }
                 
                 _selectedImagePath = selected.ImagePath;
                 _selectedImageName = selected.Name;
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Setting status text\n");
                 
-                ImageStatusText.Text = string.Format(Nythera.Services.LocalizationService.GetString("ReadyFormat"), selected.Name);
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Enabling button\n");
-                
+                ImageStatusText.Text = string.Format(Nythera.Services.LocalizationService.GetString("ReadyFormat") ?? "{0} hazir", selected.Name);
                 ApplyImageButton.IsEnabled = true;
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Selection logic complete\n");
-            }
-            else
-            {
-                System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Selected item is null or not WallpaperImage\n");
+                
+                // Update applied badge (not fully implemented in MVP, but placeholder logic)
+                UpdateImageAppliedBadge();
             }
         }
         catch (Exception ex)
         {
-            System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] Exception in SelectionChanged: {ex.Message}\n{ex.StackTrace}\n");
+            // Fallback for errors
+            ImageStatusText.Text = $"Error: {ex.Message}";
         }
-        System.IO.File.AppendAllText(logPath, $"[{DateTime.Now}] DefaultImagesGrid_SelectionChanged ended\n");
+    }
+
+    private void UpdateImageAppliedBadge()
+    {
+        // Simple mock for now
+        var targetMonitor = Nythera.Services.SettingsService.GetTargetMonitor();
+        foreach (var img in _allImages)
+        {
+            if (img.ImagePath == Nythera.Services.SettingsService.GetWallpaperType(targetMonitor)) // Checking if it's the current image
+            {
+                img.IsApplied = true;
+                img.AppliedMonitorsText = targetMonitor == "All" ? "ALL" : $"MON {targetMonitor}";
+            }
+            else
+            {
+                img.IsApplied = false;
+            }
+        }
     }
 
     private void ApplyImage_Click(object sender, RoutedEventArgs e)
@@ -2346,17 +2424,95 @@ public sealed partial class MainPage : Page
 
     private void ImagePlaylistSelectButton_Click(object sender, RoutedEventArgs e)
     {
+        if (sender is Button btn && btn.Tag is string path)
+        {
+            var img = System.Linq.Enumerable.FirstOrDefault(_allImages, i => i.ImagePath == path);
+            if (img != null)
+            {
+                img.IsSelectedForPlaylist = !img.IsSelectedForPlaylist;
+            }
+        }
+    }
+
+    private void ApplyImagePlaylistButton_Click(object sender, RoutedEventArgs e)
+    {
+        var paths = new System.Collections.Generic.List<string>();
+        foreach (var img in _allImages)
+        {
+            if (img.IsSelectedForPlaylist) paths.Add(img.ImagePath);
+        }
+        
+        if (paths.Count > 0)
+        {
+            ImageStatusText.Text = $"{paths.Count} resim seçildi ve oynatma listesi olarak ayarlandı.";
+            // For MVP, just show text, actual playlist implementation requires saving to SettingsService
+        }
+        else
+        {
+            ImageStatusText.Text = "Lütfen listeden resim seçin.";
+        }
+    }
+
+    private void DeleteImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string imagePath)
+        {
+            var image = System.Linq.Enumerable.FirstOrDefault(_allImages, v => v.ImagePath == imagePath);
+            if (image != null && image.IsCustom)
+            {
+                try
+                {
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+                catch { }
+
+                if (image.IsFavorite)
+                {
+                    var favorites = Nythera.Services.SettingsService.GetFavorites();
+                    favorites.Remove(imagePath);
+                    Nythera.Services.SettingsService.SaveFavorites(favorites);
+                }
+
+                _allImages.Remove(image);
+                if (_filteredImages.Contains(image))
+                {
+                    _filteredImages.Remove(image);
+                }
+
+                if (_selectedImagePath == imagePath)
+                {
+                    _selectedImagePath = null;
+                    ImageStatusText.Text = Nythera.Services.LocalizationService.GetString("NoImageSelected");
+                    ApplyImageButton.IsEnabled = false;
+                }
+            }
+        }
     }
 
     private void ImageFavoriteButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is string path)
         {
-            var favorites = Nythera.Services.SettingsService.GetFavorites();
-            if (favorites.Contains(path)) favorites.Remove(path);
-            else favorites.Add(path);
-            Nythera.Services.SettingsService.SaveFavorites(favorites);
-            FilterImages();
+            var img = System.Linq.Enumerable.FirstOrDefault(_allImages, v => v.ImagePath == path);
+            if (img != null)
+            {
+                img.IsFavorite = !img.IsFavorite;
+                var favorites = Nythera.Services.SettingsService.GetFavorites();
+                if (img.IsFavorite)
+                    favorites.Add(path);
+                else
+                    favorites.Remove(path);
+                
+                Nythera.Services.SettingsService.SaveFavorites(favorites);
+                
+                if (_currentImageFilter == "Favorites" && !img.IsFavorite)
+                {
+                    _filteredImages.Remove(img);
+                }
+            }
         }
     }
 
