@@ -230,7 +230,14 @@
 
                                     <!-- Brightness -->
                                     <TextBlock x:Name="ImageBrightnessTitle" Text="Parlaklık:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
-                                    <Slider x:Name="ImageBrightnessSlider" Grid.Row="1" Grid.Column="1" Minimum="10" Maximum="150" Value="100" ValueChanged="ImageProperties_ValueChanged" />
+                                    <Grid Grid.Row="1" Grid.Column="1" ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="35" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="ImageBrightnessSlider" Grid.Column="0" Minimum="10" Maximum="150" Value="100" StepFrequency="1" ValueChanged="ImageProperties_ValueChanged" />
+                                        <TextBlock x:Name="ImageBrightnessValueText" Grid.Column="1" Text="100" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Gray" />
+                                    </Grid>
 
 
                                     <!-- Stretch Mode -->
@@ -460,7 +467,14 @@
 
                                     <!-- Volume -->
                                     <TextBlock x:Name="VolumeText" Text="Volume:" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" />
-                                    <Slider x:Name="VolumeSlider" Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100" Value="0" ValueChanged="VolumeSlider_ValueChanged" />
+                                    <Grid Grid.Row="0" Grid.Column="1" ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="35" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="VolumeSlider" Grid.Column="0" Minimum="0" Maximum="100" Value="0" StepFrequency="1" ValueChanged="VolumeSlider_ValueChanged" />
+                                        <TextBlock x:Name="VolumeValueText" Grid.Column="1" Text="0" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Gray" />
+                                    </Grid>
 
                                     <!-- Speed -->
                                     <TextBlock x:Name="SpeedText" Text="Oynatma Hızı:" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
@@ -475,7 +489,14 @@
 
                                     <!-- Brightness -->
                                     <TextBlock x:Name="BrightnessText" Text="Parlaklık:" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                                    <Slider x:Name="BrightnessSlider" Grid.Row="2" Grid.Column="1" Minimum="10" Maximum="100" Value="100" ValueChanged="BrightnessSlider_ValueChanged" />
+                                    <Grid Grid.Row="2" Grid.Column="1" ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="35" />
+                                        </Grid.ColumnDefinitions>
+                                        <Slider x:Name="BrightnessSlider" Grid.Column="0" Minimum="10" Maximum="100" Value="100" StepFrequency="1" ValueChanged="BrightnessSlider_ValueChanged" />
+                                        <TextBlock x:Name="BrightnessValueText" Grid.Column="1" Text="100" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Gray" />
+                                    </Grid>
 
                                     <!-- Video Filter -->
                                     <TextBlock x:Name="ColorOverlayText" Text="Renk Filtresi:" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />

@@ -209,6 +209,7 @@ public sealed partial class MainPage : Page
         if (BrightnessSlider != null)
         {
             BrightnessSlider.Value = savedBrightness;
+            if (BrightnessValueText != null) BrightnessValueText.Text = BrightnessSlider.Value.ToString("0");
         }
 
         // Initialize Video Filter
@@ -1048,6 +1049,7 @@ public sealed partial class MainPage : Page
             if (BrightnessSlider != null)
             {
                 BrightnessSlider.Value = SettingsService.GetBrightness(tag);
+                if (BrightnessValueText != null) BrightnessValueText.Text = BrightnessSlider.Value.ToString("0");
             }
 
             string savedFilter = SettingsService.GetVideoFilter(tag);
@@ -1623,6 +1625,10 @@ public sealed partial class MainPage : Page
 
     private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
+        if (VolumeValueText != null)
+        {
+            VolumeValueText.Text = e.NewValue.ToString("0");
+        }
         foreach (var win in _wallpaperWindows.Values)
         {
             // Slider is 0-100, MediaPlayer volume is 0.0-1.0
@@ -1671,6 +1677,10 @@ public sealed partial class MainPage : Page
         try
         {
             double brightness = e.NewValue;
+            if (BrightnessValueText != null)
+            {
+                BrightnessValueText.Text = brightness.ToString("0");
+            }
             string targetMonitor = SettingsService.GetTargetMonitor();
             if (!_isInitializing)
             {
@@ -2251,6 +2261,10 @@ public sealed partial class MainPage : Page
         {
             targetMonitor = item.Tag.ToString();
         }
+        if (ImageBrightnessValueText != null)
+        {
+            ImageBrightnessValueText.Text = ImageBrightnessSlider.Value.ToString("0");
+        }
         
         Nythera.Services.SettingsService.SaveBlur(targetMonitor, ImageBlurSlider.Value);
         Nythera.Services.SettingsService.SaveBrightness(targetMonitor, ImageBrightnessSlider.Value);
@@ -2309,6 +2323,7 @@ public sealed partial class MainPage : Page
             
             ImageBlurSlider.Value = Nythera.Services.SettingsService.GetBlur(monitorId);
             ImageBrightnessSlider.Value = Nythera.Services.SettingsService.GetBrightness(monitorId);
+            if (ImageBrightnessValueText != null) ImageBrightnessValueText.Text = ImageBrightnessSlider.Value.ToString("0");
             KenBurnsToggle.IsOn = Nythera.Services.SettingsService.GetEnableKenBurns(monitorId);
             
             string savedStretchMode = Nythera.Services.SettingsService.GetImageStretchMode(monitorId);
