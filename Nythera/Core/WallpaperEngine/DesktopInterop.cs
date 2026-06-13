@@ -24,6 +24,7 @@ public class DesktopInterop
 
         // 3. Find the new WorkerW
         IntPtr workerW = IntPtr.Zero;
+        IntPtr shellWindow = IntPtr.Zero;
 
         WindowsApi.EnumWindows(new WindowsApi.EnumWindowsProc((tophandle, topparamhandle) =>
         {
@@ -31,12 +32,32 @@ public class DesktopInterop
 
             if (p != IntPtr.Zero)
             {
+                shellWindow = tophandle;
                 // The WorkerW we want is the sibling of the window that contains SHELLDLL_DefView
                 workerW = WindowsApi.FindWindowEx(IntPtr.Zero, tophandle, "WorkerW", null);
             }
 
             return true;
         }), IntPtr.Zero);
+
+        // Fallback: If sibling search failed but we found the shellWindow, 
+        // find any top-level WorkerW window that is not the shellWindow.
+        if (workerW == IntPtr.Zero && shellWindow != IntPtr.Zero)
+        {
+            WindowsApi.EnumWindows(new WindowsApi.EnumWindowsProc((tophandle, topparamhandle) =>
+            {
+                System.Text.StringBuilder className = new System.Text.StringBuilder(256);
+                if (WindowsApi.GetClassName(tophandle, className, className.Capacity) > 0)
+                {
+                    if (className.ToString() == "WorkerW" && tophandle != shellWindow)
+                    {
+                        workerW = tophandle;
+                        return false; // Stop enumerating
+                    }
+                }
+                return true;
+            }), IntPtr.Zero);
+        }
 
         return workerW;
     }
