@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using Nythera.Native;
 
 namespace Nythera.Core.WallpaperEngine;
@@ -171,10 +172,79 @@ public class DesktopInterop
         return WindowsApi.GetDesktopWindow();
     }
 
+    private static void LogDesktopWindowTree(string debugFile)
+    {
+        try
+        {
+            System.IO.File.AppendAllText(debugFile, "--- DESKTOP WINDOW TREE DUMP ---\n");
+            
+            IntPtr shell = WindowsApi.GetShellWindow();
+            IntPtr desktop = WindowsApi.GetDesktopWindow();
+            System.IO.File.AppendAllText(debugFile, $"GetShellWindow(): {shell}, GetDesktopWindow(): {desktop}\n");
+
+            WindowsApi.EnumWindows(new WindowsApi.EnumWindowsProc((tophandle, topparamhandle) =>
+            {
+                StringBuilder className = new StringBuilder(256);
+                if (WindowsApi.GetClassName(tophandle, className, className.Capacity) > 0)
+                {
+                    string cls = className.ToString();
+                    if (cls == "WorkerW" || cls == "Progman")
+                    {
+                        int style = WindowsApi.GetWindowLong(tophandle, WindowsApi.GWL_STYLE);
+                        WindowsApi.RECT rect;
+                        WindowsApi.GetWindowRect(tophandle, out rect);
+                        bool isVisible = (style & 0x10000000) != 0; // WS_VISIBLE
+                        
+                        IntPtr shellView = WindowsApi.FindWindowEx(tophandle, IntPtr.Zero, "SHELLDLL_DefView", null);
+                        string hasShellView = shellView != IntPtr.Zero ? $" (Contains SHELLDLL_DefView: {shellView})" : "";
+                        
+                        System.IO.File.AppendAllText(debugFile, 
+                            $"Top Window - Handle: {tophandle}, Class: {cls}, Visible: {isVisible}, Style: 0x{style:X8}, Rect: [{rect.Left}, {rect.Top}, {rect.Right}, {rect.Bottom}]{hasShellView}\n");
+                        
+                        EnumChildWindows(tophandle, debugFile);
+                    }
+                }
+                return true;
+            }), IntPtr.Zero);
+            
+            System.IO.File.AppendAllText(debugFile, "--------------------------------\n");
+        }
+        catch (Exception ex)
+        {
+            System.IO.File.AppendAllText(debugFile, $"Error in LogDesktopWindowTree: {ex.Message}\n");
+        }
+    }
+
+    private static void EnumChildWindows(IntPtr parent, string debugFile)
+    {
+        try
+        {
+            WindowsApi.EnumChildWindows(parent, new WindowsApi.EnumWindowsProc((childHandle, lParam) =>
+            {
+                StringBuilder className = new StringBuilder(256);
+                if (WindowsApi.GetClassName(childHandle, className, className.Capacity) > 0)
+                {
+                    int style = WindowsApi.GetWindowLong(childHandle, WindowsApi.GWL_STYLE);
+                    WindowsApi.RECT rect;
+                    WindowsApi.GetWindowRect(childHandle, out rect);
+                    bool isVisible = (style & 0x10000000) != 0;
+                    
+                    System.IO.File.AppendAllText(debugFile, 
+                        $"  -> Child - Handle: {childHandle}, Class: {className.ToString()}, Visible: {isVisible}, Style: 0x{style:X8}, Rect: [{rect.Left}, {rect.Top}, {rect.Right}, {rect.Bottom}]\n");
+                }
+                return true;
+            }), IntPtr.Zero);
+        }
+        catch { }
+    }
+
     public static void SetAsDesktopBackground(IntPtr hWnd)
     {
         string debugFile = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nythera", "monitor_debug.txt");
         
+        System.IO.File.AppendAllText(debugFile, $"\n--- SetAsDesktopBackground Start ---\n");
+        LogDesktopWindowTree(debugFile);
+
         IntPtr parentWindow = GetBestDesktopParent();
         System.IO.File.AppendAllText(debugFile, $"SetAsDesktopBackground called. hwnd={hWnd}, initial parentWindow={parentWindow}\n");
         
@@ -191,19 +261,35 @@ public class DesktopInterop
 
         if (parentWindow != IntPtr.Zero)
         {
-            // Update the window style to be a child window, removing borders etc.
-            int style = WindowsApi.GetWindowLong(hWnd, WindowsApi.GWL_STYLE);
+            int oldStyle = WindowsApi.GetWindowLong(hWnd, WindowsApi.GWL_STYLE);
+            
+            // Update the window style to be a child window, removing borders etc., and ensuring WS_VISIBLE
+            int style = oldStyle;
             style = (int)((style & ~(WindowsApi.WS_POPUP | WindowsApi.WS_CAPTION | WindowsApi.WS_THICKFRAME | WindowsApi.WS_BORDER)) 
-                          | WindowsApi.WS_CHILD | WindowsApi.WS_CLIPCHILDREN | WindowsApi.WS_CLIPSIBLINGS);
+                          | WindowsApi.WS_CHILD | 0x10000000 | WindowsApi.WS_CLIPCHILDREN | WindowsApi.WS_CLIPSIBLINGS);
+            
+            System.IO.File.AppendAllText(debugFile, $"Applying style. Old: 0x{oldStyle:X8}, New: 0x{style:X8}\n");
             WindowsApi.SetWindowLong(hWnd, WindowsApi.GWL_STYLE, style);
 
             // Set the parent of our window to the desktop parent
-            WindowsApi.SetParent(hWnd, parentWindow);
+            IntPtr prevParent = WindowsApi.SetParent(hWnd, parentWindow);
+            int errorCode = Marshal.GetLastWin32Error();
+            
+            System.IO.File.AppendAllText(debugFile, $"SetParent result: {prevParent}, LastError: {errorCode}\n");
+            
+            if (prevParent == IntPtr.Zero && errorCode != 0)
+            {
+                System.IO.File.AppendAllText(debugFile, $"[ERROR] SetParent failed with error code {errorCode}. Restoring old style.\n");
+                WindowsApi.SetWindowLong(hWnd, WindowsApi.GWL_STYLE, oldStyle);
+            }
         }
         else
         {
             System.IO.File.AppendAllText(debugFile, $"Failed to find any parent window. Keeping as is.\n");
         }
+
+        LogDesktopWindowTree(debugFile);
+        System.IO.File.AppendAllText(debugFile, $"--- SetAsDesktopBackground End ---\n\n");
     }
 
     public static void RestoreDesktop()

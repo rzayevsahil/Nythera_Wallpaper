@@ -303,6 +303,9 @@ public sealed partial class WallpaperWindow : Window
 
         // Force Win32 position again just in case WorkerW forces a relative offset
         WindowsApi.SetWindowPos(hwnd, IntPtr.Zero, x, y, width, height, 0x0200 | 0x0010); // SWP_NOOWNERZORDER | SWP_NOACTIVATE
+
+        // Ensure the window is visible
+        ShowWindow();
     }
 
     private Microsoft.UI.Xaml.Media.Animation.Storyboard _kenBurnsStoryboard;

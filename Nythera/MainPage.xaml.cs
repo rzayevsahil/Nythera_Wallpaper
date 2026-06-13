@@ -1572,6 +1572,11 @@ public sealed partial class MainPage : Page
                     imgSettings.LayoutMode = stretch;
                     
                     _ = wallpaperWindow.ApplyImageSettingsAsync(imgSettings);
+
+                    if (isNewWindow)
+                    {
+                        wallpaperWindow.ShowWindow();
+                    }
                 }
                 else
                 {
