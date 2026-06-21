@@ -81,6 +81,37 @@ public class DesktopInterop
         return IntPtr.Zero;
     }
 
+    private static bool IsValidWorkerW(IntPtr hWnd, IntPtr shellWindow)
+    {
+        if (hWnd == IntPtr.Zero || hWnd == shellWindow) return false;
+
+        System.Text.StringBuilder className = new System.Text.StringBuilder(256);
+        if (WindowsApi.GetClassName(hWnd, className, className.Capacity) > 0)
+        {
+            if (className.ToString() != "WorkerW") return false;
+        }
+        else
+        {
+            return false;
+        }
+
+        int style = WindowsApi.GetWindowLong(hWnd, WindowsApi.GWL_STYLE);
+        bool isVisible = (style & 0x10000000) != 0; // WS_VISIBLE
+        if (!isVisible) return false;
+
+        WindowsApi.RECT rect;
+        if (WindowsApi.GetWindowRect(hWnd, out rect))
+        {
+            int width = rect.Right - rect.Left;
+            int height = rect.Bottom - rect.Top;
+            if (width > 300 && height > 300)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static IntPtr TryWorkerWStrategy()
     {
         IntPtr progman = WindowsApi.FindWindow("Progman", null);
@@ -97,41 +128,73 @@ public class DesktopInterop
             1000,
             out result);
 
-        IntPtr workerW = IntPtr.Zero;
         IntPtr shellWindow = IntPtr.Zero;
 
+        // Find the window containing SHELLDLL_DefView (can be Progman or a WorkerW)
         WindowsApi.EnumWindows(new WindowsApi.EnumWindowsProc((tophandle, topparamhandle) =>
         {
             IntPtr p = WindowsApi.FindWindowEx(tophandle, IntPtr.Zero, "SHELLDLL_DefView", null);
             if (p != IntPtr.Zero)
             {
                 shellWindow = tophandle;
-                // The WorkerW we want is the sibling of the window that contains SHELLDLL_DefView
-                workerW = WindowsApi.FindWindowEx(IntPtr.Zero, tophandle, "WorkerW", null);
+                return false; // Found, stop enumerating
             }
             return true;
         }), IntPtr.Zero);
 
-        // Fallback: If sibling search failed but we found the shellWindow, 
-        // find any top-level WorkerW window that is not the shellWindow.
-        if (workerW == IntPtr.Zero && shellWindow != IntPtr.Zero)
+        if (shellWindow == IntPtr.Zero)
+        {
+            shellWindow = progman;
+        }
+
+        IntPtr foundWorkerW = IntPtr.Zero;
+
+        // 1. Fast Path: Check sibling of shellWindow
+        IntPtr sibling = WindowsApi.FindWindowEx(IntPtr.Zero, shellWindow, "WorkerW", null);
+        if (IsValidWorkerW(sibling, shellWindow))
+        {
+            foundWorkerW = sibling;
+        }
+
+        // 2. Fast Path: Check child of shellWindow (for Win11 setups where WorkerW is spawned under Progman)
+        if (foundWorkerW == IntPtr.Zero)
+        {
+            IntPtr child = WindowsApi.FindWindowEx(shellWindow, IntPtr.Zero, "WorkerW", null);
+            if (IsValidWorkerW(child, shellWindow))
+            {
+                foundWorkerW = child;
+            }
+        }
+
+        // 3. Fallback: Enumerate top-level windows to find any valid WorkerW
+        if (foundWorkerW == IntPtr.Zero)
         {
             WindowsApi.EnumWindows(new WindowsApi.EnumWindowsProc((tophandle, topparamhandle) =>
             {
-                System.Text.StringBuilder className = new System.Text.StringBuilder(256);
-                if (WindowsApi.GetClassName(tophandle, className, className.Capacity) > 0)
+                if (IsValidWorkerW(tophandle, shellWindow))
                 {
-                    if (className.ToString() == "WorkerW" && tophandle != shellWindow)
-                    {
-                        workerW = tophandle;
-                        return false; // Stop enumerating
-                    }
+                    foundWorkerW = tophandle;
+                    return false; // Stop enumerating
                 }
                 return true;
             }), IntPtr.Zero);
         }
 
-        return workerW;
+        // 4. Fallback: Enumerate child windows of shellWindow to find any valid WorkerW
+        if (foundWorkerW == IntPtr.Zero && shellWindow != IntPtr.Zero)
+        {
+            WindowsApi.EnumChildWindows(shellWindow, new WindowsApi.EnumWindowsProc((childHandle, lParam) =>
+            {
+                if (IsValidWorkerW(childHandle, shellWindow))
+                {
+                    foundWorkerW = childHandle;
+                    return false; // Stop enumerating
+                }
+                return true;
+            }), IntPtr.Zero);
+        }
+
+        return foundWorkerW;
     }
 
     private static IntPtr TryProgmanStrategy()
