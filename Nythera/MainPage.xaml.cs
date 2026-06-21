@@ -827,6 +827,7 @@ public sealed partial class MainPage : Page
         if (_selectedFile != null)
         {
             PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+            PreviewPlayer.MediaPlayer.CommandManager.IsEnabled = false;
             PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
             PreviewPlayer.MediaPlayer.Volume = 0;
             PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
@@ -1275,6 +1276,7 @@ public sealed partial class MainPage : Page
                     ApplyButton.IsEnabled = true;
                     
                     PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+                    PreviewPlayer.MediaPlayer.CommandManager.IsEnabled = false;
                     PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
                     PreviewPlayer.MediaPlayer.Volume = 0;
                     PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
@@ -1316,6 +1318,7 @@ public sealed partial class MainPage : Page
                 ApplyButton.IsEnabled = true;
                 
                 PreviewPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(_selectedFile);
+                PreviewPlayer.MediaPlayer.CommandManager.IsEnabled = false;
                 PreviewPlayer.MediaPlayer.IsLoopingEnabled = true;
                 PreviewPlayer.MediaPlayer.Volume = 0;
                 PreviewPlaceholderIcon.Visibility = Visibility.Collapsed;
