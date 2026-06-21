@@ -20,6 +20,7 @@ public sealed partial class WallpaperWindow : Window
         InitializeComponent();
         
         _mediaPlayer = new MediaPlayer();
+        _mediaPlayer.CommandManager.IsEnabled = false;
         _mediaPlayer.IsLoopingEnabled = true;
         _mediaPlayer.Volume = 0.0; // Mute by default
 
