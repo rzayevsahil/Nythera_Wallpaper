@@ -58,10 +58,26 @@ public class AudioCaptureService : IAudioCaptureService
             if (sample32 > max) max = sample32;
         }
 
-        // Mocking frequencies for MVP based on overall amplitude
-        _currentBass = max * 1.5f;
-        _currentMid = max * 1.0f;
-        _currentTreble = max * 0.8f;
+        // Mocking frequencies for MVP based on overall amplitude with EMA smoothing
+        float targetBass = max * 1.5f;
+        float targetMid = max * 1.0f;
+        float targetTreble = max * 0.8f;
+
+        // Apply EMA filter: slow attack to filter out transient pops/clicks, faster decay
+        if (targetBass > _currentBass)
+            _currentBass = _currentBass * 0.90f + targetBass * 0.10f;
+        else
+            _currentBass = _currentBass * 0.70f + targetBass * 0.30f;
+
+        if (targetMid > _currentMid)
+            _currentMid = _currentMid * 0.90f + targetMid * 0.10f;
+        else
+            _currentMid = _currentMid * 0.70f + targetMid * 0.30f;
+
+        if (targetTreble > _currentTreble)
+            _currentTreble = _currentTreble * 0.90f + targetTreble * 0.10f;
+        else
+            _currentTreble = _currentTreble * 0.70f + targetTreble * 0.30f;
     }
 
     public float GetBassLevel() => _currentBass;
